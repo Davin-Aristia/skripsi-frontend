@@ -1,8 +1,8 @@
 // import { Link } from "react-router-dom";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import Card from "@mui/material/Card";
 import Snackbar from "@mui/material/Snackbar";
@@ -20,63 +20,43 @@ import MDButton from "components/MDButton";
 
 export default function CreateBookForm() {
   // State to store form inputs
-  const { id } = useParams();
   const navigate = useNavigate();
   const { authToken } = useAuth();
 
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [name, setName] = useState("");
-  const [stock, setStock] = useState("");
-  const [minStock, setMinStock] = useState("");
+  const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
   const [price, setPrice] = useState("");
-  const [imagePreview, setImagePreview] = useState(null);
+  const [stock, setStock] = useState("");
 
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(null);
-
-  // Fetch data when the component mounts
-  useEffect(() => {
-    const fetchProductData = async () => {
-      try {
-        const response = await axios.get(`http://localhost:8080/products/${id}`);
-        const product = response.data.response;
-        setName(product.name);
-        setStock(product.stock);
-        setMinStock(product.min_stock);
-        setPrice(product.price);
-        setImagePreview(product.image);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching product data:", error);
-      }
-    };
-
-    fetchProductData();
-  }, [id]); // Dependency array includes `id` to refetch if the ID changes
 
   // Function to handle form submission
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent the default form submission behavior
 
-    const BookUpdate = {
-      name,
-      stock: parseInt(stock, 10), // Convert stock to an integer
-      min_stock: minStock,
+    // Create a new book object
+    const newBook = {
+      title,
+      author,
       price: parseFloat(price), // Convert price to a number
+      stock: parseInt(stock, 10), // Convert stock to an integer
     };
 
-    if (selectedFile) {
-      BookUpdate["image"] = selectedFile; // `selectedFile` should be the file object from input
-    }
-
     try {
-      const response = await axios.put(`http://localhost:8080/products/${id}`, BookUpdate, {
+      // Send POST request to the API
+      const response = await axios.post("http://localhost:8080/books", newBook, {
         headers: {
           Authorization: `Bearer ${authToken}`,
-          "Content-Type": "multipart/form-data",
         },
       });
-      // Handle success, e.g., show a success message or redirect
+
+      // Clear the form fields after submission
+      setTitle("");
+      setAuthor("");
+      setPrice("");
+      setStock("");
+
+      // Optionally refetch data or update the state to reflect the new book in the UI
       navigate("/product", {
         state: { message: response.data.message, severity: "success" },
       });
@@ -84,8 +64,6 @@ export default function CreateBookForm() {
       setError(error.response.data.message);
     }
   };
-
-  if (loading) return <div>Loading...</div>;
 
   return (
     <DashboardLayout>
@@ -100,6 +78,7 @@ export default function CreateBookForm() {
           {error}
         </Alert>
       </Snackbar>
+
       <Card sx={{ mt: 4 }}>
         <MDBox
           variant="gradient"
@@ -114,53 +93,27 @@ export default function CreateBookForm() {
           width="30%"
         >
           <MDTypography variant="h5" fontWeight="medium" color="white" mt={1}>
-            Edit Product
+            Create New Product
           </MDTypography>
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit}>
             <MDBox mb={2}>
-              {imagePreview && (
-                <MDBox mb={2}>
-                  <img
-                    src={imagePreview}
-                    alt="Product Image"
-                    style={{
-                      width: "100px",
-                      height: "100px",
-                      objectFit: "cover",
-                      borderRadius: "8px",
-                    }}
-                  />
-                </MDBox>
-              )}
-              <MDInput type="file" onChange={(e) => setSelectedFile(e.target.files[0])} />
-            </MDBox>
-            <MDBox mb={2}>
               <MDInput
                 type="text"
-                label="Name"
+                label="Title"
                 fullWidth
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </MDBox>
-            <MDBox mb={2}>
-              <MDInput
-                type="number"
-                label="Stock"
-                fullWidth
-                value={stock}
-                onChange={(e) => setStock(e.target.value)}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
               />
             </MDBox>
             <MDBox mb={2}>
               <MDInput
                 type="text"
-                label="MinStock"
+                label="Author"
                 fullWidth
-                value={minStock}
-                onChange={(e) => setMinStock(e.target.value)}
+                value={author}
+                onChange={(e) => setAuthor(e.target.value)}
               />
             </MDBox>
             <MDBox mb={2}>
@@ -170,6 +123,15 @@ export default function CreateBookForm() {
                 fullWidth
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
+              />
+            </MDBox>
+            <MDBox mb={2}>
+              <MDInput
+                type="number"
+                label="Stock"
+                fullWidth
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
               />
             </MDBox>
             <MDBox mt={4} mb={1}>

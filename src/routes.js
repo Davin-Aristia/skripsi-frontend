@@ -39,6 +39,7 @@ Coded by www.creative-tim.com
 import Dashboard from "layouts/dashboard";
 import Tables from "layouts/tables";
 import Product from "custom-layouts/product";
+import ProductCategory from "custom-layouts/product-category";
 import Billing from "layouts/billing";
 // import RTL from "layouts/rtl";
 import Notifications from "layouts/notifications";
@@ -49,6 +50,7 @@ import SignUp from "layouts/authentication/sign-up";
 
 //sub-route
 import productRoutes from "custom-layouts/product/routes";
+import productCategoryRoutes from "custom-layouts/product-category/routes";
 import SignInCustom from "custom-layouts/authentication/sign-in";
 
 // @mui icons
@@ -56,6 +58,7 @@ import Icon from "@mui/material/Icon";
 
 const routes = [
   ...productRoutes,
+  ...productCategoryRoutes,
   {
     type: "collapse",
     name: "Dashboard",
@@ -81,6 +84,18 @@ const routes = [
         ),
         route: "/product",
         component: <Product />,
+      },
+      {
+        type: "collapse",
+        name: "Product Category",
+        key: "product-category",
+        icon: (
+          <Icon fontSize="small" style={{ marginLeft: "30px" }}>
+            shopping_cart
+          </Icon>
+        ),
+        route: "/product-category",
+        component: <ProductCategory />,
       },
       {
         type: "collapse",

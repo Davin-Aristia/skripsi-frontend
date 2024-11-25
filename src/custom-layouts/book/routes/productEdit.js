@@ -23,13 +23,10 @@ export default function CreateBookForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { authToken } = useAuth();
-
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [name, setName] = useState("");
-  const [stock, setStock] = useState("");
-  const [minStock, setMinStock] = useState("");
+  const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
   const [price, setPrice] = useState("");
-  const [imagePreview, setImagePreview] = useState(null);
+  const [stock, setStock] = useState("");
 
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(null);
@@ -38,13 +35,12 @@ export default function CreateBookForm() {
   useEffect(() => {
     const fetchProductData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/products/${id}`);
+        const response = await axios.get(`http://localhost:8080/books/${id}`);
         const product = response.data.response;
-        setName(product.name);
-        setStock(product.stock);
-        setMinStock(product.min_stock);
+        setTitle(product.title);
+        setAuthor(product.author);
         setPrice(product.price);
-        setImagePreview(product.image);
+        setStock(product.stock);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching product data:", error);
@@ -57,25 +53,21 @@ export default function CreateBookForm() {
   // Function to handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const BookUpdate = {
-      name,
-      stock: parseInt(stock, 10), // Convert stock to an integer
-      min_stock: minStock,
-      price: parseFloat(price), // Convert price to a number
-    };
-
-    if (selectedFile) {
-      BookUpdate["image"] = selectedFile; // `selectedFile` should be the file object from input
-    }
-
     try {
-      const response = await axios.put(`http://localhost:8080/products/${id}`, BookUpdate, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          "Content-Type": "multipart/form-data",
+      const response = await axios.put(
+        `http://localhost:8080/books/${id}`,
+        {
+          title,
+          author,
+          price: parseFloat(price),
+          stock: parseInt(stock),
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
       // Handle success, e.g., show a success message or redirect
       navigate("/product", {
         state: { message: response.data.message, severity: "success" },
@@ -120,47 +112,21 @@ export default function CreateBookForm() {
         <MDBox pt={4} pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit}>
             <MDBox mb={2}>
-              {imagePreview && (
-                <MDBox mb={2}>
-                  <img
-                    src={imagePreview}
-                    alt="Product Image"
-                    style={{
-                      width: "100px",
-                      height: "100px",
-                      objectFit: "cover",
-                      borderRadius: "8px",
-                    }}
-                  />
-                </MDBox>
-              )}
-              <MDInput type="file" onChange={(e) => setSelectedFile(e.target.files[0])} />
-            </MDBox>
-            <MDBox mb={2}>
               <MDInput
                 type="text"
-                label="Name"
+                label="Title"
                 fullWidth
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </MDBox>
-            <MDBox mb={2}>
-              <MDInput
-                type="number"
-                label="Stock"
-                fullWidth
-                value={stock}
-                onChange={(e) => setStock(e.target.value)}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
               />
             </MDBox>
             <MDBox mb={2}>
               <MDInput
                 type="text"
-                label="MinStock"
+                label="Author"
                 fullWidth
-                value={minStock}
-                onChange={(e) => setMinStock(e.target.value)}
+                value={author}
+                onChange={(e) => setAuthor(e.target.value)}
               />
             </MDBox>
             <MDBox mb={2}>
@@ -172,9 +138,18 @@ export default function CreateBookForm() {
                 onChange={(e) => setPrice(e.target.value)}
               />
             </MDBox>
+            <MDBox mb={2}>
+              <MDInput
+                type="number"
+                label="Stock"
+                fullWidth
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+              />
+            </MDBox>
             <MDBox mt={4} mb={1}>
               <MDButton variant="gradient" color="info" fullWidth type="submit">
-                create
+                edit
               </MDButton>
             </MDBox>
           </MDBox>

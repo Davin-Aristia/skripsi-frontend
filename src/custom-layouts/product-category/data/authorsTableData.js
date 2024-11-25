@@ -42,7 +42,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 export default function data({ setAlert, query }) {
-  const [products, setProducts] = useState([]);
+  const [productCategories, setProductCategories] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [loading, setLoading] = useState(true);
@@ -52,11 +52,11 @@ export default function data({ setAlert, query }) {
   const { darkMode } = controller;
 
   const fetchData = async () => {
-    let link = `http://localhost:8080/products`;
+    let link = `http://localhost:8080/product-categories`;
     axios
       .get(link)
       .then((response) => {
-        setProducts(response.data.response || []);
+        setProductCategories(response.data.response || []);
         setLoading(false);
       })
       .catch((error) => {
@@ -78,73 +78,70 @@ export default function data({ setAlert, query }) {
     setCurrentPage(1);
   };
 
-  const deleteProduct = async (productId) => {
+  const deleteProductCategory = async (productCategoryId) => {
     try {
-      await axios.delete(`http://localhost:8080/products/${productId}`, {
+      await axios.delete(`http://localhost:8080/product-categories/${productCategoryId}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
       });
-      // Refresh the product list after deletion
-      // setProducts((prevProducts) => prevProducts.filter((product) => product.id !== productId));
+      // Refresh the book list after deletion
+      // setProductCategories((prevBooks) => prevBooks.filter((book) => book.id !== bookId));
       fetchData();
 
       // Check if the current page is empty after deletion
-      const updatedProducts = products.filter((product) => product.id !== productId);
+      const updatedProductCategories = productCategories.filter(
+        (productCategory) => productCategory.id !== productCategoryId
+      );
       const startIndex = (currentPage - 1) * pageSize;
-      const currentPageProducts = updatedProducts.slice(startIndex, startIndex + pageSize);
-      if (currentPageProducts.length === 0 && currentPage > 1) {
+      const currentPageProductCategories = updatedProductCategories.slice(
+        startIndex,
+        startIndex + pageSize
+      );
+      if (currentPageProductCategories.length === 0 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
       }
 
       setAlert({
         open: true,
         severity: "success",
-        message: "Product deleted successfully!",
+        message: "Product Category deleted successfully!",
       });
     } catch (error) {
-      console.error("Error deleting the product:", error);
+      console.error("Error deleting product category:", error);
       setAlert({
         open: true,
         severity: "error",
-        message: "Failed to delete the product.",
+        message: "Failed to delete product category.",
       });
     }
   };
 
   const columns = [
-    { Header: "name", accessor: "name", width: "30%", align: "left" },
-    { Header: "stock", accessor: "stock", align: "left" },
-    { Header: "min_stock", accessor: "min_stock", align: "center" },
-    { Header: "price", accessor: "price", align: "center" },
+    { Header: "name", accessor: "name", align: "left" },
+    { Header: "description", accessor: "description", align: "left" },
     { Header: "action", accessor: "action", align: "center" },
   ];
 
-  const rows = products.map((product) => ({
-    name: product.name,
-    // name: (
-    //   <MDBox display="flex" alignItems="center" lineHeight={1}>
-    //     <MDAvatar src={product.image} name={product.name} size="sm" />
-    //     <MDTypography display="block" variant="button" fontWeight="medium" ml={1} lineHeight={1}>
-    //       {product.name}
-    //     </MDTypography>
-    //   </MDBox>
-    // ),
-    stock: product.stock, // or another appropriate field
-    min_stock: product.min_stock,
-    price: `Rp ${new Intl.NumberFormat("id-ID", {
-      style: "decimal",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(product.price)}`,
+  const rows = productCategories.map((productCategory) => ({
+    name: productCategory.name,
+    description: productCategory.description,
     action: (
       <MDBox display="flex" alignItems="center" mt={{ xs: 2, sm: 0 }} ml={{ xs: -1.5, sm: 0 }}>
-        <NavLink to={`/product/${product.id}/edit`} style={{ textDecoration: "none" }}>
+        <NavLink
+          to={`/product-category/${productCategory.id}/edit`}
+          style={{ textDecoration: "none" }}
+        >
           <MDButton variant="text" color={darkMode ? "white" : "dark"} iconOnly>
             <Icon>edit</Icon>
           </MDButton>
         </NavLink>
-        <MDButton variant="text" color="error" iconOnly onClick={() => deleteProduct(product.id)}>
+        <MDButton
+          variant="text"
+          color="error"
+          iconOnly
+          onClick={() => deleteProductCategory(productCategory.id)}
+        >
           <Icon>delete</Icon>
         </MDButton>
       </MDBox>
@@ -155,10 +152,8 @@ export default function data({ setAlert, query }) {
     <DataTable
       table={{ columns, rows }}
       isSorted={true}
-      // entriesPerPage={{ defaultValue: pageSize }}
-      entriesPerPage={false}
+      entriesPerPage={{ defaultValue: pageSize }}
       showTotalEntries={true}
-      canSearch={true}
       noEndBorder
       currentPage={currentPage}
       onPageChange={handlePageChange}

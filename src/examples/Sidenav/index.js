@@ -126,7 +126,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
               <SidenavCollapse
                 name={name}
                 icon={icon}
-                active={location.pathname.startsWith(route)}
+                active={location.pathname === route || location.pathname.startsWith(`${route}/`)}
                 // active={key === collapseName}
                 noCollapse={noCollapse}
               />
@@ -138,7 +138,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
               <SidenavCollapse
                 name={name}
                 icon={icon}
-                active={location.pathname.startsWith(route)}
+                active={location.pathname === route || location.pathname.startsWith(`${route}/`)}
               />
             </NavLink>
           );
@@ -152,7 +152,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
               <SidenavCollapse
                 name={name}
                 icon={icon}
-                active={location.pathname.startsWith(route)}
+                active={location.pathname === route || location.pathname.startsWith(`${route}/`)}
                 onClick={handleClick}
                 hasChild={true}
               />
@@ -186,7 +186,10 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
                           <SidenavCollapse
                             name={subName}
                             icon={subIcon}
-                            active={location.pathname.startsWith(route)}
+                            active={
+                              location.pathname === route ||
+                              location.pathname.startsWith(`${route}/`)
+                            }
                           />
                           {/* </ListItemButton> */}
                         </NavLink>

@@ -23,10 +23,11 @@ export default function CreateBookForm() {
   const navigate = useNavigate();
   const { authToken } = useAuth();
 
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [price, setPrice] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [name, setName] = useState("");
   const [stock, setStock] = useState("");
+  const [minStock, setMinStock] = useState("");
+  const [price, setPrice] = useState("");
 
   const [error, setError] = useState(null);
 
@@ -36,25 +37,31 @@ export default function CreateBookForm() {
 
     // Create a new book object
     const newBook = {
-      title,
-      author,
-      price: parseFloat(price), // Convert price to a number
+      name,
       stock: parseInt(stock, 10), // Convert stock to an integer
+      min_stock: minStock,
+      price: parseFloat(price), // Convert price to a number
     };
+
+    if (selectedFile) {
+      newBook["image"] = selectedFile; // `selectedFile` should be the file object from input
+    }
 
     try {
       // Send POST request to the API
-      const response = await axios.post("http://localhost:8080/books", newBook, {
+      const response = await axios.post("http://localhost:8080/products", newBook, {
         headers: {
           Authorization: `Bearer ${authToken}`,
+          "Content-Type": "multipart/form-data",
         },
       });
 
       // Clear the form fields after submission
-      setTitle("");
-      setAuthor("");
-      setPrice("");
+      setSelectedFile(null);
+      setName("");
       setStock("");
+      setMinStock("");
+      setPrice("");
 
       // Optionally refetch data or update the state to reflect the new book in the UI
       navigate("/product", {
@@ -62,6 +69,7 @@ export default function CreateBookForm() {
       });
     } catch (error) {
       setError(error.response.data.message);
+      console.log(error.response.data.response);
     }
   };
 
@@ -93,36 +101,21 @@ export default function CreateBookForm() {
           width="30%"
         >
           <MDTypography variant="h5" fontWeight="medium" color="white" mt={1}>
-            Create New Product
+            Add New Product
           </MDTypography>
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit}>
             <MDBox mb={2}>
-              <MDInput
-                type="text"
-                label="Title"
-                fullWidth
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
+              <MDInput type="file" onChange={(e) => setSelectedFile(e.target.files[0])} />
             </MDBox>
             <MDBox mb={2}>
               <MDInput
                 type="text"
-                label="Author"
+                label="Name"
                 fullWidth
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
-              />
-            </MDBox>
-            <MDBox mb={2}>
-              <MDInput
-                type="number"
-                label="Price"
-                fullWidth
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
             </MDBox>
             <MDBox mb={2}>
@@ -132,6 +125,24 @@ export default function CreateBookForm() {
                 fullWidth
                 value={stock}
                 onChange={(e) => setStock(e.target.value)}
+              />
+            </MDBox>
+            <MDBox mb={2}>
+              <MDInput
+                type="text"
+                label="MinStock"
+                fullWidth
+                value={minStock}
+                onChange={(e) => setMinStock(e.target.value)}
+              />
+            </MDBox>
+            <MDBox mb={2}>
+              <MDInput
+                type="number"
+                label="Price"
+                fullWidth
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
               />
             </MDBox>
             <MDBox mt={4} mb={1}>
