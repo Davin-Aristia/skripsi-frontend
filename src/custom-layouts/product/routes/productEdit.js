@@ -7,6 +7,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
 
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
@@ -24,11 +26,14 @@ export default function CreateBookForm() {
   const navigate = useNavigate();
   const { authToken } = useAuth();
 
-  const [selectedFile, setSelectedFile] = useState(null);
   const [name, setName] = useState("");
   const [stock, setStock] = useState("");
   const [minStock, setMinStock] = useState("");
   const [price, setPrice] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState([]);
+
+  const [categories, setCategories] = useState([]);
   const [imagePreview, setImagePreview] = useState(null);
 
   const [error, setError] = useState(null);
@@ -45,6 +50,14 @@ export default function CreateBookForm() {
         setMinStock(product.min_stock);
         setPrice(product.price);
         setImagePreview(product.image);
+
+        const categoriesResponse = await axios.get(`http://localhost:8080/product-categories`);
+        const productCategories = categoriesResponse.data.response;
+        setCategories(productCategories);
+        setSelectedCategory(
+          productCategories.find((category) => category.id === product.category_id)
+        );
+
         setLoading(false);
       } catch (error) {
         console.error("Error fetching product data:", error);
@@ -64,6 +77,10 @@ export default function CreateBookForm() {
       min_stock: minStock,
       price: parseFloat(price), // Convert price to a number
     };
+
+    if (selectedCategory) {
+      BookUpdate["category_id"] = selectedCategory.id; // `selectedFile` should be the file object from input
+    }
 
     if (selectedFile) {
       BookUpdate["image"] = selectedFile; // `selectedFile` should be the file object from input
@@ -143,6 +160,22 @@ export default function CreateBookForm() {
                 fullWidth
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+              />
+            </MDBox>
+            <MDBox mb={2}>
+              <Autocomplete
+                disablePortal
+                value={selectedCategory}
+                onChange={(_event, newValue) => setSelectedCategory(newValue)}
+                options={categories}
+                getOptionLabel={(option) => option.name}
+                sx={{
+                  width: 300,
+                  "& .MuiInputLabel-root": {
+                    lineHeight: "1.5", // Adjust the line height for proper vertical alignment
+                  },
+                }}
+                renderInput={(params) => <TextField {...params} label="Select Category" />}
               />
             </MDBox>
             <MDBox mb={2}>

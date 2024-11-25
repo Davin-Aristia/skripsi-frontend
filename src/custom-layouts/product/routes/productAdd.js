@@ -1,12 +1,14 @@
 // import { Link } from "react-router-dom";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 import Card from "@mui/material/Card";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+// import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
 
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
@@ -23,13 +25,29 @@ export default function CreateBookForm() {
   const navigate = useNavigate();
   const { authToken } = useAuth();
 
-  const [selectedFile, setSelectedFile] = useState(null);
   const [name, setName] = useState("");
   const [stock, setStock] = useState("");
   const [minStock, setMinStock] = useState("");
   const [price, setPrice] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState([]);
 
+  const [categories, setCategories] = useState([]);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchProductData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8080/product-categories`);
+        const productCategories = response.data.response;
+        setCategories(productCategories);
+      } catch (error) {
+        console.error("Error fetching product categories:", error);
+      }
+    };
+
+    fetchProductData();
+  }, []);
 
   // Function to handle form submission
   const handleSubmit = async (e) => {
@@ -38,6 +56,7 @@ export default function CreateBookForm() {
     // Create a new book object
     const newBook = {
       name,
+      category_id: selectedCategory.id,
       stock: parseInt(stock, 10), // Convert stock to an integer
       min_stock: minStock,
       price: parseFloat(price), // Convert price to a number
@@ -116,6 +135,21 @@ export default function CreateBookForm() {
                 fullWidth
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+              />
+            </MDBox>
+            <MDBox mb={2}>
+              <Autocomplete
+                disablePortal
+                onChange={(_event, newValue) => setSelectedCategory(newValue)}
+                options={categories}
+                getOptionLabel={(option) => option.name}
+                sx={{
+                  width: 300,
+                  "& .MuiInputLabel-root": {
+                    lineHeight: "1.5", // Adjust the line height for proper vertical alignment
+                  },
+                }}
+                renderInput={(params) => <MDInput {...params} label="Select Category" />}
               />
             </MDBox>
             <MDBox mb={2}>
