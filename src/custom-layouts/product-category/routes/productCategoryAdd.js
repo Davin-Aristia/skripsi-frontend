@@ -23,18 +23,27 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
 import { useAuth } from "custom-layouts/authentication";
-import DataTable from "examples/Tables/DataTable";
 
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+
 export default function CreateProductCategoryForm() {
   const navigate = useNavigate();
   const { authToken } = useAuth();
 
   const [name, setName] = useState("");
+  const [specs, setSpecs] = useState([]);
+  const [specsName, setSpecsName] = useState("");
   const [description, setDescription] = useState("");
 
   const [error, setError] = useState(null);
@@ -48,6 +57,7 @@ export default function CreateProductCategoryForm() {
     const newProductCategory = {
       name,
       description,
+      specifications: specs,
     };
 
     try {
@@ -78,32 +88,24 @@ export default function CreateProductCategoryForm() {
   const handleOpenWizard = () => setOpen(true);
   const handleCloseWizard = () => {
     setOpen(false);
-    // setFromDate(null);
-    // setToDate(null);
+    setSpecsName("");
   };
 
-  const columns = [
-    { Header: "specifications", accessor: "specifications", align: "left" },
-    { Header: "action", accessor: "action", align: "center" },
-  ];
+  const handleCreate = () => {
+    const newData = [...specs, { name: specsName }];
+    setSpecs(newData);
+    handleCloseWizard();
+  };
 
-  const rows = [
-    {
-      specifications: "Processor",
-      action: (
-        <MDBox display="flex" alignItems="center" mt={{ xs: 2, sm: 0 }} ml={{ xs: -1.5, sm: 0 }}>
-          <MDButton
-            variant="text"
-            color="error"
-            iconOnly
-            // onClick={() => deleteProductCategory(productCategory.id)}
-          >
-            <Icon>delete</Icon>
-          </MDButton>
-        </MDBox>
-      ),
-    },
-  ];
+  const handleDelete = (index) => {
+    const updatedData = specs.filter((_, i) => i !== index);
+    setSpecs(updatedData);
+  };
+
+  const handleEdit = (index, newValue) => {
+    const updatedSpecs = specs.map((spec, i) => (i === index ? { ...spec, name: newValue } : spec));
+    setSpecs(updatedSpecs); // Update the state with the modified specifications
+  };
 
   return (
     <DashboardLayout>
@@ -118,7 +120,7 @@ export default function CreateProductCategoryForm() {
         <DialogTitle>
           <Box display="flex" justifyContent="space-between" alignItems="center">
             <span>Add New Specifications</span>
-            <IconButton aria-label="close" onClick={() => setOpen(false)}>
+            <IconButton aria-label="close" onClick={handleCloseWizard}>
               <CloseIcon />
             </IconButton>
           </Box>
@@ -130,15 +132,15 @@ export default function CreateProductCategoryForm() {
                 type="text"
                 label="Name"
                 fullWidth
-                value={name}
-                onChange={(e) => Name(e.target.value)}
+                value={specsName}
+                onChange={(e) => setSpecsName(e.target.value)}
               />
             </MDBox>
           </MDBox>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseWizard}>Cancel</Button>
-          {/* <Button onClick={handleExport}>Create</Button> */}
+          <Button onClick={handleCreate}>Create</Button>
         </DialogActions>
       </Dialog>
       <Snackbar
@@ -189,10 +191,89 @@ export default function CreateProductCategoryForm() {
                 onChange={(e) => setDescription(e.target.value)}
               />
             </MDBox>
-            <DataTable table={{ columns, rows }} isSorted={false} showTotalEntries={false} />
-            <Button variant="contained" onClick={handleOpenWizard} sx={{ color: "white" }}>
+            {/* <DataTable table={{ columns, rows }} isSorted={false} showTotalEntries={false} /> */}
+            <TableContainer component={Paper}>
+              <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+                <MDBox component="thead">
+                  <TableRow>
+                    <MDBox
+                      component="th"
+                      width="auto"
+                      py={1.5}
+                      px={3}
+                      sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                        borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                      })}
+                    >
+                      Specifications
+                    </MDBox>
+                    <MDBox
+                      component="th"
+                      width="auto"
+                      py={1.5}
+                      px={3}
+                      sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                        borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                      })}
+                    >
+                      Action
+                    </MDBox>
+                  </TableRow>
+                </MDBox>
+                <TableBody>
+                  {specs.map((specification, index) => (
+                    <TableRow
+                      key={index}
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    >
+                      <TableCell component="th" scope="row">
+                        <input
+                          type="text"
+                          value={specification.name}
+                          onChange={(e) => handleEdit(index, e.target.value)}
+                          style={{
+                            width: "100%",
+                            border: "1px solid lightgray",
+                            background: "transparent",
+                            outline: "none",
+                            padding: "5px",
+                            borderRadius: "4px",
+                            cursor: "text",
+                          }}
+                        />
+                        {/* <input
+                          type="text"
+                          value={specification.name}
+                          onChange={(e) => handleEdit(index, e.target.value)}
+                          style={{
+                            width: "100%",
+                            border: "1px solid lightblue",
+                            background: "rgba(173, 216, 230, 0.2)", // light blue background
+                            outline: "none",
+                            padding: "5px",
+                            borderRadius: "4px",
+                            cursor: "text",
+                          }}
+                        /> */}
+                      </TableCell>
+                      <TableCell align="right">
+                        <MDButton
+                          variant="text"
+                          color="error"
+                          iconOnly
+                          onClick={() => handleDelete(index)}
+                        >
+                          <Icon>delete</Icon>
+                        </MDButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <MDButton variant="gradient" color="info" onClick={handleOpenWizard}>
               + Create
-            </Button>
+            </MDButton>
             <MDBox mt={4} mb={1}>
               <MDButton variant="gradient" color="info" fullWidth type="submit">
                 create

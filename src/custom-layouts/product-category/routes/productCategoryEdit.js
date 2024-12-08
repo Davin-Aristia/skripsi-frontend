@@ -3,15 +3,32 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-import Card from "@mui/material/Card";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
-import Icon from "@mui/material/Icon";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+  Box,
+  Button,
+  Card,
+  Icon,
+  Snackbar,
+  Alert,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
 
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-import DataTable from "examples/Tables/DataTable";
 
 import { useAuth } from "custom-layouts/authentication";
 
@@ -26,10 +43,13 @@ export default function CreateBookForm() {
   const navigate = useNavigate();
   const { authToken } = useAuth();
   const [name, setName] = useState("");
+  const [specsName, setSpecsName] = useState("");
   const [description, setDescription] = useState("");
   const [specifications, setSpecifications] = useState([]);
+  const [newId, setNewId] = useState(1);
 
   const [error, setError] = useState(null);
+  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(null);
 
   // Fetch data when the component mounts
@@ -41,6 +61,7 @@ export default function CreateBookForm() {
         setName(product.name);
         setDescription(product.description);
         setSpecifications(product.specifications || []);
+        console.log(product.specifications);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching product category:", error);
@@ -76,32 +97,68 @@ export default function CreateBookForm() {
     }
   };
 
+  const handleOpenWizard = () => setOpen(true);
+  const handleCloseWizard = () => {
+    setOpen(false);
+    setSpecsName("");
+  };
+
+  const handleCreate = () => {
+    const newData = [...specifications, { name: specsName }];
+    setSpecifications(newData);
+    handleCloseWizard();
+  };
+
+  const handleEdit = (index, newValue) => {
+    const updatedData = specifications.map((spec, i) =>
+      i === index ? { ...spec, name: newValue } : spec
+    );
+    setSpecifications(updatedData); // Update the state with the modified specifications
+  };
+
+  const handleDelete = (index) => {
+    const updatedData = specifications.filter((_, i) => i !== index);
+    setSpecifications(updatedData);
+  };
+
   if (loading) return <div>Loading...</div>;
-
-  const columns = [
-    { Header: "specifications", accessor: "specifications", align: "left" },
-    { Header: "action", accessor: "action", align: "center" },
-  ];
-
-  const rows = specifications.map((specification) => ({
-    specifications: specification.name,
-    action: (
-      <MDBox display="flex" alignItems="center" mt={{ xs: 2, sm: 0 }} ml={{ xs: -1.5, sm: 0 }}>
-        <MDButton
-          variant="text"
-          color="error"
-          iconOnly
-          // onClick={() => deleteProductCategory(productCategory.id)}
-        >
-          <Icon>delete</Icon>
-        </MDButton>
-      </MDBox>
-    ),
-  }));
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
+      <Dialog
+        open={open}
+        onClose={handleCloseWizard}
+        PaperProps={{
+          sx: { width: "30%", maxWidth: "none" },
+        }}
+      >
+        <DialogTitle>
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <span>Add New Specifications</span>
+            <IconButton aria-label="close" onClick={handleCloseWizard}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <DialogContent dividers>
+          <MDBox component="form" role="form" onSubmit={handleSubmit}>
+            <MDBox mb={2} mt={2}>
+              <MDInput
+                type="text"
+                label="Name"
+                fullWidth
+                value={specsName}
+                onChange={(e) => setSpecsName(e.target.value)}
+              />
+            </MDBox>
+          </MDBox>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseWizard}>Cancel</Button>
+          <Button onClick={handleCreate}>Create</Button>
+        </DialogActions>
+      </Dialog>
       <Snackbar
         open={Boolean(error)}
         autoHideDuration={4000}
@@ -149,7 +206,98 @@ export default function CreateBookForm() {
                 onChange={(e) => setDescription(e.target.value)}
               />
             </MDBox>
-            <DataTable table={{ columns, rows }} isSorted={false} showTotalEntries={false} />
+            {/* <DataTable
+              table={{ columns, rows }}
+              isSorted={false}
+              showTotalEntries={false}
+              entriesPerPage={false}
+            /> */}
+
+            <TableContainer component={Paper}>
+              <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+                <MDBox component="thead">
+                  <TableRow>
+                    <MDBox
+                      component="th"
+                      width="auto"
+                      py={1.5}
+                      px={3}
+                      sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                        borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                      })}
+                    >
+                      Specifications
+                    </MDBox>
+                    <MDBox
+                      component="th"
+                      width="auto"
+                      py={1.5}
+                      px={3}
+                      sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                        borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                      })}
+                    >
+                      Action
+                    </MDBox>
+                  </TableRow>
+                </MDBox>
+                <TableBody>
+                  {specifications.map((specification, index) => (
+                    <TableRow
+                      key={index}
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    >
+                      <TableCell component="th" scope="row">
+                        <input
+                          type="text"
+                          value={specification.name}
+                          onChange={(e) => handleEdit(index, e.target.value)}
+                          style={{
+                            width: "100%",
+                            border: "1px solid lightgray",
+                            background: "transparent",
+                            outline: "none",
+                            padding: "5px",
+                            borderRadius: "4px",
+                            cursor: "text",
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell align="right">
+                        <MDButton
+                          variant="text"
+                          color="error"
+                          iconOnly
+                          onClick={() => handleDelete(index)}
+                        >
+                          <Icon>delete</Icon>
+                        </MDButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            {/* <table className="table bordered">
+              <thead>
+                <tr>
+                  <th>Specifications</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {specifications.map((specification) => (
+                  <tr key={specification.id}>
+                    <td>{specification.name}</td>
+                    <td>{specification.name}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table> */}
+            <MDButton variant="gradient" color="info" onClick={handleOpenWizard}>
+              + Create
+            </MDButton>
             <MDBox mt={4} mb={1}>
               <MDButton variant="gradient" color="info" fullWidth type="submit">
                 edit

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 // import MainLayout from "../layouts/MainLayout";
-// import axios from "axios";
+import axios from "axios";
 import { toast } from "react-toastify";
 import { ComponentToPrint } from "printout/Checkout";
 import { useReactToPrint } from "react-to-print";
@@ -22,59 +22,59 @@ function POSPage() {
 
   const fetchProducts = async () => {
     setIsLoading(true);
-    // const result = await axios.get('products');
-    // setProducts(await result.data);
-    const result = [
-      {
-        id: 123,
-        name: "orange",
-        price: "2",
-        image: "https://cdn.pixabay.com/photo/2017/01/20/15/06/oranges-1995056_960_720.jpg",
-      },
-      {
-        id: 131,
-        name: "Milk",
-        price: "3",
-        image: "https://cdn.pixabay.com/photo/2018/03/16/16/42/milk-3231772_960_720.jpg",
-      },
-      {
-        id: 132,
-        name: "Ice Cream",
-        price: "4",
-        image: "https://cdn.pixabay.com/photo/2016/12/26/16/09/bowl-1932375_960_720.jpg",
-      },
-      {
-        id: 133,
-        name: "Salmon",
-        price: "10",
-        image: "https://cdn.pixabay.com/photo/2021/01/05/23/18/salmon-5892659_960_720.jpg",
-      },
-      {
-        id: 134,
-        name: "Watermelon",
-        price: "2",
-        image: "https://cdn.pixabay.com/photo/2015/09/27/18/18/watermelons-961128_960_720.jpg",
-      },
-      {
-        id: 173,
-        name: "Salmon",
-        price: "10",
-        image: "https://cdn.pixabay.com/photo/2021/01/05/23/18/salmon-5892659_960_720.jpg",
-      },
-      {
-        id: 174,
-        name: "Watermelon",
-        price: "2",
-        image: "https://cdn.pixabay.com/photo/2015/09/27/18/18/watermelons-961128_960_720.jpg",
-      },
-      {
-        id: 135,
-        name: "Potato",
-        price: "4",
-        image: "https://cdn.pixabay.com/photo/2016/08/11/08/43/potatoes-1585060_960_720.jpg",
-      },
-    ];
-    setProducts(result);
+    const result = await axios.get("http://localhost:8080/products");
+    setProducts(await result.data.response);
+    // const result = [
+    //   {
+    //     id: 123,
+    //     name: "orange",
+    //     price: "2",
+    //     image: "https://cdn.pixabay.com/photo/2017/01/20/15/06/oranges-1995056_960_720.jpg",
+    //   },
+    //   {
+    //     id: 131,
+    //     name: "Milk",
+    //     price: "3",
+    //     image: "https://cdn.pixabay.com/photo/2018/03/16/16/42/milk-3231772_960_720.jpg",
+    //   },
+    //   {
+    //     id: 132,
+    //     name: "Ice Cream",
+    //     price: "4",
+    //     image: "https://cdn.pixabay.com/photo/2016/12/26/16/09/bowl-1932375_960_720.jpg",
+    //   },
+    //   {
+    //     id: 133,
+    //     name: "Salmon",
+    //     price: "10",
+    //     image: "https://cdn.pixabay.com/photo/2021/01/05/23/18/salmon-5892659_960_720.jpg",
+    //   },
+    //   {
+    //     id: 134,
+    //     name: "Watermelon",
+    //     price: "2",
+    //     image: "https://cdn.pixabay.com/photo/2015/09/27/18/18/watermelons-961128_960_720.jpg",
+    //   },
+    //   {
+    //     id: 173,
+    //     name: "Salmon",
+    //     price: "10",
+    //     image: "https://cdn.pixabay.com/photo/2021/01/05/23/18/salmon-5892659_960_720.jpg",
+    //   },
+    //   {
+    //     id: 174,
+    //     name: "Watermelon",
+    //     price: "2",
+    //     image: "https://cdn.pixabay.com/photo/2015/09/27/18/18/watermelons-961128_960_720.jpg",
+    //   },
+    //   {
+    //     id: 135,
+    //     name: "Potato",
+    //     price: "4",
+    //     image: "https://cdn.pixabay.com/photo/2016/08/11/08/43/potatoes-1585060_960_720.jpg",
+    //   },
+    // ];
+    // setProducts(result);
     setIsLoading(false);
   };
 
@@ -146,7 +146,7 @@ function POSPage() {
     <DashboardLayout>
       <DashboardNavbar />
       <div className="row">
-        <div className="col-lg-8">
+        <div className="col-lg-6">
           {isLoading ? (
             "Loading"
           ) : (
@@ -166,7 +166,7 @@ function POSPage() {
             </div>
           )}
         </div>
-        <div className="col-lg-4">
+        <div className="col-lg-6">
           <div style={{ display: "none" }}>
             <ComponentToPrint cart={cart} totalAmount={totalAmount} ref={componentRef} />
           </div>
