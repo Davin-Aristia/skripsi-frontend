@@ -214,7 +214,15 @@ export default function CreateBookForm() {
             /> */}
 
             <TableContainer component={Paper}>
-              <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+              {/* <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table"> */}
+              <Table
+                sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                  borderTop: `${borderWidth[1]} solid ${light.main}`,
+                  minWidth: 650,
+                })}
+                size="small"
+                aria-label="a dense table"
+              >
                 <MDBox component="thead">
                   <TableRow>
                     <MDBox
@@ -263,7 +271,7 @@ export default function CreateBookForm() {
                           }}
                         />
                       </TableCell>
-                      <TableCell align="right">
+                      <TableCell align="center">
                         <MDButton
                           variant="text"
                           color="error"

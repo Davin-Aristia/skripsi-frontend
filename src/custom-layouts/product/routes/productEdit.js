@@ -20,6 +20,14 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+
 export default function CreateBookForm() {
   // State to store form inputs
   const { id } = useParams();
@@ -32,6 +40,7 @@ export default function CreateBookForm() {
   const [price, setPrice] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState([]);
+  const [specs, setSpecs] = useState([]);
 
   const [categories, setCategories] = useState([]);
   const [imagePreview, setImagePreview] = useState(null);
@@ -50,6 +59,7 @@ export default function CreateBookForm() {
         setMinStock(product.min_stock);
         setPrice(product.price);
         setImagePreview(product.image);
+        setSpecs(product.specifications);
 
         const categoriesResponse = await axios.get(`http://localhost:8080/product-categories`);
         const productCategories = categoriesResponse.data.response;
@@ -86,6 +96,10 @@ export default function CreateBookForm() {
       BookUpdate["image"] = selectedFile; // `selectedFile` should be the file object from input
     }
 
+    if (specs.length > 0) {
+      BookUpdate.specifications = JSON.stringify(specs);
+    }
+
     try {
       const response = await axios.put(`http://localhost:8080/products/${id}`, BookUpdate, {
         headers: {
@@ -100,6 +114,34 @@ export default function CreateBookForm() {
     } catch (error) {
       setError(error.response.data.message);
     }
+  };
+
+  const handleCategoryChange = async (event, newValue) => {
+    setSelectedCategory(newValue || null);
+
+    if (newValue) {
+      try {
+        const response = await axios.get(`http://localhost:8080/product-categories/${newValue.id}`);
+        const transformedSpecs = (response.data.response.specifications || []).map((spec) => ({
+          ...spec,
+          description: "", // Add the empty description key
+        }));
+
+        setSpecs(transformedSpecs);
+      } catch (error) {
+        console.error("Error fetching specs:", error);
+        setSpecs([]);
+      }
+    } else {
+      setSpecs([]);
+    }
+  };
+
+  const handleEdit = (index, newValue) => {
+    const updatedSpecs = specs.map((spec, i) =>
+      i === index ? { ...spec, description: newValue } : spec
+    );
+    setSpecs(updatedSpecs); // Update the state with the modified specifications
   };
 
   if (loading) return <div>Loading...</div>;
@@ -166,7 +208,7 @@ export default function CreateBookForm() {
               <Autocomplete
                 disablePortal
                 value={selectedCategory}
-                onChange={(_event, newValue) => setSelectedCategory(newValue)}
+                onChange={handleCategoryChange}
                 options={categories}
                 getOptionLabel={(option) => option.name}
                 sx={{
@@ -205,6 +247,66 @@ export default function CreateBookForm() {
                 onChange={(e) => setPrice(e.target.value)}
               />
             </MDBox>
+            {specs && specs.length > 0 && (
+              <TableContainer component={Paper}>
+                <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+                  <MDBox component="thead">
+                    <TableRow>
+                      <MDBox
+                        component="th"
+                        width="auto"
+                        py={1.5}
+                        px={3}
+                        sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                          borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                        })}
+                      >
+                        Specifications
+                      </MDBox>
+                      <MDBox
+                        component="th"
+                        width="auto"
+                        py={1.5}
+                        px={3}
+                        sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                          borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                        })}
+                      >
+                        Description
+                      </MDBox>
+                    </TableRow>
+                  </MDBox>
+                  <TableBody>
+                    {specs.map((specification, index) => (
+                      <TableRow
+                        key={index}
+                        sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                      >
+                        <TableCell component="th" scope="row">
+                          {specification.name}
+                        </TableCell>
+                        <TableCell align="right">
+                          <input
+                            type="text"
+                            value={specification.description}
+                            onChange={(e) => handleEdit(index, e.target.value)}
+                            style={{
+                              width: "100%",
+                              border: "1px solid lightgray",
+                              background: "transparent",
+                              outline: "none",
+                              padding: "5px",
+                              borderRadius: "4px",
+                              cursor: "text",
+                            }}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
             <MDBox mt={4} mb={1}>
               <MDButton variant="gradient" color="info" fullWidth type="submit">
                 create

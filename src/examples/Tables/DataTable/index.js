@@ -230,6 +230,13 @@ function DataTable({
         <TableBody {...getTableBodyProps()}>
           {page.map((row, key) => {
             prepareRow(row);
+            const minStockCell = row.cells.find((cell) => cell.column.Header === "min_stock");
+            const stockCell = row.cells.find((cell) => cell.column.Header === "stock");
+
+            // Check if min_stock > stock and apply red style if true
+            const isMinStockGreater =
+              minStockCell && stockCell && minStockCell.value > stockCell.value;
+
             return (
               <TableRow key={key} {...row.getRowProps()}>
                 {row.cells.map((cell, idx) => (
@@ -238,6 +245,7 @@ function DataTable({
                     noBorder={noEndBorder && rows.length - 1 === key}
                     align={cell.column.align ? cell.column.align : "left"}
                     {...cell.getCellProps()}
+                    color={isMinStockGreater ? "red" : ""}
                   >
                     {cell.render("Cell")}
                   </DataTableBodyCell>

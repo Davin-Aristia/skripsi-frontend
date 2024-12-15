@@ -19,7 +19,7 @@ import PropTypes from "prop-types";
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 
-function DataTableBodyCell({ noBorder, align, children }) {
+function DataTableBodyCell({ noBorder, align, children, color }) {
   return (
     <MDBox
       component="td"
@@ -35,7 +35,7 @@ function DataTableBodyCell({ noBorder, align, children }) {
         display="inline-block"
         width="max-content"
         color="text"
-        sx={{ verticalAlign: "middle" }}
+        sx={{ verticalAlign: "middle", ...(color && { color }) }}
       >
         {children}
       </MDBox>
@@ -54,6 +54,7 @@ DataTableBodyCell.propTypes = {
   children: PropTypes.node.isRequired,
   noBorder: PropTypes.bool,
   align: PropTypes.oneOf(["left", "right", "center"]),
+  color: PropTypes.string,
 };
 
 export default DataTableBodyCell;
