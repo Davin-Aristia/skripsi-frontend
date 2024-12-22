@@ -19,7 +19,7 @@ export const ComponentToPrint = React.forwardRef((props, ref) => {
           {cart
             ? cart.map((cartProduct, key) => (
                 <tr key={key}>
-                  <td style={{ "padding-bottom": "100px" }}>{cartProduct.id}</td>
+                  <td style={{ paddingBottom: "100px" }}>{cartProduct.id}</td>
                   <td>{cartProduct.name}</td>
                   <td>{cartProduct.price}</td>
                   <td>{cartProduct.quantity}</td>

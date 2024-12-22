@@ -8,21 +8,40 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./index.css";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
+import Autocomplete from "@mui/material/Autocomplete";
+import MDInput from "components/MDInput";
 
 function POSPage() {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [cart, setCart] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState({});
 
   const toastOptions = {
     autoClose: 400,
     pauseOnHover: true,
   };
 
-  const fetchProducts = async () => {
+  const fetchCategories = async () => {
+    const categoriesResult = await axios.get(`http://localhost:8080/product-categories`);
+    const fetchedCategories = categoriesResult.data.response;
+    setCategories(fetchedCategories);
+    let selected = fetchedCategories[0];
+    if (fetchedCategories.length > 0) {
+      setSelectedCategory(selected);
+    }
+    fetchProducts(selected);
+  };
+
+  const fetchProducts = async (selected = null) => {
     setIsLoading(true);
-    const result = await axios.get("http://localhost:8080/products");
+    const result = await axios.get("http://localhost:8080/products", {
+      params: {
+        category: selected ? selected.id : selectedCategory?.id,
+      },
+    });
     setProducts(await result.data.response);
     // const result = [
     //   {
@@ -130,7 +149,7 @@ function POSPage() {
   };
 
   useEffect(() => {
-    fetchProducts();
+    fetchCategories();
   }, []);
 
   useEffect(() => {
@@ -141,14 +160,42 @@ function POSPage() {
     setTotalAmount(newTotalAmount);
   }, [cart]);
 
+  const handleCategoryChange = async (event, newValue) => {
+    // if (!newValue) {
+    //   newValue = categories[0];
+    // }
+    setSelectedCategory(newValue);
+    fetchProducts(newValue);
+  };
+
   return (
     // <MainLayout>
     <DashboardLayout>
       <DashboardNavbar />
       <div className="row">
         <div className="col-lg-6">
+          <div className="col-lg-5 mb-4">
+            <Autocomplete
+              disablePortal
+              value={selectedCategory}
+              onChange={handleCategoryChange}
+              options={categories}
+              disableClearable
+              getOptionLabel={(option) => option?.name || ""}
+              sx={{
+                mb: 1,
+                mt: 1,
+                "& .MuiInputLabel-root": {
+                  lineHeight: "1.5", // Adjust the line height for proper vertical alignment
+                },
+              }}
+              renderInput={(params) => <MDInput {...params} label="Select Category" />}
+            />
+          </div>
           {isLoading ? (
             "Loading"
+          ) : !products ? (
+            <h1 className="text-center mt-4">Product Not Found</h1>
           ) : (
             <div className="row">
               {products.map((product, key) => (
