@@ -152,8 +152,9 @@ export default function data({ setAlert, query }) {
     <DataTable
       table={{ columns, rows }}
       isSorted={true}
-      entriesPerPage={{ defaultValue: pageSize }}
+      entriesPerPage={false}
       showTotalEntries={true}
+      canSearch={true}
       noEndBorder
       currentPage={currentPage}
       onPageChange={handlePageChange}

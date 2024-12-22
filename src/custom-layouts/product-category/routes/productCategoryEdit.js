@@ -18,6 +18,7 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
+import Grid from "@mui/material/Grid";
 import CloseIcon from "@mui/icons-material/Close";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -212,80 +213,86 @@ export default function CreateBookForm() {
               showTotalEntries={false}
               entriesPerPage={false}
             /> */}
-
-            <TableContainer component={Paper}>
-              {/* <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table"> */}
-              <Table
-                sx={({ palette: { light }, borders: { borderWidth } }) => ({
-                  borderTop: `${borderWidth[1]} solid ${light.main}`,
-                  minWidth: 650,
-                })}
-                size="small"
-                aria-label="a dense table"
-              >
-                <MDBox component="thead">
-                  <TableRow>
-                    <MDBox
-                      component="th"
-                      width="auto"
-                      py={1.5}
-                      px={3}
+            <h3 style={{ padding: "40px 0px 15px 0px" }}>Specifications</h3>
+            <Grid container spacing={0}>
+              <Grid item xs={6}>
+                <TableContainer component={Paper}>
+                  <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+                    {/* <Table
                       sx={({ palette: { light }, borders: { borderWidth } }) => ({
-                        borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                        borderTop: `${borderWidth[1]} solid ${light.main}`,
+                        minWidth: 650,
                       })}
-                    >
-                      Specifications
-                    </MDBox>
-                    <MDBox
-                      component="th"
-                      width="auto"
-                      py={1.5}
-                      px={3}
-                      sx={({ palette: { light }, borders: { borderWidth } }) => ({
-                        borderBottom: `${borderWidth[1]} solid ${light.main}`,
-                      })}
-                    >
-                      Action
-                    </MDBox>
-                  </TableRow>
-                </MDBox>
-                <TableBody>
-                  {specifications.map((specification, index) => (
-                    <TableRow
-                      key={index}
-                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                    >
-                      <TableCell component="th" scope="row">
-                        <input
-                          type="text"
-                          value={specification.name}
-                          onChange={(e) => handleEdit(index, e.target.value)}
-                          style={{
-                            width: "100%",
-                            border: "1px solid lightgray",
-                            background: "transparent",
-                            outline: "none",
-                            padding: "5px",
-                            borderRadius: "4px",
-                            cursor: "text",
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell align="center">
-                        <MDButton
-                          variant="text"
-                          color="error"
-                          iconOnly
-                          onClick={() => handleDelete(index)}
+                      size="small"
+                      aria-label="a dense table"
+                    > */}
+                    <MDBox component="thead">
+                      <TableRow>
+                        <MDBox
+                          component="th"
+                          width="auto"
+                          py={1.5}
+                          px={3}
+                          sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                            borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                            borderTop: `${borderWidth[2]} solid ${light.main}`,
+                          })}
                         >
-                          <Icon>delete</Icon>
-                        </MDButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                          Specifications
+                        </MDBox>
+                        <MDBox
+                          component="th"
+                          width="auto"
+                          py={1.5}
+                          px={3}
+                          sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                            borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                            borderTop: `${borderWidth[2]} solid ${light.main}`,
+                          })}
+                        >
+                          Action
+                        </MDBox>
+                      </TableRow>
+                    </MDBox>
+                    <TableBody>
+                      {specifications.map((specification, index) => (
+                        <TableRow
+                          key={index}
+                          sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                        >
+                          <TableCell component="th" scope="row">
+                            <input
+                              type="text"
+                              value={specification.name}
+                              onChange={(e) => handleEdit(index, e.target.value)}
+                              style={{
+                                width: "100%",
+                                border: "1px solid lightgray",
+                                background: "transparent",
+                                outline: "none",
+                                padding: "5px",
+                                borderRadius: "4px",
+                                cursor: "text",
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell align="center">
+                            <MDButton
+                              variant="text"
+                              color="error"
+                              iconOnly
+                              onClick={() => handleDelete(index)}
+                            >
+                              <Icon>delete</Icon>
+                            </MDButton>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Grid>
+            </Grid>
 
             {/* <table className="table bordered">
               <thead>
@@ -303,8 +310,13 @@ export default function CreateBookForm() {
                 ))}
               </tbody>
             </table> */}
-            <MDButton variant="gradient" color="info" onClick={handleOpenWizard}>
-              + Create
+            <MDButton
+              variant="gradient"
+              color="info"
+              onClick={handleOpenWizard}
+              sx={{ marginTop: "20px" }}
+            >
+              add specs
             </MDButton>
             <MDBox mt={4} mb={1}>
               <MDButton variant="gradient" color="info" fullWidth type="submit">

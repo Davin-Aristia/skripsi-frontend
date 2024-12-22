@@ -9,6 +9,7 @@ import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
+import Grid from "@mui/material/Grid";
 
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
@@ -178,138 +179,162 @@ export default function CreateBookForm() {
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit}>
-            <MDBox mb={2}>
-              {imagePreview && (
+            <Grid container spacing={0}>
+              <Grid item xs={6}>
+                <h3 style={{ paddingBottom: "20px" }}>Product Information</h3>
                 <MDBox mb={2}>
-                  <img
-                    src={imagePreview}
-                    alt="Product Image"
-                    style={{
-                      width: "100px",
-                      height: "100px",
-                      objectFit: "cover",
-                      borderRadius: "8px",
-                    }}
+                  {imagePreview && (
+                    <MDBox mb={2}>
+                      <img
+                        src={imagePreview}
+                        alt="Product Image"
+                        style={{
+                          width: "100px",
+                          height: "100px",
+                          objectFit: "cover",
+                          borderRadius: "8px",
+                        }}
+                      />
+                    </MDBox>
+                  )}
+                  <MDInput type="file" onChange={(e) => setSelectedFile(e.target.files[0])} />
+                </MDBox>
+                <MDBox mb={2}>
+                  <MDInput
+                    type="text"
+                    label="Name"
+                    fullWidth
+                    value={name}
+                    py={5}
+                    onChange={(e) => setName(e.target.value)}
                   />
                 </MDBox>
-              )}
-              <MDInput type="file" onChange={(e) => setSelectedFile(e.target.files[0])} />
-            </MDBox>
-            <MDBox mb={2}>
-              <MDInput
-                type="text"
-                label="Name"
-                fullWidth
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </MDBox>
-            <MDBox mb={2}>
-              <Autocomplete
-                disablePortal
-                value={selectedCategory}
-                onChange={handleCategoryChange}
-                options={categories}
-                getOptionLabel={(option) => option.name}
-                sx={{
-                  width: 300,
-                  "& .MuiInputLabel-root": {
-                    lineHeight: "1.5", // Adjust the line height for proper vertical alignment
-                  },
-                }}
-                renderInput={(params) => <TextField {...params} label="Select Category" />}
-              />
-            </MDBox>
-            <MDBox mb={2}>
-              <MDInput
-                type="number"
-                label="Stock"
-                fullWidth
-                value={stock}
-                onChange={(e) => setStock(e.target.value)}
-              />
-            </MDBox>
-            <MDBox mb={2}>
-              <MDInput
-                type="text"
-                label="MinStock"
-                fullWidth
-                value={minStock}
-                onChange={(e) => setMinStock(e.target.value)}
-              />
-            </MDBox>
-            <MDBox mb={2}>
-              <MDInput
-                type="number"
-                label="Price"
-                fullWidth
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-              />
-            </MDBox>
-            {specs && specs.length > 0 && (
-              <TableContainer component={Paper}>
-                <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
-                  <MDBox component="thead">
-                    <TableRow>
-                      <MDBox
-                        component="th"
-                        width="auto"
-                        py={1.5}
-                        px={3}
-                        sx={({ palette: { light }, borders: { borderWidth } }) => ({
-                          borderBottom: `${borderWidth[1]} solid ${light.main}`,
-                        })}
-                      >
-                        Specifications
-                      </MDBox>
-                      <MDBox
-                        component="th"
-                        width="auto"
-                        py={1.5}
-                        px={3}
-                        sx={({ palette: { light }, borders: { borderWidth } }) => ({
-                          borderBottom: `${borderWidth[1]} solid ${light.main}`,
-                        })}
-                      >
-                        Description
-                      </MDBox>
-                    </TableRow>
-                  </MDBox>
-                  <TableBody>
-                    {specs.map((specification, index) => (
-                      <TableRow
-                        key={index}
-                        sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                      >
-                        <TableCell component="th" scope="row">
-                          {specification.name}
-                        </TableCell>
-                        <TableCell align="right">
-                          <input
-                            type="text"
-                            value={specification.description}
-                            onChange={(e) => handleEdit(index, e.target.value)}
-                            style={{
-                              width: "100%",
-                              border: "1px solid lightgray",
-                              background: "transparent",
-                              outline: "none",
-                              padding: "5px",
-                              borderRadius: "4px",
-                              cursor: "text",
-                            }}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )}
+                <MDBox mb={2}>
+                  <Grid container spacing={2}>
+                    {/* Autocomplete Field */}
+                    <Grid item xs={5}>
+                      <Autocomplete
+                        disablePortal
+                        value={selectedCategory}
+                        onChange={handleCategoryChange}
+                        options={categories}
+                        getOptionLabel={(option) => option.name}
+                        sx={{
+                          width: 300,
+                          "& .MuiInputLabel-root": {
+                            lineHeight: "1.5", // Adjust the line height for proper vertical alignment
+                          },
+                        }}
+                        renderInput={(params) => <TextField {...params} label="Select Category" />}
+                      />
+                    </Grid>
+
+                    <Grid item xs={2}></Grid>
+
+                    {/* Price Field */}
+                    <Grid item xs={5}>
+                      <MDInput
+                        type="number"
+                        label="Price"
+                        fullWidth
+                        value={price}
+                        onChange={(e) => setPrice(e.target.value)}
+                      />
+                    </Grid>
+                    {specs.length > 0 && (
+                      <>
+                        <h3 style={{ padding: "50px 0px 15px 0px" }}>Specifications</h3>
+                        <TableContainer component={Paper}>
+                          <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+                            <MDBox component="thead">
+                              <TableRow>
+                                <MDBox
+                                  component="th"
+                                  width="auto"
+                                  py={1.5}
+                                  px={3}
+                                  sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                                    borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                                    borderTop: `${borderWidth[2]} solid ${light.main}`,
+                                  })}
+                                >
+                                  Specifications
+                                </MDBox>
+                                <MDBox
+                                  component="th"
+                                  width="auto"
+                                  py={1.5}
+                                  px={3}
+                                  sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                                    borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                                    borderTop: `${borderWidth[2]} solid ${light.main}`,
+                                  })}
+                                >
+                                  Description
+                                </MDBox>
+                              </TableRow>
+                            </MDBox>
+                            <TableBody>
+                              {specs.map((specification, index) => (
+                                <TableRow
+                                  key={index}
+                                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                                >
+                                  <TableCell component="th" scope="row">
+                                    {specification.name}
+                                  </TableCell>
+                                  <TableCell align="right">
+                                    <input
+                                      type="text"
+                                      value={specification.description}
+                                      onChange={(e) => handleEdit(index, e.target.value)}
+                                      style={{
+                                        width: "100%",
+                                        border: "1px solid lightgray",
+                                        background: "transparent",
+                                        outline: "none",
+                                        padding: "5px",
+                                        borderRadius: "4px",
+                                        cursor: "text",
+                                      }}
+                                    />
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      </>
+                    )}
+                  </Grid>
+                </MDBox>
+              </Grid>
+              <Grid item xs={2}></Grid>
+              <Grid item xs={3}>
+                <h3 style={{ paddingBottom: "20px" }}>Stock Information</h3>
+                <MDBox mb={2}>
+                  <MDInput
+                    type="number"
+                    label="Stock"
+                    fullWidth
+                    value={stock}
+                    onChange={(e) => setStock(e.target.value)}
+                  />
+                </MDBox>
+                <MDBox mb={2}>
+                  <MDInput
+                    type="text"
+                    label="MinStock"
+                    fullWidth
+                    value={minStock}
+                    onChange={(e) => setMinStock(e.target.value)}
+                  />
+                </MDBox>
+              </Grid>
+            </Grid>
             <MDBox mt={4} mb={1}>
               <MDButton variant="gradient" color="info" fullWidth type="submit">
-                create
+                edit
               </MDButton>
             </MDBox>
           </MDBox>
