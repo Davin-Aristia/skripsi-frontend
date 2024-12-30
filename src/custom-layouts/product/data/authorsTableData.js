@@ -20,10 +20,8 @@ import Icon from "@mui/material/Icon";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
-import MDAvatar from "components/MDAvatar";
-import MDBadge from "components/MDBadge";
 import MDButton from "components/MDButton";
+import { toast } from "react-toastify";
 
 import { useAuth } from "custom-layouts/authentication";
 
@@ -41,7 +39,7 @@ import DataTable from "examples/Tables/DataTable";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-export default function data({ setAlert, query }) {
+export default function data({ query }) {
   const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -97,18 +95,10 @@ export default function data({ setAlert, query }) {
         setCurrentPage(currentPage - 1);
       }
 
-      setAlert({
-        open: true,
-        severity: "success",
-        message: "Product deleted successfully!",
-      });
+      toast.success("Product deleted successfully");
     } catch (error) {
+      toast.error("Failed to delete the product.");
       console.error("Error deleting the product:", error);
-      setAlert({
-        open: true,
-        severity: "error",
-        message: "Failed to delete the product.",
-      });
     }
   };
 

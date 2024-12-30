@@ -21,7 +21,7 @@ import React, { useState, useEffect } from "react";
 // import Icon from "@mui/material/Icon";
 // import Snackbar from "@mui/material/Snackbar";
 // import Alert from "@mui/material/Alert";
-import { Grid, Card, Icon, Snackbar, Alert } from "@mui/material";
+import { Grid, Card, Icon } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 
 // Material Dashboard 2 React components
@@ -40,46 +40,23 @@ import { NavLink } from "react-router-dom";
 import AuthorsTableData from "custom-layouts/product-category/data/authorsTableData";
 
 function ProductCategories() {
-  const [alert, setAlert] = useState({ open: false, severity: null, message: "" });
-  const [searchValue, setSearchValue] = useState("");
+  // const [searchValue, setSearchValue] = useState("");
 
-  const location = useLocation();
-  const navigate = useNavigate();
+  // const location = useLocation();
+  // const navigate = useNavigate();
 
-  useEffect(() => {
-    if (location.state?.message && location.state.severity) {
-      setAlert({
-        open: true,
-        severity: location.state.severity,
-        message: location.state.message,
-      });
-      // Optionally clear the state to avoid showing the message again on refresh
-      navigate("/product-category", { replace: true });
-    }
-  }, [location.state, navigate]);
+  // const handleClose = () => {
+  //   setAlert({ open: false, message: "" });
+  // };
 
-  const handleClose = () => {
-    setAlert({ open: false, message: "" });
-  };
-
-  const handleSearchChange = (value) => {
-    setSearchValue(value);
-    console.log("Search Input Value:", value); // You can use this value as needed
-  };
+  // const handleSearchChange = (value) => {
+  //   setSearchValue(value);
+  //   console.log("Search Input Value:", value); // You can use this value as needed
+  // };
 
   return (
     <DashboardLayout>
-      <DashboardNavbar onSearchChange={handleSearchChange} />
-      <Snackbar
-        open={alert.open}
-        autoHideDuration={4000}
-        onClose={handleClose}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert onClose={handleClose} severity={alert.severity}>
-          {alert.message}
-        </Alert>
-      </Snackbar>
+      <DashboardNavbar />
       <MDBox pt={6} pb={3}>
         <Grid container spacing={6}>
           <Grid item xs={12}>
@@ -108,7 +85,7 @@ function ProductCategories() {
                 </NavLink>
               </MDBox>
               <MDBox pt={3}>
-                <AuthorsTableData setAlert={setAlert} query={searchValue} />
+                <AuthorsTableData />
               </MDBox>
             </Card>
           </Grid>

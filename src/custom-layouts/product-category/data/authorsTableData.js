@@ -20,9 +20,6 @@ import Icon from "@mui/material/Icon";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
-import MDAvatar from "components/MDAvatar";
-import MDBadge from "components/MDBadge";
 import MDButton from "components/MDButton";
 
 import { useAuth } from "custom-layouts/authentication";
@@ -30,6 +27,7 @@ import { useAuth } from "custom-layouts/authentication";
 // Material Dashboard 2 React context
 import { useMaterialUIController } from "context";
 import { NavLink } from "react-router-dom";
+import { toast } from "react-toastify";
 
 // Images
 import team2 from "assets/images/team-2.jpg";
@@ -41,7 +39,7 @@ import DataTable from "examples/Tables/DataTable";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-export default function data({ setAlert, query }) {
+export default function data({ query }) {
   const [productCategories, setProductCategories] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -102,18 +100,10 @@ export default function data({ setAlert, query }) {
         setCurrentPage(currentPage - 1);
       }
 
-      setAlert({
-        open: true,
-        severity: "success",
-        message: "Product Category deleted successfully!",
-      });
+      toast.success("Product Category deleted successfully");
     } catch (error) {
+      toast.error("Failed to delete the product category");
       console.error("Error deleting product category:", error);
-      setAlert({
-        open: true,
-        severity: "error",
-        message: "Failed to delete product category.",
-      });
     }
   };
 

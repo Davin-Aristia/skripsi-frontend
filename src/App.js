@@ -22,6 +22,8 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Icon from "@mui/material/Icon";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -193,6 +195,7 @@ export default function App() {
         {getRoutes(routes)}
         <Route path="*" element={<Navigate to="/dashboard" />} />
       </Routes>
+      <ToastContainer toastStyle={{ fontSize: "16px" }} />
     </ThemeProvider>
   );
 }

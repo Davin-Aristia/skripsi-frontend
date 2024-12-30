@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import {
@@ -15,8 +16,6 @@ import {
   Button,
   Card,
   Icon,
-  Snackbar,
-  Alert,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import CloseIcon from "@mui/icons-material/Close";
@@ -90,10 +89,10 @@ export default function CreateBookForm() {
         }
       );
       // Handle success, e.g., show a success message or redirect
-      navigate("/product-category", {
-        state: { message: response.data.message, severity: "success" },
-      });
+      toast.success("success update product category");
+      navigate("/product-category");
     } catch (error) {
+      toast.error("failed update product category");
       setError(error.response.data.message);
     }
   };
@@ -160,16 +159,6 @@ export default function CreateBookForm() {
           <Button onClick={handleCreate}>Create</Button>
         </DialogActions>
       </Dialog>
-      <Snackbar
-        open={Boolean(error)}
-        autoHideDuration={4000}
-        onClose={() => setError("")}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert onClose={() => setError("")} severity="error" sx={{ width: "100%" }}>
-          {error}
-        </Alert>
-      </Snackbar>
       <Card sx={{ mt: 4 }}>
         <MDBox
           variant="gradient"

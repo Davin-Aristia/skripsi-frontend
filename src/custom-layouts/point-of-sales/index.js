@@ -20,7 +20,7 @@ function POSPage() {
   const [selectedCategory, setSelectedCategory] = useState({});
 
   const toastOptions = {
-    autoClose: 400,
+    autoClose: 1500,
     pauseOnHover: true,
   };
 
@@ -121,7 +121,8 @@ function POSPage() {
       });
 
       setCart(newCart);
-      toast(`Added ${newItem.name} to cart`, toastOptions);
+      console.log("this works?");
+      toast.success(`Added ${newItem.name} to cart`, toastOptions);
     } else {
       let addingProduct = {
         ...product,

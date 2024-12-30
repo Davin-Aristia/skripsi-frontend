@@ -146,7 +146,7 @@ function Products() {
 
   return (
     <DashboardLayout>
-      <DashboardNavbar onSearchChange={handleSearchChange} />
+      <DashboardNavbar />
       <Snackbar
         open={alert.open}
         autoHideDuration={4000}

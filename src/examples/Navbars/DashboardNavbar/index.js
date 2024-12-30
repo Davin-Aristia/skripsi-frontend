@@ -53,19 +53,19 @@ import {
   setOpenConfigurator,
 } from "context";
 
-function DashboardNavbar({ absolute, light, isMini, onSearchChange }) {
+function DashboardNavbar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator, darkMode } = controller;
   const [openMenu, setOpenMenu] = useState(false);
   const route = useLocation().pathname.split("/").slice(1);
 
-  const handleInputChange = (event) => {
-    const value = event.target.value;
-    if (onSearchChange) {
-      onSearchChange(value); // Pass the value back to the Product page
-    }
-  };
+  // const handleInputChange = (event) => {
+  //   const value = event.target.value;
+  //   if (onSearchChange) {
+  //     onSearchChange(value); // Pass the value back to the Product page
+  //   }
+  // };
 
   useEffect(() => {
     // Setting the navbar type
@@ -154,7 +154,7 @@ function DashboardNavbar({ absolute, light, isMini, onSearchChange }) {
         {isMini ? null : (
           <MDBox sx={(theme) => navbarRow(theme, { isMini })}>
             <MDBox pr={1}>
-              <MDInput label="Search here" onChange={handleInputChange} />
+              <MDInput label="Search here" />
             </MDBox>
             <MDBox color={light ? "white" : "inherit"}>
               <Link to="/authentication/sign-in/basic">
@@ -215,7 +215,6 @@ DashboardNavbar.propTypes = {
   absolute: PropTypes.bool,
   light: PropTypes.bool,
   isMini: PropTypes.bool,
-  onSearchChange: PropTypes.string,
 };
 
 export default DashboardNavbar;

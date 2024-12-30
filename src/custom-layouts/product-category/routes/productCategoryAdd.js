@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, NavLink } from "react-router-dom";
+import { toast } from "react-toastify";
 
 import {
   Dialog,
@@ -78,10 +79,10 @@ export default function CreateProductCategoryForm() {
       setDescription("");
 
       // Optionally refetch data or update the state to reflect the new book in the UI
-      navigate("/product-category", {
-        state: { message: response.data.message, severity: "success" },
-      });
+      toast.success("success add new product category");
+      navigate("/product-category");
     } catch (error) {
+      toast.success("success add new product category");
       setError(error.response.data.message);
     }
   };
@@ -144,16 +145,6 @@ export default function CreateProductCategoryForm() {
           <Button onClick={handleCreate}>Create</Button>
         </DialogActions>
       </Dialog>
-      <Snackbar
-        open={Boolean(error)}
-        autoHideDuration={4000}
-        onClose={() => setError("")}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert onClose={() => setError("")} severity="error" sx={{ width: "100%" }}>
-          {error}
-        </Alert>
-      </Snackbar>
 
       <Card sx={{ mt: 4 }}>
         <MDBox

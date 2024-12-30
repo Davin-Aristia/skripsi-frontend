@@ -33,8 +33,6 @@ import {
   Grid,
   Card,
   Icon,
-  Snackbar,
-  Alert,
   TextField,
 } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -50,7 +48,6 @@ import MDButton from "components/MDButton";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import DataTable from "examples/Tables/DataTable";
 
 import { NavLink } from "react-router-dom";
 
@@ -58,27 +55,26 @@ import { NavLink } from "react-router-dom";
 import AuthorsTableData from "custom-layouts/product/data/authorsTableData";
 
 function Products() {
-  const [alert, setAlert] = useState({ open: false, severity: null, message: "" });
+  // const [alert, setAlert] = useState({ open: false, severity: null, message: "" });
   const [books, setBooks] = useState([]);
   const [open, setOpen] = useState(false);
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
-  const [searchValue, setSearchValue] = useState("");
 
-  const location = useLocation();
-  const navigate = useNavigate();
+  // const location = useLocation();
+  // const navigate = useNavigate();
 
-  useEffect(() => {
-    if (location.state?.message && location.state.severity) {
-      setAlert({
-        open: true,
-        severity: location.state.severity,
-        message: location.state.message,
-      });
-      // Optionally clear the state to avoid showing the message again on refresh
-      navigate("/product", { replace: true });
-    }
-  }, [location.state, navigate]);
+  // useEffect(() => {
+  //   if (location.state?.message && location.state.severity) {
+  //     setAlert({
+  //       open: true,
+  //       severity: location.state.severity,
+  //       message: location.state.message,
+  //     });
+  //     // Optionally clear the state to avoid showing the message again on refresh
+  //     navigate("/product", { replace: true });
+  //   }
+  // }, [location.state, navigate]);
 
   const handleOpenWizard = () => setOpen(true);
   const handleCloseWizard = () => {
@@ -92,10 +88,6 @@ function Products() {
     exportSimpleExcel(fromDate, toDate);
     // }
     handleCloseWizard();
-  };
-
-  const handleClose = () => {
-    setAlert({ open: false, message: "" });
   };
 
   const fetchData = async () => {
@@ -139,24 +131,9 @@ function Products() {
     });
   };
 
-  const handleSearchChange = (value) => {
-    setSearchValue(value);
-    console.log("Search Input Value:", value); // You can use this value as needed
-  };
-
   return (
     <DashboardLayout>
-      <DashboardNavbar onSearchChange={handleSearchChange} />
-      <Snackbar
-        open={alert.open}
-        autoHideDuration={4000}
-        onClose={handleClose}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert onClose={handleClose} severity={alert.severity}>
-          {alert.message}
-        </Alert>
-      </Snackbar>
+      <DashboardNavbar />
       {/* <button onClick={exportSimpleExcel}>Download Simple Excel</button> */}
       <Button variant="contained" onClick={handleOpenWizard}>
         Export Books
@@ -235,7 +212,7 @@ function Products() {
                     </MDButton>
                   ))}
                 </div> */}
-                <AuthorsTableData setAlert={setAlert} query={searchValue} />
+                <AuthorsTableData />
               </MDBox>
             </Card>
           </Grid>

@@ -3,11 +3,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 import Card from "@mui/material/Card";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
-import Icon from "@mui/material/Icon";
 // import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import Grid from "@mui/material/Grid";
@@ -44,7 +42,6 @@ export default function CreateBookForm() {
   const [specs, setSpecs] = useState([]);
 
   const [categories, setCategories] = useState([]);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchProductData = async () => {
@@ -99,11 +96,10 @@ export default function CreateBookForm() {
       setSpecs("");
 
       // Optionally refetch data or update the state to reflect the new book in the UI
-      navigate("/product", {
-        state: { message: response.data.message, severity: "success" },
-      });
+      toast.success("success add new product");
+      navigate("/product");
     } catch (error) {
-      setError(error.response.data.message);
+      toast.error("failed delete product");
       console.log(error.response.data.response);
     }
   };
@@ -139,16 +135,6 @@ export default function CreateBookForm() {
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <Snackbar
-        open={Boolean(error)}
-        autoHideDuration={4000}
-        onClose={() => setError("")}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert onClose={() => setError("")} severity="error" sx={{ width: "100%" }}>
-          {error}
-        </Alert>
-      </Snackbar>
 
       <Card sx={{ mt: 4 }}>
         <MDBox
@@ -193,7 +179,7 @@ export default function CreateBookForm() {
                         disablePortal
                         onChange={handleCategoryChange}
                         options={categories}
-                        getOptionLabel={(option) => option.name}
+                        getOptionLabel={(option) => option?.name || ""}
                         sx={{
                           "& .MuiInputLabel-root": {
                             lineHeight: "1.5", // Adjust the line height for proper vertical alignment
