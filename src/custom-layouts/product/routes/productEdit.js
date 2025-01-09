@@ -42,6 +42,8 @@ export default function CreateBookForm() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState([]);
   const [specs, setSpecs] = useState([]);
+  const [createdAt, setCreatedAt] = useState([]);
+  const [updatedAt, setUpdatedAt] = useState([]);
 
   const [categories, setCategories] = useState([]);
   const [imagePreview, setImagePreview] = useState(null);
@@ -61,6 +63,11 @@ export default function CreateBookForm() {
         setImagePreview(product.image);
         setSpecs(product.specifications);
 
+        const formattedCreateDate = convertToLocalDate(product.created_at);
+        setCreatedAt(formattedCreateDate);
+        const formattedUpdateDate = convertToLocalDate(product.updated_at);
+        setUpdatedAt(formattedUpdateDate);
+
         const categoriesResponse = await axios.get(`http://localhost:8080/product-categories`);
         const productCategories = categoriesResponse.data.response;
         setCategories(productCategories);
@@ -76,6 +83,13 @@ export default function CreateBookForm() {
 
     fetchProductData();
   }, [id]); // Dependency array includes `id` to refetch if the ID changes
+
+  const convertToLocalDate = (utcDateString) => {
+    const date = new Date(utcDateString);
+    const jakartaOffset = 7 * 60;
+    const jakartaTime = new Date(date.getTime() + jakartaOffset * 60 * 1000);
+    return jakartaTime.toISOString().split("T")[0];
+  };
 
   // Function to handle form submission
   const handleSubmit = async (e) => {
@@ -94,9 +108,11 @@ export default function CreateBookForm() {
 
     if (selectedFile) {
       BookUpdate["image"] = selectedFile; // `selectedFile` should be the file object from input
+    } else {
+      BookUpdate["image"] = imagePreview;
     }
 
-    if (specs.length > 0) {
+    if (specs && specs.length > 0) {
       BookUpdate.specifications = JSON.stringify(specs);
     }
 
@@ -166,7 +182,22 @@ export default function CreateBookForm() {
             Edit Product
           </MDTypography>
         </MDBox>
-        <MDBox pt={4} pb={3} px={3}>
+
+        <MDBox
+          sx={{
+            position: "absolute",
+            top: 15, // Adjust the top spacing
+            right: 10, // Align to the right
+          }}
+        >
+          <MDTypography variant="body2" fontWeight="medium" sx={{ color: "grey.600" }}>
+            Create Date: {createdAt || "-"}
+          </MDTypography>
+          <MDTypography variant="body2" fontWeight="medium" sx={{ color: "grey.600" }}>
+            Last Edit: {updatedAt || "-"}
+          </MDTypography>
+        </MDBox>
+        <MDBox pt={3} pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit}>
             <Grid container spacing={0}>
               <Grid item xs={6}>
@@ -196,6 +227,7 @@ export default function CreateBookForm() {
                     value={name}
                     py={5}
                     onChange={(e) => setName(e.target.value)}
+                    required
                   />
                 </MDBox>
                 <MDBox mb={2}>
@@ -230,7 +262,7 @@ export default function CreateBookForm() {
                         onChange={(e) => setPrice(e.target.value)}
                       />
                     </Grid>
-                    {specs.length > 0 && (
+                    {specs && specs.length > 0 && (
                       <>
                         <h3 style={{ padding: "50px 0px 15px 0px" }}>Specifications</h3>
                         <TableContainer component={Paper}>

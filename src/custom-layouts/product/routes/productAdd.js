@@ -99,7 +99,7 @@ export default function CreateBookForm() {
       toast.success("success add new product");
       navigate("/product");
     } catch (error) {
-      toast.error("failed delete product");
+      toast.error("failed create product");
       console.log(error.response.data.response);
     }
   };
