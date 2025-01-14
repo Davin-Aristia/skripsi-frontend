@@ -59,14 +59,14 @@ import Icon from "@mui/material/Icon";
 const routes = [
   ...productRoutes,
   ...productCategoryRoutes,
-  {
-    type: "collapse",
-    name: "Dashboard",
-    key: "dashboard",
-    icon: <Icon fontSize="small">dashboard</Icon>,
-    route: "/dashboard",
-    component: <Dashboard />,
-  },
+  // {
+  //   type: "collapse",
+  //   name: "Dashboard",
+  //   key: "dashboard",
+  //   icon: <Icon fontSize="small">dashboard</Icon>,
+  //   route: "/dashboard",
+  //   component: <Dashboard />,
+  // },
   {
     type: "collapse",
     name: "Master Data",
@@ -91,7 +91,7 @@ const routes = [
         key: "product-category",
         icon: (
           <Icon fontSize="small" style={{ marginLeft: "30px" }}>
-            shopping_cart
+            category
           </Icon>
         ),
         route: "/product-category",
@@ -127,15 +127,10 @@ const routes = [
     type: "collapse",
     name: "Transaction",
     key: "transaction",
-    icon: <Icon fontSize="small">taskz</Icon>,
+    icon: <Icon fontSize="small">task</Icon>,
     // route: "/tables/test",
     // component: <Tables />,
     collapse: [
-      {
-        type: "title",
-        title: "Purchase",
-        key: "purchase-title",
-      },
       {
         type: "collapse",
         name: "Purchase",
@@ -150,8 +145,8 @@ const routes = [
       },
       {
         type: "collapse",
-        name: "Purchase Return",
-        key: "purchase-return",
+        name: "Customer Payment",
+        key: "customer-payment",
         icon: (
           <Icon fontSize="small" style={{ marginLeft: "30px" }}>
             shop
@@ -161,26 +156,9 @@ const routes = [
         component: <Tables />,
       },
       {
-        type: "title",
-        title: "Sales",
-        key: "sales-title",
-      },
-      {
         type: "collapse",
-        name: "Sales",
-        key: "sales",
-        icon: (
-          <Icon fontSize="small" style={{ marginLeft: "30px" }}>
-            point_of_sale
-          </Icon>
-        ),
-        route: "/sales",
-        component: <Tables />,
-      },
-      {
-        type: "collapse",
-        name: "Sales Return",
-        key: "sales-return",
+        name: "Vendor Payment",
+        key: "vendor-payment",
         icon: (
           <Icon fontSize="small" style={{ marginLeft: "30px" }}>
             assignment_return
@@ -193,65 +171,145 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Sign In Custom",
-    key: "sign-in-custom",
-    icon: <Icon fontSize="small">login</Icon>,
-    route: "/sign-in",
-    component: <SignInCustom />,
+    name: "Inventory",
+    key: "inventory",
+    icon: <Icon fontSize="small">inventory</Icon>,
+    // route: "/tables/test",
+    // component: <Tables />,
+    collapse: [
+      {
+        type: "collapse",
+        name: "Inventory In",
+        key: "inventory-in",
+        icon: (
+          <Icon fontSize="small" style={{ marginLeft: "30px" }}>
+            shop
+          </Icon>
+        ),
+        route: "/purchase-return",
+        component: <Tables />,
+      },
+      {
+        type: "collapse",
+        name: "Inventory Out",
+        key: "inventory-out",
+        icon: (
+          <Icon fontSize="small" style={{ marginLeft: "30px" }}>
+            assignment_return
+          </Icon>
+        ),
+        route: "/sales-return",
+        component: <Tables />,
+      },
+    ],
   },
   {
     type: "collapse",
-    name: "Billing",
-    key: "billing",
-    icon: <Icon fontSize="small">receipt_long</Icon>,
-    route: "/billing",
-    component: <Billing />,
+    name: "Report",
+    key: "report",
+    icon: <Icon fontSize="small">summarize</Icon>,
+    // route: "/tables/test",
+    // component: <Tables />,
+    collapse: [
+      {
+        type: "collapse",
+        name: "Purchase",
+        key: "purchase-report",
+        icon: (
+          <Icon fontSize="small" style={{ marginLeft: "30px" }}>
+            shop
+          </Icon>
+        ),
+        route: "/purchase-return",
+        component: <Tables />,
+      },
+      {
+        type: "collapse",
+        name: "Sales",
+        key: "sales-report",
+        icon: (
+          <Icon fontSize="small" style={{ marginLeft: "30px" }}>
+            assignment_return
+          </Icon>
+        ),
+        route: "/sales-return",
+        component: <Tables />,
+      },
+      {
+        type: "collapse",
+        name: "Inventory",
+        key: "inventory-report",
+        icon: (
+          <Icon fontSize="small" style={{ marginLeft: "30px" }}>
+            assignment_return
+          </Icon>
+        ),
+        route: "/sales-return",
+        component: <Tables />,
+      },
+    ],
   },
   // {
   //   type: "collapse",
-  //   name: "RTL",
-  //   key: "rtl",
-  //   icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
-  //   route: "/rtl",
-  //   component: <RTL />,
+  //   name: "Sign In Custom",
+  //   key: "sign-in-custom",
+  //   icon: <Icon fontSize="small">login</Icon>,
+  //   route: "/sign-in",
+  //   component: <SignInCustom />,
   // },
-  {
-    type: "collapse",
-    name: "Notifications",
-    key: "notifications",
-    icon: <Icon fontSize="small">notifications</Icon>,
-    route: "/notifications",
-    component: <Notifications />,
-  },
-  {
-    type: "collapse",
-    name: "Profile",
-    key: "profile",
-    icon: <Icon fontSize="small">person</Icon>,
-    route: "/profile",
-    component: <Profile />,
-  },
-  {
-    type: "collapse",
-    name: "Sign In",
-    key: "sign-in",
-    icon: <Icon fontSize="small">login</Icon>,
-    route: "/authentication/sign-in",
-    component: <SignIn />,
-  },
-  {
-    type: "collapse",
-    name: "Sign Up",
-    key: "sign-up",
-    icon: <Icon fontSize="small">assignment</Icon>,
-    route: "/authentication/sign-up",
-    component: <SignUp />,
-  },
+  // {
+  //   type: "collapse",
+  //   name: "Billing",
+  //   key: "billing",
+  //   icon: <Icon fontSize="small">receipt_long</Icon>,
+  //   route: "/billing",
+  //   component: <Billing />,
+  // },
+  // // {
+  // //   type: "collapse",
+  // //   name: "RTL",
+  // //   key: "rtl",
+  // //   icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
+  // //   route: "/rtl",
+  // //   component: <RTL />,
+  // // },
+  // {
+  //   type: "collapse",
+  //   name: "Notifications",
+  //   key: "notifications",
+  //   icon: <Icon fontSize="small">notifications</Icon>,
+  //   route: "/notifications",
+  //   component: <Notifications />,
+  // },
+  // {
+  //   type: "collapse",
+  //   name: "Profile",
+  //   key: "profile",
+  //   icon: <Icon fontSize="small">person</Icon>,
+  //   route: "/profile",
+  //   component: <Profile />,
+  // },
+  // {
+  //   type: "collapse",
+  //   name: "Sign In",
+  //   key: "sign-in",
+  //   icon: <Icon fontSize="small">login</Icon>,
+  //   route: "/authentication/sign-in",
+  //   component: <SignIn />,
+  // },
+  // {
+  //   type: "collapse",
+  //   name: "Sign Up",
+  //   key: "sign-up",
+  //   icon: <Icon fontSize="small">assignment</Icon>,
+  //   route: "/authentication/sign-up",
+  //   component: <SignUp />,
+  // },
   {
     type: "collapse",
     name: "Point of Sales",
     key: "point-of-sales",
-    icon: <Icon fontSize="small">assignment</Icon>,
+    icon: <Icon fontSize="small">point_of_sale</Icon>,
     route: "/point-of-sales",
     component: <PointOfSales />,
   },
