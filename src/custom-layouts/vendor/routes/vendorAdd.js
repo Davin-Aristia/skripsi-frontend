@@ -5,20 +5,7 @@ import axios from "axios";
 import { useNavigate, NavLink } from "react-router-dom";
 import { toast } from "react-toastify";
 
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  IconButton,
-  Box,
-  Button,
-  Card,
-  Icon,
-  Snackbar,
-  Alert,
-} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import { Card } from "@mui/material";
 
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
@@ -30,13 +17,6 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 
 export default function CreateVendorForm() {
@@ -62,11 +42,25 @@ export default function CreateVendorForm() {
     e.preventDefault();
 
     try {
-      const response = await axios.post("http://localhost:8080/vendors", vendor, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
+      const response = await axios.post(
+        "http://localhost:8080/vendors",
+        {
+          company: vendor.company,
+          email: vendor.email,
+          name: vendor.company,
+          phone_number: vendor.phoneNumber,
+          address: vendor.address,
+          account_name: vendor.accountName,
+          account_number: vendor.accountNumber,
+          account_bank: vendor.accountBank,
+          net_term: parseInt(vendor.netTerm, 10),
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
 
       setVendor(initialVendorState);
 

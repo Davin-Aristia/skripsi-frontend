@@ -5,7 +5,7 @@
 * Material Dashboard 2 React - v2.2.0
 =========================================================
 
-* Vendor Page: https://www.creative-tim.com/vendor/material-dashboard-react
+* Product Page: https://www.creative-tim.com/product/material-dashboard-react
 * Copyright 2023 Creative Tim (https://www.creative-tim.com)
 
 Coded by www.creative-tim.com
@@ -49,7 +49,6 @@ export default function data({ query }) {
       .get(link)
       .then((response) => {
         setVendors(response.data.response || []);
-        setLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);

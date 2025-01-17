@@ -41,6 +41,7 @@ import Tables from "layouts/tables";
 import Product from "custom-layouts/product";
 import ProductCategory from "custom-layouts/product-category";
 import Vendor from "custom-layouts/vendor";
+import Customer from "custom-layouts/customer";
 import Billing from "layouts/billing";
 // import RTL from "layouts/rtl";
 import Notifications from "layouts/notifications";
@@ -53,6 +54,7 @@ import SignUp from "layouts/authentication/sign-up";
 import productRoutes from "custom-layouts/product/routes";
 import productCategoryRoutes from "custom-layouts/product-category/routes";
 import vendorRoutes from "custom-layouts/vendor/routes";
+import customerRoutes from "custom-layouts/customer/routes";
 import SignInCustom from "custom-layouts/authentication/sign-in";
 
 // @mui icons
@@ -62,6 +64,7 @@ const routes = [
   ...productRoutes,
   ...productCategoryRoutes,
   ...vendorRoutes,
+  ...customerRoutes,
   // {
   //   type: "collapse",
   //   name: "Dashboard",
@@ -110,7 +113,7 @@ const routes = [
           </Icon>
         ),
         route: "/customer",
-        component: <Tables />,
+        component: <Customer />,
       },
       {
         type: "collapse",
