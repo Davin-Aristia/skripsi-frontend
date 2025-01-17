@@ -42,8 +42,8 @@ export default function CreateBookForm() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState([]);
   const [specs, setSpecs] = useState([]);
-  const [createdAt, setCreatedAt] = useState([]);
-  const [updatedAt, setUpdatedAt] = useState([]);
+  const [createdAt, setCreatedAt] = useState("");
+  const [updatedAt, setUpdatedAt] = useState("");
 
   const [categories, setCategories] = useState([]);
   const [imagePreview, setImagePreview] = useState(null);
