@@ -42,6 +42,7 @@ import Product from "custom-layouts/product";
 import ProductCategory from "custom-layouts/product-category";
 import Vendor from "custom-layouts/vendor";
 import Customer from "custom-layouts/customer";
+import Purchase from "custom-layouts/purchase";
 import Billing from "layouts/billing";
 // import RTL from "layouts/rtl";
 import Notifications from "layouts/notifications";
@@ -147,7 +148,7 @@ const routes = [
           </Icon>
         ),
         route: "/purchase",
-        component: <Tables />,
+        component: <Purchase />,
       },
       {
         type: "collapse",
