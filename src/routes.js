@@ -56,6 +56,7 @@ import productRoutes from "custom-layouts/product/routes";
 import productCategoryRoutes from "custom-layouts/product-category/routes";
 import vendorRoutes from "custom-layouts/vendor/routes";
 import customerRoutes from "custom-layouts/customer/routes";
+import purchaseRoutes from "custom-layouts/purchase/routes";
 import SignInCustom from "custom-layouts/authentication/sign-in";
 
 // @mui icons
@@ -66,6 +67,7 @@ const routes = [
   ...productCategoryRoutes,
   ...vendorRoutes,
   ...customerRoutes,
+  ...purchaseRoutes,
   // {
   //   type: "collapse",
   //   name: "Dashboard",

@@ -1,18 +1,18 @@
-import CustomerAdd from "./customerAdd";
-import CustomerEdit from "./purchaseEdit";
+import PurchaseAdd from "./purchaseAdd";
+import PurchaseEdit from "./purchaseEdit";
 
 const routes = [
   {
     type: "sub-route",
-    key: "customer-add",
-    route: "/customer/add",
-    component: <CustomerAdd />,
+    key: "purchase-add",
+    route: "/purchase/add",
+    component: <PurchaseAdd />,
   },
   {
     type: "sub-route",
-    key: "customer-edit",
-    route: "/customer/:id/edit",
-    component: <CustomerEdit />,
+    key: "purchase-edit",
+    route: "/purchase/:id/edit",
+    component: <PurchaseEdit />,
   },
 ];
 

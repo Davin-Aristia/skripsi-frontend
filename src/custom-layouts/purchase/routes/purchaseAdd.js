@@ -1,11 +1,23 @@
 // import { Link } from "react-router-dom";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, NavLink } from "react-router-dom";
 import { toast } from "react-toastify";
 
-import { Card } from "@mui/material";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+  Box,
+  Button,
+  Card,
+  Icon,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import Autocomplete from "@mui/material/Autocomplete";
 
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
@@ -17,44 +29,209 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 
-export default function CreateCustomerForm() {
+export default function CreatePurchaseForm() {
   const navigate = useNavigate();
   const { authToken } = useAuth();
 
-  const initialCustomerState = {
+  const initialPurchaseState = {
     name: "",
-    email: "",
-    phone: "",
+    date: "",
+    selectedVendor: {},
+    total: null,
   };
+  const initialDetailWizard = {
+    selectedProduct: {},
+    quantity: null,
+    price: null,
+    tax: null,
+    subtotal: null,
+  };
+  const [purchase, setPurchase] = useState(initialPurchaseState);
+  const [details, setDetails] = useState([]);
+  const [detailWizard, setDetailWizard] = useState(initialDetailWizard);
+  const [vendors, setVendors] = useState([]);
+  const [products, setProducts] = useState([]);
 
-  const [customer, setCustomer] = useState(initialCustomerState);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        // Fetch both vendors and products simultaneously
+        const [vendorsResponse, productsResponse] = await Promise.all([
+          axios.get(`http://localhost:8080/vendors`),
+          axios.get(`http://localhost:8080/products`),
+        ]);
+
+        // Extract the data from the responses
+        const vendors = vendorsResponse.data.response;
+        const products = productsResponse.data.response;
+
+        // Set the state with fetched data
+        setVendors(vendors);
+        setProducts(products);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    })();
+  }, []);
 
   // Function to handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const newPurchase = {
+      name: purchase.name,
+      date: ensureDateTimeFormat(purchase.date),
+      vendor_id: purchase.selectedVendor.id,
+      total: parseFloat(purchase.total),
+    };
+
+    if (details.length > 0) {
+      newPurchase.details = details.map((item) => ({
+        product_id: item.selectedProduct.id,
+        quantity: parseInt(item.quantity, 10),
+        price: parseFloat(item.price),
+        tax: parseFloat(item.tax),
+        subtotal: parseFloat(item.subtotal),
+      }));
+    }
+
     try {
-      const response = await axios.post("http://localhost:8080/customers", customer, {
+      // Send POST request to the API
+      const response = await axios.post("http://localhost:8080/purchases", newPurchase, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
       });
 
-      setCustomer(initialCustomerState);
+      // Clear the form fields after submission
+      setPurchase(initialPurchaseState);
+      setDetails([]);
 
-      toast.success("success add new customer");
-      navigate("/customer");
+      // Optionally refetch data or update the state to reflect the new book in the UI
+      toast.success("success add new purchase");
+      navigate("/purchase");
     } catch (error) {
-      toast.error("failed add new customer");
+      toast.error("failed add new purchase");
       console.log(error.response.data.message);
     }
+  };
+
+  const handleOpenWizard = () => setOpen(true);
+  const handleCloseWizard = () => {
+    setOpen(false);
+    setDetailWizard(initialDetailWizard);
+  };
+
+  const handleCreate = () => {
+    const newData = [...details, detailWizard];
+    setDetails(newData);
+    handleCloseWizard();
+  };
+
+  const handleDelete = (index) => {
+    const updatedData = details.filter((_, i) => i !== index);
+    setDetails(updatedData);
+  };
+
+  const handleEdit = (index, fieldName, newValue) => {
+    const updatedDetails = details.map((detail, i) =>
+      i === index ? { ...detail, [fieldName]: newValue } : detail
+    );
+    setDetails(updatedDetails);
+  };
+
+  const ensureDateTimeFormat = (date) => {
+    // If it's just a date (YYYY-MM-DD), add default time T00:00:00Z
+    if (date && date.length === 10) {
+      return date + "T00:00:00Z"; // Convert to datetime format (2025-01-07 -> 2025-01-07T00:00:00Z)
+    }
+    if (date && date.length === 16) {
+      return date + ":00Z"; // Add missing seconds (e.g., 2025-01-03T00:00 -> 2025-01-03T00:00:00Z)
+    }
+    // console.log("date", date);
+    return date; // If it's already in datetime format (e.g., 2025-01-07T12:30)
   };
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
+      <Dialog
+        open={open}
+        onClose={handleCloseWizard}
+        PaperProps={{
+          sx: { width: "30%", maxWidth: "none" },
+        }}
+      >
+        <DialogTitle>
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <span>Add New Detail</span>
+            <IconButton aria-label="close" onClick={handleCloseWizard}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <DialogContent dividers>
+          <MDBox component="form" role="form" onSubmit={handleSubmit}>
+            <MDBox mb={2} mt={2}>
+              <Autocomplete
+                disablePortal
+                onChange={(event, newValue) =>
+                  setDetailWizard({ ...detailWizard, selectedProduct: newValue })
+                }
+                options={products}
+                getOptionLabel={(option) => option?.name || ""}
+                sx={{
+                  "& .MuiInputLabel-root": {
+                    lineHeight: "1.5", // Adjust the line height for proper vertical alignment
+                  },
+                }}
+                renderInput={(params) => <MDInput {...params} label="Select Product" />}
+              />
+            </MDBox>
+            <MDBox mb={2} mt={2}>
+              <MDInput
+                type="number"
+                label="Quantity"
+                fullWidth
+                value={detailWizard.quantity}
+                onChange={(e) => setDetailWizard({ ...detailWizard, quantity: e.target.value })}
+              />
+            </MDBox>
+            <MDBox mb={2} mt={2}>
+              <MDInput
+                type="number"
+                label="Price"
+                fullWidth
+                value={detailWizard.price}
+                onChange={(e) => setDetailWizard({ ...detailWizard, price: e.target.value })}
+              />
+            </MDBox>
+            <MDBox mb={2} mt={2}>
+              <MDInput
+                type="number"
+                label="Tax"
+                fullWidth
+                value={detailWizard.tax}
+                onChange={(e) => setDetailWizard({ ...detailWizard, tax: e.target.value })}
+              />
+            </MDBox>
+          </MDBox>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseWizard}>Cancel</Button>
+          <Button onClick={handleCreate}>Create</Button>
+        </DialogActions>
+      </Dialog>
 
       <Card sx={{ mt: 4 }}>
         <MDBox
@@ -70,39 +247,251 @@ export default function CreateCustomerForm() {
           width="30%"
         >
           <MDTypography variant="h5" fontWeight="medium" color="white" mt={1}>
-            Add New Customer
+            Add New Purchase
           </MDTypography>
         </MDBox>
-        <MDBox pt={2} pb={3} px={3}>
+        <MDBox pt={4} pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit}>
-            <h3 style={{ paddingBottom: "10px" }}>Customer Information</h3>
             <MDBox mb={2}>
               <MDInput
                 type="text"
                 label="Name"
                 fullWidth
-                value={customer.name}
-                onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
+                value={purchase.name}
+                onChange={(e) => setPurchase({ ...purchase, name: e.target.value })}
               />
             </MDBox>
             <MDBox mb={2}>
               <MDInput
-                type="text"
-                label="Email"
+                type="date"
+                label="Date"
                 fullWidth
-                value={customer.email}
-                onChange={(e) => setCustomer({ ...customer, email: e.target.value })}
+                value={purchase.date}
+                onChange={(e) => setPurchase({ ...purchase, date: e.target.value })}
               />
             </MDBox>
             <MDBox mb={2}>
               <MDInput
-                type="text"
-                label="Phone"
+                type="number"
+                label="Total"
                 fullWidth
-                value={customer.phone}
-                onChange={(e) => setCustomer({ ...customer, phone: e.target.value })}
+                value={purchase.total}
+                onChange={(e) => setPurchase({ ...purchase, total: e.target.value })}
               />
             </MDBox>
+            <MDBox mb={2}>
+              <Autocomplete
+                disablePortal
+                onChange={(event, newValue) =>
+                  setPurchase({ ...purchase, selectedVendor: newValue })
+                }
+                options={vendors}
+                getOptionLabel={(option) => option?.name || ""}
+                sx={{
+                  "& .MuiInputLabel-root": {
+                    lineHeight: "1.5", // Adjust the line height for proper vertical alignment
+                  },
+                }}
+                renderInput={(params) => <MDInput {...params} label="Select Vendor" />}
+              />
+            </MDBox>
+            {/* <DataTable table={{ columns, rows }} isSorted={false} showTotalEntries={false} /> */}
+            <h3 style={{ padding: "40px 0px 15px 0px" }}>Specifications</h3>
+            <TableContainer component={Paper}>
+              <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+                {/* <Table
+                  sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                    borderTop: `${borderWidth[1]} solid ${light.main}`,
+                    minWidth: 650,
+                  })}
+                  size="small"
+                  aria-label="a dense table"
+                > */}
+                <MDBox component="thead">
+                  <TableRow>
+                    <MDBox
+                      component="th"
+                      width="auto"
+                      py={1.5}
+                      px={3}
+                      sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                        borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                        borderTop: `${borderWidth[2]} solid ${light.main}`,
+                      })}
+                    >
+                      Product
+                    </MDBox>
+                    <MDBox
+                      component="th"
+                      width="auto"
+                      py={1.5}
+                      px={3}
+                      sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                        borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                        borderTop: `${borderWidth[2]} solid ${light.main}`,
+                      })}
+                    >
+                      Quantity
+                    </MDBox>
+                    <MDBox
+                      component="th"
+                      width="auto"
+                      py={1.5}
+                      px={3}
+                      sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                        borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                        borderTop: `${borderWidth[2]} solid ${light.main}`,
+                      })}
+                    >
+                      Unit Price
+                    </MDBox>
+                    <MDBox
+                      component="th"
+                      width="auto"
+                      py={1.5}
+                      px={3}
+                      sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                        borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                        borderTop: `${borderWidth[2]} solid ${light.main}`,
+                      })}
+                    >
+                      PPN
+                    </MDBox>
+                    <MDBox
+                      component="th"
+                      width="auto"
+                      py={1.5}
+                      px={3}
+                      sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                        borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                        borderTop: `${borderWidth[2]} solid ${light.main}`,
+                      })}
+                    >
+                      Subtotal
+                    </MDBox>
+                    <MDBox
+                      component="th"
+                      width="auto"
+                      py={1.5}
+                      px={3}
+                      sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                        borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                        borderTop: `${borderWidth[2]} solid ${light.main}`,
+                      })}
+                    >
+                      Action
+                    </MDBox>
+                  </TableRow>
+                </MDBox>
+                <TableBody>
+                  {details.map((detail, index) => (
+                    <TableRow
+                      key={index}
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    >
+                      <TableCell component="th" scope="row">
+                        <input
+                          type="text"
+                          value={detail.selectedProduct.name}
+                          // onChange={(e) => handleEdit(index, e.target.value)}
+                          // style={{
+                          //   width: "100%",
+                          //   border: "1px solid lightgray",
+                          //   background: "transparent",
+                          //   outline: "none",
+                          //   padding: "5px",
+                          //   borderRadius: "4px",
+                          //   cursor: "text",
+                          // }}
+                        />
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        <input
+                          type="number"
+                          value={detail.quantity}
+                          onChange={(e) => handleEdit(index, "quantity", e.target.value)}
+                          style={{
+                            width: "100%",
+                            border: "1px solid lightgray",
+                            background: "transparent",
+                            outline: "none",
+                            padding: "5px",
+                            borderRadius: "4px",
+                            cursor: "text",
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        <input
+                          type="number"
+                          value={detail.price}
+                          onChange={(e) => handleEdit(index, "price", e.target.value)}
+                          style={{
+                            width: "100%",
+                            border: "1px solid lightgray",
+                            background: "transparent",
+                            outline: "none",
+                            padding: "5px",
+                            borderRadius: "4px",
+                            cursor: "text",
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        <input
+                          type="number"
+                          value={detail.tax}
+                          onChange={(e) => handleEdit(index, "tax", e.target.value)}
+                          style={{
+                            width: "100%",
+                            border: "1px solid lightgray",
+                            background: "transparent",
+                            outline: "none",
+                            padding: "5px",
+                            borderRadius: "4px",
+                            cursor: "text",
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        <input
+                          type="number"
+                          value={detail.subtotal}
+                          onChange={(e) => handleEdit(index, "subtotal", e.target.value)}
+                          style={{
+                            width: "100%",
+                            border: "1px solid lightgray",
+                            background: "transparent",
+                            outline: "none",
+                            padding: "5px",
+                            borderRadius: "4px",
+                            cursor: "text",
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell align="center">
+                        <MDButton
+                          variant="text"
+                          color="error"
+                          iconOnly
+                          onClick={() => handleDelete(index)}
+                        >
+                          <Icon>delete</Icon>
+                        </MDButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <MDButton
+              variant="gradient"
+              color="info"
+              onClick={handleOpenWizard}
+              sx={{ marginTop: "20px" }}
+            >
+              add details
+            </MDButton>
             <MDBox mt={4} mb={1}>
               <MDButton variant="gradient" color="info" fullWidth type="submit">
                 create
