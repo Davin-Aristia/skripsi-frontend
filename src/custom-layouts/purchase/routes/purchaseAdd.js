@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import Autocomplete from "@mui/material/Autocomplete";
+import Divider from "@mui/material/Divider";
 
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
@@ -42,17 +43,16 @@ export default function CreatePurchaseForm() {
   const { authToken } = useAuth();
 
   const initialPurchaseState = {
-    name: "",
     date: "",
     selectedVendor: {},
-    total: null,
+    total: 0,
   };
   const initialDetailWizard = {
     selectedProduct: {},
     quantity: null,
     price: null,
     tax: null,
-    subtotal: null,
+    subtotal: 0,
   };
   const [purchase, setPurchase] = useState(initialPurchaseState);
   const [details, setDetails] = useState([]);
@@ -89,7 +89,6 @@ export default function CreatePurchaseForm() {
     e.preventDefault();
 
     const newPurchase = {
-      name: purchase.name,
       date: ensureDateTimeFormat(purchase.date),
       vendor_id: purchase.selectedVendor.id,
       total: parseFloat(purchase.total),
@@ -132,9 +131,14 @@ export default function CreatePurchaseForm() {
     setDetailWizard(initialDetailWizard);
   };
 
+  const calculateSubtotal = (quantity, price, tax) => {
+    return (parseFloat(quantity) || 0) * (parseFloat(price) || 0) + (parseFloat(tax) || 0);
+  };
+
   const handleCreate = () => {
-    const newData = [...details, detailWizard];
-    setDetails(newData);
+    const subtotal = calculateSubtotal(detailWizard.quantity, detailWizard.price, detailWizard.tax);
+    const newDetail = { ...detailWizard, subtotal };
+    setDetails([...details, newDetail]);
     handleCloseWizard();
   };
 
@@ -143,12 +147,48 @@ export default function CreatePurchaseForm() {
     setDetails(updatedData);
   };
 
+  // const handleEdit = (index, fieldName, newValue) => {
+  //   const updatedDetails = details.map((detail, i) =>
+  //     i === index
+  //       ? {
+  //           ...detail,
+  //           [fieldName]: newValue,
+  //           subtotal:
+  //             parseFloat(detail.quantity) * parseFloat(detail.price) + parseFloat(detail.tax),
+  //         }
+  //       : detail
+  //   );
+  //   setDetails(updatedDetails);
+  //   updateTotal();
+  //   console.log("detailnya:", details);
+  // };
+
   const handleEdit = (index, fieldName, newValue) => {
-    const updatedDetails = details.map((detail, i) =>
-      i === index ? { ...detail, [fieldName]: newValue } : detail
-    );
+    const updatedDetails = details.map((detail, i) => {
+      if (i === index) {
+        const updatedDetail = {
+          ...detail,
+          [fieldName]: newValue,
+        };
+
+        updatedDetail.subtotal = calculateSubtotal(
+          updatedDetail.quantity,
+          updatedDetail.price,
+          updatedDetail.tax
+        );
+
+        return updatedDetail;
+      }
+      return detail;
+    });
+
     setDetails(updatedDetails);
   };
+
+  useEffect(() => {
+    const total = details.reduce((sum, detail) => sum + (detail.subtotal || 0), 0);
+    setPurchase((prevPurchase) => ({ ...prevPurchase, total }));
+  }, [details]);
 
   const ensureDateTimeFormat = (date) => {
     // If it's just a date (YYYY-MM-DD), add default time T00:00:00Z
@@ -254,24 +294,6 @@ export default function CreatePurchaseForm() {
           <MDBox component="form" role="form" onSubmit={handleSubmit}>
             <MDBox mb={2}>
               <MDInput
-                type="text"
-                label="Name"
-                fullWidth
-                value={purchase.name}
-                onChange={(e) => setPurchase({ ...purchase, name: e.target.value })}
-              />
-            </MDBox>
-            <MDBox mb={2}>
-              <MDInput
-                type="date"
-                label="Date"
-                fullWidth
-                value={purchase.date}
-                onChange={(e) => setPurchase({ ...purchase, date: e.target.value })}
-              />
-            </MDBox>
-            <MDBox mb={2}>
-              <MDInput
                 type="number"
                 label="Total"
                 fullWidth
@@ -295,8 +317,20 @@ export default function CreatePurchaseForm() {
                 renderInput={(params) => <MDInput {...params} label="Select Vendor" />}
               />
             </MDBox>
+            <MDBox mb={2}>
+              <MDInput
+                type="date"
+                label="Date"
+                fullWidth
+                value={purchase.date}
+                onChange={(e) => setPurchase({ ...purchase, date: e.target.value })}
+                InputLabelProps={{
+                  shrink: true, // Ensures label stays on top even when the input is empty
+                }}
+              />
+            </MDBox>
             {/* <DataTable table={{ columns, rows }} isSorted={false} showTotalEntries={false} /> */}
-            <h3 style={{ padding: "40px 0px 15px 0px" }}>Specifications</h3>
+            <h3 style={{ padding: "20px 0px 15px 0px" }}>Details</h3>
             <TableContainer component={Paper}>
               <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
                 {/* <Table
@@ -457,7 +491,7 @@ export default function CreatePurchaseForm() {
                         <input
                           type="number"
                           value={detail.subtotal}
-                          onChange={(e) => handleEdit(index, "subtotal", e.target.value)}
+                          // onChange={(e) => handleEdit(index, "subtotal", e.target.value)}
                           style={{
                             width: "100%",
                             border: "1px solid lightgray",
@@ -484,14 +518,42 @@ export default function CreatePurchaseForm() {
                 </TableBody>
               </Table>
             </TableContainer>
-            <MDButton
-              variant="gradient"
-              color="info"
-              onClick={handleOpenWizard}
-              sx={{ marginTop: "20px" }}
-            >
-              add details
-            </MDButton>
+            <MDBox>
+              {/* Add Details Button */}
+              <MDBox display="flex" justifyContent="flex-start" mt={3}>
+                <MDButton
+                  variant="gradient"
+                  color="info"
+                  onClick={handleOpenWizard}
+                  sx={{ marginTop: "20px" }}
+                >
+                  Add Details
+                </MDButton>
+              </MDBox>
+
+              {/* Divider */}
+              <MDBox my={3}>
+                <Divider />
+              </MDBox>
+
+              {/* Total Section */}
+              <MDBox
+                display="flex"
+                justifyContent="flex-end"
+                sx={{
+                  padding: "0px 20px",
+                  borderRadius: "8px",
+                  fontWeight: "bold",
+                  fontSize: "1.5rem",
+                }}
+              >
+                Total: Rp{" "}
+                {new Intl.NumberFormat("id-ID", {
+                  style: "decimal",
+                }).format(purchase.total)}
+              </MDBox>
+            </MDBox>
+
             <MDBox mt={4} mb={1}>
               <MDButton variant="gradient" color="info" fullWidth type="submit">
                 create

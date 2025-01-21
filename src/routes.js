@@ -88,7 +88,7 @@ const routes = [
         key: "product",
         icon: (
           <Icon fontSize="small" style={{ marginLeft: "30px" }}>
-            shopping_cart
+            computer
           </Icon>
         ),
         route: "/product",
@@ -158,7 +158,7 @@ const routes = [
         key: "customer-payment",
         icon: (
           <Icon fontSize="small" style={{ marginLeft: "30px" }}>
-            shop
+            move_to_inbox_outlined
           </Icon>
         ),
         route: "/purchase-return",
@@ -170,7 +170,7 @@ const routes = [
         key: "vendor-payment",
         icon: (
           <Icon fontSize="small" style={{ marginLeft: "30px" }}>
-            assignment_return
+            outbox_outlined
           </Icon>
         ),
         route: "/sales-return",
@@ -192,7 +192,7 @@ const routes = [
         key: "inventory-in",
         icon: (
           <Icon fontSize="small" style={{ marginLeft: "30px" }}>
-            shop
+            archive
           </Icon>
         ),
         route: "/purchase-return",
@@ -204,7 +204,7 @@ const routes = [
         key: "inventory-out",
         icon: (
           <Icon fontSize="small" style={{ marginLeft: "30px" }}>
-            assignment_return
+            unarchive
           </Icon>
         ),
         route: "/sales-return",
