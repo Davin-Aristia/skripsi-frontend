@@ -293,15 +293,6 @@ export default function CreatePurchaseForm() {
         <MDBox pt={4} pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit}>
             <MDBox mb={2}>
-              <MDInput
-                type="number"
-                label="Total"
-                fullWidth
-                value={purchase.total}
-                onChange={(e) => setPurchase({ ...purchase, total: e.target.value })}
-              />
-            </MDBox>
-            <MDBox mb={2}>
               <Autocomplete
                 disablePortal
                 onChange={(event, newValue) =>
@@ -424,19 +415,20 @@ export default function CreatePurchaseForm() {
                       sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                     >
                       <TableCell component="th" scope="row">
-                        <input
-                          type="text"
-                          value={detail.selectedProduct.name}
-                          // onChange={(e) => handleEdit(index, e.target.value)}
-                          // style={{
-                          //   width: "100%",
-                          //   border: "1px solid lightgray",
-                          //   background: "transparent",
-                          //   outline: "none",
-                          //   padding: "5px",
-                          //   borderRadius: "4px",
-                          //   cursor: "text",
-                          // }}
+                        <Autocomplete
+                          disablePortal
+                          value={detail.selectedProduct}
+                          onChange={(event, newValue) =>
+                            handleEdit(index, "selectedProduct", newValue)
+                          }
+                          options={products}
+                          getOptionLabel={(option) => option?.name || ""}
+                          sx={{
+                            "& .MuiInputLabel-root": {
+                              lineHeight: "1.5", // Adjust the line height for proper vertical alignment
+                            },
+                          }}
+                          renderInput={(params) => <MDInput {...params} label="Select Product" />}
                         />
                       </TableCell>
                       <TableCell component="th" scope="row">
@@ -488,20 +480,7 @@ export default function CreatePurchaseForm() {
                         />
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        <input
-                          type="number"
-                          value={detail.subtotal}
-                          // onChange={(e) => handleEdit(index, "subtotal", e.target.value)}
-                          style={{
-                            width: "100%",
-                            border: "1px solid lightgray",
-                            background: "transparent",
-                            outline: "none",
-                            padding: "5px",
-                            borderRadius: "4px",
-                            cursor: "text",
-                          }}
-                        />
+                        <h5>{detail.subtotal}</h5>
                       </TableCell>
                       <TableCell align="center">
                         <MDButton
