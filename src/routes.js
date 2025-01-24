@@ -88,7 +88,7 @@ const routes = [
         key: "product",
         icon: (
           <Icon fontSize="small" style={{ marginLeft: "30px" }}>
-            computer
+            important_devices
           </Icon>
         ),
         route: "/product",
@@ -112,7 +112,7 @@ const routes = [
         key: "customer",
         icon: (
           <Icon fontSize="small" style={{ marginLeft: "30px" }}>
-            shop
+            people_alt
           </Icon>
         ),
         route: "/customer",
@@ -124,7 +124,7 @@ const routes = [
         key: "vendor",
         icon: (
           <Icon fontSize="small" style={{ marginLeft: "30px" }}>
-            point_of_sale
+            perm_contact_calendar
           </Icon>
         ),
         route: "/vendor",
@@ -226,7 +226,7 @@ const routes = [
         key: "purchase-report",
         icon: (
           <Icon fontSize="small" style={{ marginLeft: "30px" }}>
-            shop
+            article
           </Icon>
         ),
         route: "/purchase-return",
@@ -238,7 +238,7 @@ const routes = [
         key: "sales-report",
         icon: (
           <Icon fontSize="small" style={{ marginLeft: "30px" }}>
-            assignment_return
+            auto_stories
           </Icon>
         ),
         route: "/sales-return",
@@ -250,7 +250,7 @@ const routes = [
         key: "inventory-report",
         icon: (
           <Icon fontSize="small" style={{ marginLeft: "30px" }}>
-            assignment_return
+            ballot
           </Icon>
         ),
         route: "/sales-return",
