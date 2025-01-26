@@ -43,6 +43,7 @@ import ProductCategory from "custom-layouts/product-category";
 import Vendor from "custom-layouts/vendor";
 import Customer from "custom-layouts/customer";
 import Purchase from "custom-layouts/purchase";
+import InventoryIn from "custom-layouts/inventory-in";
 import Billing from "layouts/billing";
 // import RTL from "layouts/rtl";
 import Notifications from "layouts/notifications";
@@ -161,7 +162,7 @@ const routes = [
             move_to_inbox_outlined
           </Icon>
         ),
-        route: "/purchase-return",
+        route: "/customer-payment",
         component: <Tables />,
       },
       {
@@ -173,7 +174,7 @@ const routes = [
             outbox_outlined
           </Icon>
         ),
-        route: "/sales-return",
+        route: "/vendor-payment",
         component: <Tables />,
       },
     ],
@@ -195,8 +196,8 @@ const routes = [
             archive
           </Icon>
         ),
-        route: "/purchase-return",
-        component: <Tables />,
+        route: "/inventory-in",
+        component: <InventoryIn />,
       },
       {
         type: "collapse",
@@ -207,7 +208,7 @@ const routes = [
             unarchive
           </Icon>
         ),
-        route: "/sales-return",
+        route: "/inventory-out",
         component: <Tables />,
       },
     ],
@@ -229,7 +230,7 @@ const routes = [
             article
           </Icon>
         ),
-        route: "/purchase-return",
+        route: "/purchase-report",
         component: <Tables />,
       },
       {
@@ -241,7 +242,7 @@ const routes = [
             auto_stories
           </Icon>
         ),
-        route: "/sales-return",
+        route: "/sales-report",
         component: <Tables />,
       },
       {
@@ -253,7 +254,7 @@ const routes = [
             ballot
           </Icon>
         ),
-        route: "/sales-return",
+        route: "/inventory-report",
         component: <Tables />,
       },
     ],
