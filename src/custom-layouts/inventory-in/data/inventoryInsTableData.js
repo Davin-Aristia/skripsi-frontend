@@ -119,7 +119,7 @@ export default function data({ query }) {
     total: inventoryIn.total,
     action: (
       <MDBox display="flex" alignItems="center" mt={{ xs: 2, sm: 0 }} ml={{ xs: -1.5, sm: 0 }}>
-        <NavLink to={`/inventoryIn/${inventoryIn.id}/edit`} style={{ textDecoration: "none" }}>
+        <NavLink to={`/inventory-in/${inventoryIn.id}/edit`} style={{ textDecoration: "none" }}>
           <MDButton variant="text" color={darkMode ? "white" : "dark"} iconOnly>
             <Icon>edit</Icon>
           </MDButton>

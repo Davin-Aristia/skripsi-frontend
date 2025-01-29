@@ -1,18 +1,18 @@
-import PurchaseAdd from "./purchaseAdd";
-import PurchaseEdit from "./purchaseEdit";
+import InventoryInAdd from "./inventoryInAdd";
+import InventoryInEdit from "./inventoryInEdit";
 
 const routes = [
   {
     type: "sub-route",
-    key: "purchase-add",
-    route: "/purchase/add",
-    component: <PurchaseAdd />,
+    key: "inventory-in-add",
+    route: "/inventory-in/add",
+    component: <InventoryInAdd />,
   },
   {
     type: "sub-route",
-    key: "purchase-edit",
-    route: "/purchase/:id/edit",
-    component: <PurchaseEdit />,
+    key: "inventory-in-edit",
+    route: "/inventory-in/:id/edit",
+    component: <InventoryInEdit />,
   },
 ];
 

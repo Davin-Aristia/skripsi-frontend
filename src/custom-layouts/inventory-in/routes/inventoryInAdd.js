@@ -38,13 +38,17 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 
-export default function CreatePurchaseForm() {
+export default function CreateInventoryInForm() {
   const navigate = useNavigate();
   const { authToken } = useAuth();
 
-  const initialPurchaseState = {
+  const initialInventoryInState = {
     date: "",
-    selectedVendor: {},
+    dueDate: "",
+    billDate: "",
+    billNumber: "",
+    deliveryNumber: "",
+    selectedPurchase: {},
     total: 0,
   };
   const initialDetailWizard = {
@@ -54,29 +58,30 @@ export default function CreatePurchaseForm() {
     tax: null,
     subtotal: 0,
   };
-  const [purchase, setPurchase] = useState(initialPurchaseState);
+  const [inventoryIn, setInventoryIn] = useState(initialInventoryInState);
   const [details, setDetails] = useState([]);
   const [detailWizard, setDetailWizard] = useState(initialDetailWizard);
-  const [vendors, setVendors] = useState([]);
+  const [purchases, setPurchases] = useState([]);
   const [products, setProducts] = useState([]);
 
   const [open, setOpen] = useState(false);
+  const [openBillReceiptWizard, setOpenBillReceiptWizard] = useState(false);
 
   useEffect(() => {
     (async () => {
       try {
-        // Fetch both vendors and products simultaneously
-        const [vendorsResponse, productsResponse] = await Promise.all([
-          axios.get(`http://localhost:8080/vendors`),
+        // Fetch both purchases and products simultaneously
+        const [purchasesResponse, productsResponse] = await Promise.all([
+          axios.get(`http://localhost:8080/purchases`),
           axios.get(`http://localhost:8080/products`),
         ]);
 
         // Extract the data from the responses
-        const vendors = vendorsResponse.data.response;
+        const purchases = purchasesResponse.data.response;
         const products = productsResponse.data.response;
 
         // Set the state with fetched data
-        setVendors(vendors);
+        setPurchases(purchases);
         setProducts(products);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -88,14 +93,14 @@ export default function CreatePurchaseForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newPurchase = {
-      date: ensureDateTimeFormat(purchase.date),
-      vendor_id: purchase.selectedVendor.id,
-      total: parseFloat(purchase.total),
+    const newInventoryIn = {
+      date: ensureDateTimeFormat(inventoryIn.date),
+      vendor_id: inventoryIn.selectedVendor.id,
+      total: parseFloat(inventoryIn.total),
     };
 
     if (details.length > 0) {
-      newPurchase.details = details.map((item) => ({
+      newInventoryIn.details = details.map((item) => ({
         product_id: item.selectedProduct.id,
         quantity: parseInt(item.quantity, 10),
         price: parseFloat(item.price),
@@ -106,25 +111,30 @@ export default function CreatePurchaseForm() {
 
     try {
       // Send POST request to the API
-      const response = await axios.post("http://localhost:8080/purchases", newPurchase, {
+      const response = await axios.post("http://localhost:8080/inventory-ins", newInventoryIn, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
       });
 
       // Clear the form fields after submission
-      setPurchase(initialPurchaseState);
+      setInventoryIn(initialInventoryInState);
       setDetails([]);
 
       // Optionally refetch data or update the state to reflect the new book in the UI
-      toast.success("success add new purchase");
-      navigate("/purchase");
+      toast.success("success add new inventory in");
+      navigate("/inventory-in");
     } catch (error) {
-      toast.error("failed add new purchase");
+      toast.error("failed add new inventory in");
       console.log(error.response.data.message);
     }
   };
 
+  // const handleOpenBillReceipt = () => setOpenBillReceiptWizard(true);
+  // const handleCloseBillReceipt = () => {
+  //   setOpenBillReceiptWizard(false);
+  //   // setDetailBillReceipt(initialDetailBillReceipt);
+  // };
   const handleOpenWizard = () => setOpen(true);
   const handleCloseWizard = () => {
     setOpen(false);
@@ -187,7 +197,7 @@ export default function CreatePurchaseForm() {
 
   useEffect(() => {
     const total = details.reduce((sum, detail) => sum + (detail.subtotal || 0), 0);
-    setPurchase((prevPurchase) => ({ ...prevPurchase, total }));
+    setInventoryIn((prevInventoryIn) => ({ ...prevInventoryIn, total }));
   }, [details]);
 
   const ensureDateTimeFormat = (date) => {
@@ -200,6 +210,20 @@ export default function CreatePurchaseForm() {
     }
     // console.log("date", date);
     return date; // If it's already in datetime format (e.g., 2025-01-07T12:30)
+  };
+
+  const setBillReceipt = (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+
+    setInventoryIn({
+      ...inventoryIn,
+      billDate: formData.get("billDate"),
+      billNumber: formData.get("billNumber"),
+    });
+
+    // Close wizard or handle navigation
+    setOpenBillReceiptWizard(false);
   };
 
   return (
@@ -273,6 +297,45 @@ export default function CreatePurchaseForm() {
         </DialogActions>
       </Dialog>
 
+      <Dialog
+        open={openBillReceiptWizard}
+        onClose={() => setOpenBillReceiptWizard(false)}
+        PaperProps={{
+          sx: { width: "30%", maxWidth: "none" },
+        }}
+      >
+        <DialogTitle>
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <span>Bill Receipt</span>
+            <IconButton aria-label="close" onClick={() => setOpenBillReceiptWizard(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <MDBox component="form" role="form" onSubmit={setBillReceipt}>
+          <DialogContent dividers>
+            <MDBox mb={2} mt={2}>
+              <MDInput
+                type="date"
+                label="Bill Date"
+                fullWidth
+                name="billDate"
+                required
+                InputLabelProps={{
+                  shrink: true, // Ensures label stays on top even when the input is empty
+                }}
+              />
+            </MDBox>
+            <MDBox mb={2} mt={2}>
+              <MDInput type="text" label="Bill Number" fullWidth name="billNumber" />
+            </MDBox>
+          </DialogContent>
+          <DialogActions>
+            <Button type="submit">Add</Button>
+          </DialogActions>
+        </MDBox>
+      </Dialog>
+
       <Card sx={{ mt: 4 }}>
         <MDBox
           variant="gradient"
@@ -287,25 +350,56 @@ export default function CreatePurchaseForm() {
           width="30%"
         >
           <MDTypography variant="h5" fontWeight="medium" color="white" mt={1}>
-            Add New Purchase
+            Add New Inventory In
           </MDTypography>
         </MDBox>
+
+        {!inventoryIn.billDate && (
+          <MDBox
+            sx={{
+              position: "absolute",
+              top: 5, // Adjust the top spacing
+              left: 15, // Align to the right
+            }}
+          >
+            <MDButton
+              variant="gradient"
+              color="info"
+              onClick={() => setOpenBillReceiptWizard(true)}
+              sx={{ marginTop: "20px" }}
+            >
+              Bill Receipt
+            </MDButton>
+          </MDBox>
+        )}
         <MDBox pt={4} pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit}>
             <MDBox mb={2}>
               <Autocomplete
                 disablePortal
                 onChange={(event, newValue) =>
-                  setPurchase({ ...purchase, selectedVendor: newValue })
+                  setInventoryIn({ ...inventoryIn, selectedVendor: newValue })
                 }
-                options={vendors}
+                options={purchases}
                 getOptionLabel={(option) => option?.name || ""}
                 sx={{
                   "& .MuiInputLabel-root": {
                     lineHeight: "1.5", // Adjust the line height for proper vertical alignment
                   },
                 }}
-                renderInput={(params) => <MDInput {...params} label="Select Vendor" />}
+                renderInput={(params) => <MDInput {...params} label="Select Purchase" />}
+              />
+            </MDBox>
+            <MDBox mb={2}>
+              <MDInput
+                type="text"
+                label="Delivery Number"
+                fullWidth
+                value={inventoryIn.deliveryNumber}
+                py={5}
+                onChange={(e) =>
+                  setDeliveryNumber({ ...inventoryIn, deliveryNumber: e.target.value })
+                }
               />
             </MDBox>
             <MDBox mb={2}>
@@ -313,13 +407,72 @@ export default function CreatePurchaseForm() {
                 type="date"
                 label="Date"
                 fullWidth
-                value={purchase.date}
-                onChange={(e) => setPurchase({ ...purchase, date: e.target.value })}
+                value={inventoryIn.date}
+                onChange={(e) => setInventoryIn({ ...inventoryIn, date: e.target.value })}
                 InputLabelProps={{
                   shrink: true, // Ensures label stays on top even when the input is empty
                 }}
               />
             </MDBox>
+            <MDBox mb={2}>
+              <MDInput
+                type="date"
+                label="Due Date"
+                fullWidth
+                value={inventoryIn.dueDate}
+                onChange={(e) => setInventoryIn({ ...inventoryIn, dueDate: e.target.value })}
+                InputLabelProps={{
+                  shrink: true, // Ensures label stays on top even when the input is empty
+                }}
+              />
+            </MDBox>
+            {inventoryIn.billDate && (
+              <Grid container spacing={2}>
+                <Grid item xs={4}>
+                  <MDBox mb={2}>
+                    <MDInput
+                      type="date"
+                      label="Bill Date"
+                      fullWidth
+                      value={inventoryIn.billDate}
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          setInventoryIn({ ...inventoryIn, billDate: e.target.value });
+                        }
+                      }}
+                      InputLabelProps={{
+                        shrink: true, // Ensures label stays on top even when the input is empty
+                      }}
+                    />
+                  </MDBox>
+                </Grid>
+                <Grid item xs={6}>
+                  <MDBox mb={2}>
+                    <MDInput
+                      type="text"
+                      label="Bill Number"
+                      fullWidth
+                      value={inventoryIn.billNumber}
+                      py={5}
+                      onChange={(e) =>
+                        setInventoryIn({ ...inventoryIn, billNumber: e.target.value })
+                      }
+                    />
+                  </MDBox>
+                </Grid>
+                <Grid item xs={2}>
+                  <MDButton
+                    variant="gradient"
+                    color="error"
+                    fullWidth
+                    type="button"
+                    onClick={() => setInventoryIn({ ...inventoryIn, billDate: "", billNumber: "" })}
+                  >
+                    cancel bill receipt
+                  </MDButton>
+                </Grid>
+              </Grid>
+            )}
             {/* <DataTable table={{ columns, rows }} isSorted={false} showTotalEntries={false} /> */}
             <h3 style={{ padding: "20px 0px 15px 0px" }}>Details</h3>
             <TableContainer component={Paper}>
@@ -529,7 +682,7 @@ export default function CreatePurchaseForm() {
                 Total: Rp{" "}
                 {new Intl.NumberFormat("id-ID", {
                   style: "decimal",
-                }).format(purchase.total)}
+                }).format(inventoryIn.total)}
               </MDBox>
             </MDBox>
 
