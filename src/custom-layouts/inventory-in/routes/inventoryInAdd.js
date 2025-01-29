@@ -37,6 +37,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
+import { DataGrid } from "@mui/x-data-grid";
 
 export default function CreateInventoryInForm() {
   const navigate = useNavigate();
@@ -52,7 +53,7 @@ export default function CreateInventoryInForm() {
     total: 0,
   };
   const initialDetailWizard = {
-    selectedProduct: {},
+    product: {},
     quantity: null,
     price: null,
     tax: null,
@@ -63,6 +64,8 @@ export default function CreateInventoryInForm() {
   const [detailWizard, setDetailWizard] = useState(initialDetailWizard);
   const [purchases, setPurchases] = useState([]);
   const [products, setProducts] = useState([]);
+  const [rows, setRows] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]);
 
   const [open, setOpen] = useState(false);
   const [openBillReceiptWizard, setOpenBillReceiptWizard] = useState(false);
@@ -92,7 +95,6 @@ export default function CreateInventoryInForm() {
   // Function to handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("inventoryIn.selectedPurchase.id", ensureDateTimeFormat(inventoryIn.billDate));
 
     const newInventoryIn = {
       date: ensureDateTimeFormat(inventoryIn.date),
@@ -105,8 +107,9 @@ export default function CreateInventoryInForm() {
     };
 
     if (details.length > 0) {
-      newInventoryIn.details = details.map((item) => ({
-        product_id: item.selectedProduct.id,
+      newInventoryIn.stock_moves = details.map((item) => ({
+        purchase_detail_id: item.id,
+        product_id: item.product.id,
         quantity: parseInt(item.quantity, 10),
         price: parseFloat(item.price),
         tax: parseFloat(item.tax),
@@ -135,11 +138,33 @@ export default function CreateInventoryInForm() {
     }
   };
 
-  // const handleOpenBillReceipt = () => setOpenBillReceiptWizard(true);
-  // const handleCloseBillReceipt = () => {
-  //   setOpenBillReceiptWizard(false);
-  //   // setDetailBillReceipt(initialDetailBillReceipt);
-  // };
+  const columns = [
+    { field: "product_name", headerName: "Product", flex: 1 },
+    {
+      field: "quantity",
+      headerName: "Quantity",
+      type: "number",
+      flex: 1,
+    },
+    {
+      field: "price",
+      headerName: "Unit Price",
+      type: "number",
+      flex: 1,
+    },
+    {
+      field: "tax",
+      headerName: "PPN",
+      type: "number",
+      flex: 1,
+    },
+    {
+      field: "subtotal",
+      headerName: "Subtotal",
+      type: "number",
+      flex: 1,
+    },
+  ];
   const handleOpenWizard = () => setOpen(true);
   const handleCloseWizard = () => {
     setOpen(false);
@@ -150,33 +175,28 @@ export default function CreateInventoryInForm() {
     return (parseFloat(quantity) || 0) * (parseFloat(price) || 0) + (parseFloat(tax) || 0);
   };
 
-  const handleCreate = () => {
-    const subtotal = calculateSubtotal(detailWizard.quantity, detailWizard.price, detailWizard.tax);
-    const newDetail = { ...detailWizard, subtotal };
-    setDetails([...details, newDetail]);
-    handleCloseWizard();
-  };
+  // const handleSelect = () => {
+  //   const subtotal = calculateSubtotal(detailWizard.quantity, detailWizard.price, detailWizard.tax);
+  //   const newDetail = { ...detailWizard, subtotal };
+  //   setDetails([...details, newDetail]);
+  //   handleCloseWizard();
+  // };
+
+  // const handleDelete = (index) => {
+  //   const updatedData = details.filter((_, i) => i !== index);
+  //   setDetails(updatedData);
+  // };
 
   const handleDelete = (index) => {
-    const updatedData = details.filter((_, i) => i !== index);
-    setDetails(updatedData);
-  };
+    setDetails((prevDetails) => {
+      const deletedItem = prevDetails[index]; // Get the deleted item
+      const updatedDetails = prevDetails.filter((_, i) => i !== index);
 
-  // const handleEdit = (index, fieldName, newValue) => {
-  //   const updatedDetails = details.map((detail, i) =>
-  //     i === index
-  //       ? {
-  //           ...detail,
-  //           [fieldName]: newValue,
-  //           subtotal:
-  //             parseFloat(detail.quantity) * parseFloat(detail.price) + parseFloat(detail.tax),
-  //         }
-  //       : detail
-  //   );
-  //   setDetails(updatedDetails);
-  //   updateTotal();
-  //   console.log("detailnya:", details);
-  // };
+      setRows((prevRows) => [...prevRows, deletedItem]); // Add back to rows
+
+      return updatedDetails;
+    });
+  };
 
   const handleEdit = (index, fieldName, newValue) => {
     const updatedDetails = details.map((detail, i) => {
@@ -231,6 +251,45 @@ export default function CreateInventoryInForm() {
     setOpenBillReceiptWizard(false);
   };
 
+  // const handlePurchaseChange = (event, newValue) => {
+  //   setInventoryIn({ ...inventoryIn, selectedPurchase: newValue });
+  //   setRows(newValue.details);
+  // };
+
+  const handlePurchaseChange = async (event, newValue) => {
+    if (!newValue) return;
+
+    try {
+      const response = await axios.get(`http://localhost:8080/purchases/${newValue.id}`);
+      const purchaseDetails = response.data.response.details;
+      const formattedDetails = purchaseDetails
+        ? purchaseDetails.map((detail) => ({
+            ...detail,
+            product_name: detail.product?.name || "Unknown Product", // Handle potential null product
+          }))
+        : [];
+
+      setInventoryIn({ ...inventoryIn, selectedPurchase: newValue });
+      setRows(formattedDetails);
+      setDetails([]);
+    } catch (error) {
+      console.error("Error fetching purchase details:", error);
+    }
+  };
+
+  const handleSelectionChange = (selectionModel) => {
+    const selectedDetails = rows.filter((row) => selectionModel.includes(row.id));
+    setSelectedRows(selectedDetails);
+  };
+
+  const handleSelect = () => {
+    setDetails((prevDetails) => [...prevDetails, ...selectedRows]); // Add selected rows to details
+    setRows((prevRows) =>
+      prevRows.filter((row) => !selectedRows.some((selected) => selected.id === row.id))
+    );
+    handleCloseWizard();
+  };
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -238,7 +297,7 @@ export default function CreateInventoryInForm() {
         open={open}
         onClose={handleCloseWizard}
         PaperProps={{
-          sx: { width: "30%", maxWidth: "none" },
+          sx: { width: "80%", maxWidth: "none" },
         }}
       >
         <DialogTitle>
@@ -250,55 +309,21 @@ export default function CreateInventoryInForm() {
           </Box>
         </DialogTitle>
         <DialogContent dividers>
-          <MDBox component="form" role="form" onSubmit={handleSubmit}>
-            <MDBox mb={2} mt={2}>
-              <Autocomplete
-                disablePortal
-                onChange={(event, newValue) =>
-                  setDetailWizard({ ...detailWizard, selectedProduct: newValue })
-                }
-                options={products}
-                getOptionLabel={(option) => option?.name || ""}
-                sx={{
-                  "& .MuiInputLabel-root": {
-                    lineHeight: "1.5", // Adjust the line height for proper vertical alignment
-                  },
-                }}
-                renderInput={(params) => <MDInput {...params} label="Select Product" />}
-              />
-            </MDBox>
-            <MDBox mb={2} mt={2}>
-              <MDInput
-                type="number"
-                label="Quantity"
-                fullWidth
-                value={detailWizard.quantity}
-                onChange={(e) => setDetailWizard({ ...detailWizard, quantity: e.target.value })}
-              />
-            </MDBox>
-            <MDBox mb={2} mt={2}>
-              <MDInput
-                type="number"
-                label="Price"
-                fullWidth
-                value={detailWizard.price}
-                onChange={(e) => setDetailWizard({ ...detailWizard, price: e.target.value })}
-              />
-            </MDBox>
-            <MDBox mb={2} mt={2}>
-              <MDInput
-                type="number"
-                label="Tax"
-                fullWidth
-                value={detailWizard.tax}
-                onChange={(e) => setDetailWizard({ ...detailWizard, tax: e.target.value })}
-              />
-            </MDBox>
-          </MDBox>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            disableSelectionOnClick
+            pageSize={5}
+            rowsPerPageOptions={[5]}
+            disableColumnSelector
+            disableColumnFilter
+            checkboxSelection
+            onRowSelectionModelChange={handleSelectionChange}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseWizard}>Cancel</Button>
-          <Button onClick={handleCreate}>Create</Button>
+          <Button onClick={handleSelect}>Select</Button>
         </DialogActions>
       </Dialog>
 
@@ -382,9 +407,7 @@ export default function CreateInventoryInForm() {
             <MDBox mb={2}>
               <Autocomplete
                 disablePortal
-                onChange={(event, newValue) =>
-                  setInventoryIn({ ...inventoryIn, selectedPurchase: newValue })
-                }
+                onChange={handlePurchaseChange}
                 options={purchases}
                 getOptionLabel={(option) => option?.name || ""}
                 sx={{
@@ -571,21 +594,7 @@ export default function CreateInventoryInForm() {
                       sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                     >
                       <TableCell component="th" scope="row">
-                        <Autocomplete
-                          disablePortal
-                          value={detail.selectedProduct}
-                          onChange={(event, newValue) =>
-                            handleEdit(index, "selectedProduct", newValue)
-                          }
-                          options={products}
-                          getOptionLabel={(option) => option?.name || ""}
-                          sx={{
-                            "& .MuiInputLabel-root": {
-                              lineHeight: "1.5", // Adjust the line height for proper vertical alignment
-                            },
-                          }}
-                          renderInput={(params) => <MDInput {...params} label="Select Product" />}
-                        />
+                        {detail.product.name}
                       </TableCell>
                       <TableCell component="th" scope="row">
                         <input
@@ -604,36 +613,10 @@ export default function CreateInventoryInForm() {
                         />
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        <input
-                          type="number"
-                          value={detail.price}
-                          onChange={(e) => handleEdit(index, "price", e.target.value)}
-                          style={{
-                            width: "100%",
-                            border: "1px solid lightgray",
-                            background: "transparent",
-                            outline: "none",
-                            padding: "5px",
-                            borderRadius: "4px",
-                            cursor: "text",
-                          }}
-                        />
+                        {detail.price}
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        <input
-                          type="number"
-                          value={detail.tax}
-                          onChange={(e) => handleEdit(index, "tax", e.target.value)}
-                          style={{
-                            width: "100%",
-                            border: "1px solid lightgray",
-                            background: "transparent",
-                            outline: "none",
-                            padding: "5px",
-                            borderRadius: "4px",
-                            cursor: "text",
-                          }}
-                        />
+                        {detail.tax}
                       </TableCell>
                       <TableCell component="th" scope="row">
                         <h5>{detail.subtotal}</h5>
