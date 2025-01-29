@@ -44,8 +44,8 @@ export default function CreateInventoryInForm() {
 
   const initialInventoryInState = {
     date: "",
-    dueDate: "",
-    billDate: "",
+    dueDate: null,
+    billDate: null,
     billNumber: "",
     deliveryNumber: "",
     selectedPurchase: {},
@@ -92,10 +92,15 @@ export default function CreateInventoryInForm() {
   // Function to handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("inventoryIn.selectedPurchase.id", ensureDateTimeFormat(inventoryIn.billDate));
 
     const newInventoryIn = {
       date: ensureDateTimeFormat(inventoryIn.date),
-      vendor_id: inventoryIn.selectedVendor.id,
+      due_date: ensureDateTimeFormat(inventoryIn.dueDate),
+      bill_date: ensureDateTimeFormat(inventoryIn.billDate),
+      bill_number: inventoryIn.billNumber,
+      delivery_number: inventoryIn.deliveryNumber,
+      purchase_id: inventoryIn.selectedPurchase.id,
       total: parseFloat(inventoryIn.total),
     };
 
@@ -126,7 +131,7 @@ export default function CreateInventoryInForm() {
       navigate("/inventory-in");
     } catch (error) {
       toast.error("failed add new inventory in");
-      console.log(error.response.data.message);
+      console.log(error.response.data.response);
     }
   };
 
@@ -378,7 +383,7 @@ export default function CreateInventoryInForm() {
               <Autocomplete
                 disablePortal
                 onChange={(event, newValue) =>
-                  setInventoryIn({ ...inventoryIn, selectedVendor: newValue })
+                  setInventoryIn({ ...inventoryIn, selectedPurchase: newValue })
                 }
                 options={purchases}
                 getOptionLabel={(option) => option?.name || ""}
@@ -397,9 +402,7 @@ export default function CreateInventoryInForm() {
                 fullWidth
                 value={inventoryIn.deliveryNumber}
                 py={5}
-                onChange={(e) =>
-                  setDeliveryNumber({ ...inventoryIn, deliveryNumber: e.target.value })
-                }
+                onChange={(e) => setInventoryIn({ ...inventoryIn, deliveryNumber: e.target.value })}
               />
             </MDBox>
             <MDBox mb={2}>
