@@ -37,48 +37,55 @@ import TableContainer from "@mui/material/TableContainer";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
+import { DataGrid } from "@mui/x-data-grid";
 
-export default function CreatePurchaseForm() {
+export default function CreateInventoryInForm() {
   const navigate = useNavigate();
   const { authToken } = useAuth();
   const { id } = useParams();
 
-  const initialPurchaseState = {
-    name: "",
+  const initialInventoryInState = {
     date: "",
-    selectedVendor: {},
+    dueDate: null,
+    billDate: null,
+    billNumber: "",
+    deliveryNumber: "",
+    selectedPurchase: {},
     total: 0,
   };
   const initialDetailWizard = {
-    selectedProduct: {},
+    product: {},
     quantity: null,
     price: null,
     tax: null,
     subtotal: 0,
   };
-  const [purchase, setPurchase] = useState(initialPurchaseState);
+  const [inventoryIn, setInventoryIn] = useState(initialInventoryInState);
   const [details, setDetails] = useState([]);
   const [detailWizard, setDetailWizard] = useState(initialDetailWizard);
-  const [vendors, setVendors] = useState([]);
+  const [purchases, setPurchases] = useState([]);
   const [products, setProducts] = useState([]);
+  const [rows, setRows] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]);
 
   const [open, setOpen] = useState(false);
+  const [openBillReceiptWizard, setOpenBillReceiptWizard] = useState(false);
 
   useEffect(() => {
     (async () => {
       try {
-        // Fetch both vendors and products simultaneously
-        const [vendorsResponse, productsResponse] = await Promise.all([
-          axios.get(`http://localhost:8080/vendors`),
+        // Fetch both purchases and products simultaneously
+        const [purchasesResponse, productsResponse] = await Promise.all([
+          axios.get(`http://localhost:8080/purchases`),
           axios.get(`http://localhost:8080/products`),
         ]);
 
         // Extract the data from the responses
-        const vendors = vendorsResponse.data.response;
+        const purchases = purchasesResponse.data.response;
         const products = productsResponse.data.response;
 
         // Set the state with fetched data
-        setVendors(vendors);
+        setPurchases(purchases);
         setProducts(products);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -89,18 +96,23 @@ export default function CreatePurchaseForm() {
   useEffect(() => {
     (async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/purchases/${id}`);
-        const purchase = response.data.response;
-        setPurchase({
-          name: purchase.name,
-          date: convertToLocalDate(purchase.date),
-          selectedVendor: purchase.vendor,
-          total: purchase.total,
-          createdAt: convertToLocalDate(purchase.created_at),
-          updatedAt: convertToLocalDate(purchase.updated_at),
+        const response = await axios.get(`http://localhost:8080/inventory-ins/${id}`);
+        const inventoryIn = response.data.response;
+        setInventoryIn({
+          // name: inventoryIn.name,
+          date: convertToLocalDate(inventoryIn.date),
+          dueDate: convertToLocalDate(inventoryIn.due_date),
+          billDate: convertToLocalDate(inventoryIn.bill_date),
+          billNumber: inventoryIn.bill_number,
+          deliveryNumber: inventoryIn.delivery_number,
+          selectedPurchase: inventoryIn.purchase_object,
+          total: 0,
+          createdAt: convertToLocalDate(inventoryIn.created_at),
+          updatedAt: convertToLocalDate(inventoryIn.updated_at),
         });
-        const transformedDetails = purchase.details.map((detail) => ({
-          selectedProduct: detail.product,
+        const transformedDetails = inventoryIn.stock_moves.map((detail) => ({
+          id: detail.purchase_detail_id,
+          product: detail.product,
           quantity: detail.quantity || null,
           price: detail.price || null,
           tax: detail.tax || null,
@@ -108,6 +120,20 @@ export default function CreatePurchaseForm() {
         }));
 
         setDetails(transformedDetails);
+
+        const purchaseResponse = await axios.get(
+          `http://localhost:8080/purchases/${inventoryIn.purchase_object.id}`
+        );
+        const purchaseDetails = purchaseResponse.data.response.details || [];
+
+        const availableRows = purchaseDetails
+          .map((detail) => ({
+            ...detail,
+            product_name: detail.product?.name || "Unknown Product",
+          }))
+          .filter((detail) => !transformedDetails.some((d) => d.id === detail.id)); // Exclude selected ones
+
+        setRows(availableRows);
       } catch (error) {
         console.error("Error fetching purchase:", error);
       }
@@ -115,25 +141,33 @@ export default function CreatePurchaseForm() {
   }, [id]);
 
   const convertToLocalDate = (utcDateString) => {
-    const date = new Date(utcDateString);
-    const jakartaOffset = 7 * 60;
-    const jakartaTime = new Date(date.getTime() + jakartaOffset * 60 * 1000);
-    return jakartaTime.toISOString().split("T")[0];
+    if (utcDateString) {
+      const date = new Date(utcDateString);
+      const jakartaOffset = 7 * 60;
+      const jakartaTime = new Date(date.getTime() + jakartaOffset * 60 * 1000);
+      return jakartaTime.toISOString().split("T")[0];
+    }
+    return utcDateString;
   };
 
   // Function to handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newPurchase = {
-      date: ensureDateTimeFormat(purchase.date),
-      vendor_id: purchase.selectedVendor.id,
-      total: parseFloat(purchase.total),
+    const newInventoryIn = {
+      date: ensureDateTimeFormat(inventoryIn.date),
+      due_date: ensureDateTimeFormat(inventoryIn.dueDate),
+      bill_date: ensureDateTimeFormat(inventoryIn.billDate),
+      bill_number: inventoryIn.billNumber,
+      delivery_number: inventoryIn.deliveryNumber,
+      purchase_id: inventoryIn.selectedPurchase.id,
+      total: parseFloat(inventoryIn.total),
     };
 
     if (details.length > 0) {
-      newPurchase.details = details.map((item) => ({
-        product_id: item.selectedProduct.id,
+      newInventoryIn.stock_moves = details.map((item) => ({
+        purchase_detail_id: item.id,
+        product_id: item.product.id,
         quantity: parseInt(item.quantity, 10),
         price: parseFloat(item.price),
         tax: parseFloat(item.tax),
@@ -143,25 +177,56 @@ export default function CreatePurchaseForm() {
 
     try {
       // Send POST request to the API
-      const response = await axios.put(`http://localhost:8080/purchases/${id}`, newPurchase, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
+      const response = await axios.put(
+        `http://localhost:8080/inventory-ins/${id}`,
+        newInventoryIn,
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
 
       // Clear the form fields after submission
-      setPurchase(initialPurchaseState);
+      setInventoryIn(initialInventoryInState);
       setDetails([]);
 
       // Optionally refetch data or update the state to reflect the new book in the UI
-      toast.success("success update new purchase");
-      navigate("/purchase");
+      toast.success("success add new inventory in");
+      navigate("/inventory-in");
     } catch (error) {
-      toast.error("failed update new purchase");
-      console.log(error.response.data.message);
+      toast.error("failed add new inventory in");
+      console.log(error.response.data.response);
     }
   };
 
+  const columns = [
+    { field: "product_name", headerName: "Product", flex: 1 },
+    {
+      field: "quantity",
+      headerName: "Quantity",
+      type: "number",
+      flex: 1,
+    },
+    {
+      field: "price",
+      headerName: "Unit Price",
+      type: "number",
+      flex: 1,
+    },
+    {
+      field: "tax",
+      headerName: "PPN",
+      type: "number",
+      flex: 1,
+    },
+    {
+      field: "subtotal",
+      headerName: "Subtotal",
+      type: "number",
+      flex: 1,
+    },
+  ];
   const handleOpenWizard = () => setOpen(true);
   const handleCloseWizard = () => {
     setOpen(false);
@@ -172,33 +237,31 @@ export default function CreatePurchaseForm() {
     return (parseFloat(quantity) || 0) * (parseFloat(price) || 0) + (parseFloat(tax) || 0);
   };
 
-  const handleCreate = () => {
-    const subtotal = calculateSubtotal(detailWizard.quantity, detailWizard.price, detailWizard.tax);
-    const newDetail = { ...detailWizard, subtotal };
-    setDetails([...details, newDetail]);
-    handleCloseWizard();
-  };
+  // const handleSelect = () => {
+  //   const subtotal = calculateSubtotal(detailWizard.quantity, detailWizard.price, detailWizard.tax);
+  //   const newDetail = { ...detailWizard, subtotal };
+  //   setDetails([...details, newDetail]);
+  //   handleCloseWizard();
+  // };
+
+  // const handleDelete = (index) => {
+  //   const updatedData = details.filter((_, i) => i !== index);
+  //   setDetails(updatedData);
+  // };
 
   const handleDelete = (index) => {
-    const updatedData = details.filter((_, i) => i !== index);
-    setDetails(updatedData);
-  };
+    setDetails((prevDetails) => {
+      const deletedItem = {
+        ...prevDetails[index],
+        product_name: prevDetails[index].product?.name || "Unknown Product",
+      };
+      const updatedDetails = prevDetails.filter((_, i) => i !== index);
 
-  // const handleEdit = (index, fieldName, newValue) => {
-  //   const updatedDetails = details.map((detail, i) =>
-  //     i === index
-  //       ? {
-  //           ...detail,
-  //           [fieldName]: newValue,
-  //           subtotal:
-  //             parseFloat(detail.quantity) * parseFloat(detail.price) + parseFloat(detail.tax),
-  //         }
-  //       : detail
-  //   );
-  //   setDetails(updatedDetails);
-  //   updateTotal();
-  //   console.log("detailnya:", details);
-  // };
+      setRows((prevRows) => [...prevRows, deletedItem]); // Add back to rows
+
+      return updatedDetails;
+    });
+  };
 
   const handleEdit = (index, fieldName, newValue) => {
     const updatedDetails = details.map((detail, i) => {
@@ -224,7 +287,7 @@ export default function CreatePurchaseForm() {
 
   useEffect(() => {
     const total = details.reduce((sum, detail) => sum + (detail.subtotal || 0), 0);
-    setPurchase((prevPurchase) => ({ ...prevPurchase, total }));
+    setInventoryIn((prevInventoryIn) => ({ ...prevInventoryIn, total }));
   }, [details]);
 
   const ensureDateTimeFormat = (date) => {
@@ -239,6 +302,60 @@ export default function CreatePurchaseForm() {
     return date; // If it's already in datetime format (e.g., 2025-01-07T12:30)
   };
 
+  const setBillReceipt = (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+
+    setInventoryIn({
+      ...inventoryIn,
+      billDate: formData.get("billDate"),
+      billNumber: formData.get("billNumber"),
+    });
+
+    // Close wizard or handle navigation
+    setOpenBillReceiptWizard(false);
+  };
+
+  // const handlePurchaseChange = (event, newValue) => {
+  //   setInventoryIn({ ...inventoryIn, selectedPurchase: newValue });
+  //   setRows(newValue.details);
+  // };
+
+  const handlePurchaseChange = async (event, newValue) => {
+    console.log("masuk purchase change");
+    if (!newValue) return;
+
+    try {
+      const response = await axios.get(`http://localhost:8080/purchases/${newValue.id}`);
+      const purchaseDetails = response.data.response.details;
+      const formattedDetails = purchaseDetails
+        .map((detail) => ({
+          ...detail,
+          product_name: detail.product?.name || "Unknown Product",
+        }))
+        .filter((detail) => !details.some((d) => d.id === detail.id));
+
+      setInventoryIn({ ...inventoryIn, selectedPurchase: newValue });
+      setRows(formattedDetails);
+      setDetails([]);
+    } catch (error) {
+      console.error("Error fetching purchase details:", error);
+    }
+  };
+
+  const handleSelectionChange = (selectionModel) => {
+    const selectedDetails = rows.filter((row) => selectionModel.includes(row.id));
+    setSelectedRows(selectedDetails);
+  };
+
+  const handleSelect = () => {
+    setDetails((prevDetails) => [...prevDetails, ...selectedRows]); // Add selected rows to details
+    setRows((prevRows) =>
+      prevRows.filter((row) => !selectedRows.some((selected) => selected.id === row.id))
+    );
+    handleCloseWizard();
+  };
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -246,7 +363,7 @@ export default function CreatePurchaseForm() {
         open={open}
         onClose={handleCloseWizard}
         PaperProps={{
-          sx: { width: "30%", maxWidth: "none" },
+          sx: { width: "80%", maxWidth: "none" },
         }}
       >
         <DialogTitle>
@@ -258,56 +375,61 @@ export default function CreatePurchaseForm() {
           </Box>
         </DialogTitle>
         <DialogContent dividers>
-          <MDBox component="form" role="form" onSubmit={handleSubmit}>
-            <MDBox mb={2} mt={2}>
-              <Autocomplete
-                disablePortal
-                onChange={(event, newValue) =>
-                  setDetailWizard({ ...detailWizard, selectedProduct: newValue })
-                }
-                options={products}
-                getOptionLabel={(option) => option?.name || ""}
-                sx={{
-                  "& .MuiInputLabel-root": {
-                    lineHeight: "1.5", // Adjust the line height for proper vertical alignment
-                  },
-                }}
-                renderInput={(params) => <MDInput {...params} label="Select Product" />}
-              />
-            </MDBox>
-            <MDBox mb={2} mt={2}>
-              <MDInput
-                type="number"
-                label="Quantity"
-                fullWidth
-                value={detailWizard.quantity}
-                onChange={(e) => setDetailWizard({ ...detailWizard, quantity: e.target.value })}
-              />
-            </MDBox>
-            <MDBox mb={2} mt={2}>
-              <MDInput
-                type="number"
-                label="Price"
-                fullWidth
-                value={detailWizard.price}
-                onChange={(e) => setDetailWizard({ ...detailWizard, price: e.target.value })}
-              />
-            </MDBox>
-            <MDBox mb={2} mt={2}>
-              <MDInput
-                type="number"
-                label="Tax"
-                fullWidth
-                value={detailWizard.tax}
-                onChange={(e) => setDetailWizard({ ...detailWizard, tax: e.target.value })}
-              />
-            </MDBox>
-          </MDBox>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            disableSelectionOnClick
+            pageSize={5}
+            rowsPerPageOptions={[5]}
+            disableColumnSelector
+            disableColumnFilter
+            checkboxSelection
+            onRowSelectionModelChange={handleSelectionChange}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseWizard}>Cancel</Button>
-          <Button onClick={handleCreate}>Create</Button>
+          <Button onClick={handleSelect}>Select</Button>
         </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openBillReceiptWizard}
+        onClose={() => setOpenBillReceiptWizard(false)}
+        PaperProps={{
+          sx: { width: "30%", maxWidth: "none" },
+        }}
+      >
+        <DialogTitle>
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <span>Bill Receipt</span>
+            <IconButton aria-label="close" onClick={() => setOpenBillReceiptWizard(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <MDBox component="form" role="form" onSubmit={setBillReceipt}>
+          <DialogContent dividers>
+            <MDBox mb={2} mt={2}>
+              <MDInput
+                type="date"
+                label="Bill Date"
+                fullWidth
+                name="billDate"
+                required
+                InputLabelProps={{
+                  shrink: true, // Ensures label stays on top even when the input is empty
+                }}
+              />
+            </MDBox>
+            <MDBox mb={2} mt={2}>
+              <MDInput type="text" label="Bill Number" fullWidth name="billNumber" />
+            </MDBox>
+          </DialogContent>
+          <DialogActions>
+            <Button type="submit">Add</Button>
+          </DialogActions>
+        </MDBox>
       </Dialog>
 
       <Card sx={{ mt: 4 }}>
@@ -324,7 +446,7 @@ export default function CreatePurchaseForm() {
           width="30%"
         >
           <MDTypography variant="h5" fontWeight="medium" color="white" mt={1}>
-            Update Purchase
+            Add New Inventory In
           </MDTypography>
         </MDBox>
 
@@ -336,30 +458,55 @@ export default function CreatePurchaseForm() {
           }}
         >
           <MDTypography variant="body2" fontWeight="medium" sx={{ color: "grey.600" }}>
-            Create Date: {purchase.createdAt || "-"}
+            Create Date: {inventoryIn.createdAt || "-"}
           </MDTypography>
           <MDTypography variant="body2" fontWeight="medium" sx={{ color: "grey.600" }}>
-            Last Edit: {purchase.updatedAt || "-"}
+            Last Edit: {inventoryIn.updatedAt || "-"}
           </MDTypography>
         </MDBox>
+        {!inventoryIn.billDate && (
+          <MDBox
+            sx={{
+              position: "absolute",
+              top: 5, // Adjust the top spacing
+              left: 15, // Align to the right
+            }}
+          >
+            <MDButton
+              variant="gradient"
+              color="info"
+              onClick={() => setOpenBillReceiptWizard(true)}
+              sx={{ marginTop: "20px" }}
+            >
+              Bill Receipt
+            </MDButton>
+          </MDBox>
+        )}
         <MDBox pt={4} pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit}>
-            <h3>{purchase.name}</h3>
-            <MDBox mb={2} mt={3}>
+            <MDBox mb={2}>
               <Autocomplete
                 disablePortal
-                value={purchase.selectedVendor}
-                onChange={(event, newValue) =>
-                  setPurchase({ ...purchase, selectedVendor: newValue })
-                }
-                options={vendors}
+                onChange={handlePurchaseChange}
+                value={inventoryIn.selectedPurchase}
+                options={purchases}
                 getOptionLabel={(option) => option?.name || ""}
                 sx={{
                   "& .MuiInputLabel-root": {
                     lineHeight: "1.5", // Adjust the line height for proper vertical alignment
                   },
                 }}
-                renderInput={(params) => <MDInput {...params} label="Select Vendor" />}
+                renderInput={(params) => <MDInput {...params} label="Select Purchase" />}
+              />
+            </MDBox>
+            <MDBox mb={2}>
+              <MDInput
+                type="text"
+                label="Delivery Number"
+                fullWidth
+                value={inventoryIn.deliveryNumber}
+                py={5}
+                onChange={(e) => setInventoryIn({ ...inventoryIn, deliveryNumber: e.target.value })}
               />
             </MDBox>
             <MDBox mb={2}>
@@ -367,13 +514,72 @@ export default function CreatePurchaseForm() {
                 type="date"
                 label="Date"
                 fullWidth
-                value={purchase.date}
-                onChange={(e) => setPurchase({ ...purchase, date: e.target.value })}
+                value={inventoryIn.date}
+                onChange={(e) => setInventoryIn({ ...inventoryIn, date: e.target.value })}
                 InputLabelProps={{
                   shrink: true, // Ensures label stays on top even when the input is empty
                 }}
               />
             </MDBox>
+            <MDBox mb={2}>
+              <MDInput
+                type="date"
+                label="Due Date"
+                fullWidth
+                value={inventoryIn.dueDate}
+                onChange={(e) => setInventoryIn({ ...inventoryIn, dueDate: e.target.value })}
+                InputLabelProps={{
+                  shrink: true, // Ensures label stays on top even when the input is empty
+                }}
+              />
+            </MDBox>
+            {inventoryIn.billDate && (
+              <Grid container spacing={2}>
+                <Grid item xs={4}>
+                  <MDBox mb={2}>
+                    <MDInput
+                      type="date"
+                      label="Bill Date"
+                      fullWidth
+                      value={inventoryIn.billDate}
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          setInventoryIn({ ...inventoryIn, billDate: e.target.value });
+                        }
+                      }}
+                      InputLabelProps={{
+                        shrink: true, // Ensures label stays on top even when the input is empty
+                      }}
+                    />
+                  </MDBox>
+                </Grid>
+                <Grid item xs={6}>
+                  <MDBox mb={2}>
+                    <MDInput
+                      type="text"
+                      label="Bill Number"
+                      fullWidth
+                      value={inventoryIn.billNumber}
+                      py={5}
+                      onChange={(e) =>
+                        setInventoryIn({ ...inventoryIn, billNumber: e.target.value })
+                      }
+                    />
+                  </MDBox>
+                </Grid>
+                <Grid item xs={2}>
+                  <MDButton
+                    variant="gradient"
+                    color="error"
+                    fullWidth
+                    type="button"
+                    onClick={() => setInventoryIn({ ...inventoryIn, billDate: "", billNumber: "" })}
+                  >
+                    cancel bill receipt
+                  </MDButton>
+                </Grid>
+              </Grid>
+            )}
             {/* <DataTable table={{ columns, rows }} isSorted={false} showTotalEntries={false} /> */}
             <h3 style={{ padding: "20px 0px 15px 0px" }}>Details</h3>
             <TableContainer component={Paper}>
@@ -469,21 +675,7 @@ export default function CreatePurchaseForm() {
                       sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                     >
                       <TableCell component="th" scope="row">
-                        <Autocomplete
-                          disablePortal
-                          value={detail.selectedProduct}
-                          onChange={(event, newValue) =>
-                            handleEdit(index, "selectedProduct", newValue)
-                          }
-                          options={products}
-                          getOptionLabel={(option) => option?.name || ""}
-                          sx={{
-                            "& .MuiInputLabel-root": {
-                              lineHeight: "1.5", // Adjust the line height for proper vertical alignment
-                            },
-                          }}
-                          renderInput={(params) => <MDInput {...params} label="Select Product" />}
-                        />
+                        {detail.product.name}
                       </TableCell>
                       <TableCell component="th" scope="row">
                         <input
@@ -502,36 +694,10 @@ export default function CreatePurchaseForm() {
                         />
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        <input
-                          type="number"
-                          value={detail.price}
-                          onChange={(e) => handleEdit(index, "price", e.target.value)}
-                          style={{
-                            width: "100%",
-                            border: "1px solid lightgray",
-                            background: "transparent",
-                            outline: "none",
-                            padding: "5px",
-                            borderRadius: "4px",
-                            cursor: "text",
-                          }}
-                        />
+                        {detail.price}
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        <input
-                          type="number"
-                          value={detail.tax}
-                          onChange={(e) => handleEdit(index, "tax", e.target.value)}
-                          style={{
-                            width: "100%",
-                            border: "1px solid lightgray",
-                            background: "transparent",
-                            outline: "none",
-                            padding: "5px",
-                            borderRadius: "4px",
-                            cursor: "text",
-                          }}
-                        />
+                        {detail.tax}
                       </TableCell>
                       <TableCell component="th" scope="row">
                         <h5>{detail.subtotal}</h5>
@@ -583,13 +749,13 @@ export default function CreatePurchaseForm() {
                 Total: Rp{" "}
                 {new Intl.NumberFormat("id-ID", {
                   style: "decimal",
-                }).format(purchase.total)}
+                }).format(inventoryIn.total)}
               </MDBox>
             </MDBox>
 
             <MDBox mt={4} mb={1}>
               <MDButton variant="gradient" color="info" fullWidth type="submit">
-                edit
+                create
               </MDButton>
             </MDBox>
           </MDBox>

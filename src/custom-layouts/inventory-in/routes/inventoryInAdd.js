@@ -271,6 +271,7 @@ export default function CreateInventoryInForm() {
 
       setInventoryIn({ ...inventoryIn, selectedPurchase: newValue });
       setRows(formattedDetails);
+      console.log("formattedDetails", formattedDetails);
       setDetails([]);
     } catch (error) {
       console.error("Error fetching purchase details:", error);
