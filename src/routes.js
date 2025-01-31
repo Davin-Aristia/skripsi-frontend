@@ -44,6 +44,7 @@ import Vendor from "custom-layouts/vendor";
 import Customer from "custom-layouts/customer";
 import Purchase from "custom-layouts/purchase";
 import InventoryIn from "custom-layouts/inventory-in";
+import PaymentVendor from "custom-layouts/payment-vendor";
 import Billing from "layouts/billing";
 // import RTL from "layouts/rtl";
 import Notifications from "layouts/notifications";
@@ -59,6 +60,7 @@ import vendorRoutes from "custom-layouts/vendor/routes";
 import customerRoutes from "custom-layouts/customer/routes";
 import purchaseRoutes from "custom-layouts/purchase/routes";
 import inventoryInRoutes from "custom-layouts/inventory-in/routes";
+import paymentVendorRoutes from "custom-layouts/payment-vendor/routes";
 import SignInCustom from "custom-layouts/authentication/sign-in";
 
 // @mui icons
@@ -71,6 +73,7 @@ const routes = [
   ...customerRoutes,
   ...purchaseRoutes,
   ...inventoryInRoutes,
+  ...paymentVendorRoutes,
   // {
   //   type: "collapse",
   //   name: "Dashboard",
@@ -177,7 +180,7 @@ const routes = [
           </Icon>
         ),
         route: "/vendor-payment",
-        component: <Tables />,
+        component: <PaymentVendor />,
       },
     ],
   },
