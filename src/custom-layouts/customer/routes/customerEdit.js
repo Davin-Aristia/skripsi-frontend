@@ -58,8 +58,6 @@ export default function CreateCustomerForm() {
   // Function to handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(parseInt(customer.netTerm, 10));
-    console.log(customer.netTerm);
 
     try {
       const response = await axios.put(`http://localhost:8080/customers/${id}`, customer, {
@@ -121,6 +119,7 @@ export default function CreateCustomerForm() {
                 label="Name"
                 fullWidth
                 value={customer.name}
+                required
                 onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
               />
             </MDBox>

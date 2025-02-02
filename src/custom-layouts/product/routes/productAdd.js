@@ -169,6 +169,7 @@ export default function CreateBookForm() {
                     value={name}
                     py={5}
                     onChange={(e) => setName(e.target.value)}
+                    required
                   />
                 </MDBox>
                 <MDBox mb={2}>
@@ -185,7 +186,9 @@ export default function CreateBookForm() {
                             lineHeight: "1.5", // Adjust the line height for proper vertical alignment
                           },
                         }}
-                        renderInput={(params) => <MDInput {...params} label="Select Category" />}
+                        renderInput={(params) => (
+                          <MDInput {...params} label="Select Category" required />
+                        )}
                       />
                     </Grid>
 
@@ -198,6 +201,7 @@ export default function CreateBookForm() {
                         label="Price"
                         fullWidth
                         value={price}
+                        required
                         onChange={(e) => setPrice(e.target.value)}
                       />
                     </Grid>
@@ -278,6 +282,7 @@ export default function CreateBookForm() {
                     label="Stock"
                     fullWidth
                     value={stock}
+                    required
                     onChange={(e) => setStock(e.target.value)}
                   />
                 </MDBox>

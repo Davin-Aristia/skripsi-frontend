@@ -98,7 +98,7 @@ export default function data({ query }) {
   const columns = [
     { Header: "customer", accessor: "customer", width: "30%", align: "left" },
     { Header: "email", accessor: "email", align: "left" },
-    { Header: "phone_number", accessor: "phone_number", align: "center" },
+    { Header: "phone number", accessor: "phone_number", align: "center" },
     { Header: "action", accessor: "action", align: "center" },
   ];
 

@@ -82,6 +82,7 @@ export default function CreateCustomerForm() {
                 label="Name"
                 fullWidth
                 value={customer.name}
+                required
                 onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
               />
             </MDBox>

@@ -46,7 +46,8 @@ export default function CreateBookForm() {
   const [specsName, setSpecsName] = useState("");
   const [description, setDescription] = useState("");
   const [specifications, setSpecifications] = useState([]);
-  const [newId, setNewId] = useState(1);
+  const [createdAt, setCreatedAt] = useState([]);
+  const [updatedAt, setUpdatedAt] = useState([]);
 
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false);
@@ -61,7 +62,8 @@ export default function CreateBookForm() {
         setName(product.name);
         setDescription(product.description);
         setSpecifications(product.specifications || []);
-        console.log(product.specifications);
+        setCreatedAt(convertToLocalDate(product.created_at));
+        setUpdatedAt(convertToLocalDate(product.updated_at));
         setLoading(false);
       } catch (error) {
         console.error("Error fetching product category:", error);
@@ -70,6 +72,13 @@ export default function CreateBookForm() {
 
     fetchProductData();
   }, [id]); // Dependency array includes `id` to refetch if the ID changes
+
+  const convertToLocalDate = (utcDateString) => {
+    const date = new Date(utcDateString);
+    const jakartaOffset = 7 * 60;
+    const jakartaTime = new Date(date.getTime() + jakartaOffset * 60 * 1000);
+    return jakartaTime.toISOString().split("T")[0];
+  };
 
   // Function to handle form submission
   const handleSubmit = async (e) => {
@@ -149,6 +158,7 @@ export default function CreateBookForm() {
                 label="Name"
                 fullWidth
                 value={specsName}
+                required
                 onChange={(e) => setSpecsName(e.target.value)}
               />
             </MDBox>
@@ -173,7 +183,22 @@ export default function CreateBookForm() {
           width="30%"
         >
           <MDTypography variant="h5" fontWeight="medium" color="white" mt={1}>
-            Edit Product
+            Edit Product Category
+          </MDTypography>
+        </MDBox>
+
+        <MDBox
+          sx={{
+            position: "absolute",
+            top: 15, // Adjust the top spacing
+            right: 10, // Align to the right
+          }}
+        >
+          <MDTypography variant="body2" fontWeight="medium" sx={{ color: "grey.600" }}>
+            Create Date: {createdAt || "-"}
+          </MDTypography>
+          <MDTypography variant="body2" fontWeight="medium" sx={{ color: "grey.600" }}>
+            Last Edit: {updatedAt || "-"}
           </MDTypography>
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
@@ -184,6 +209,7 @@ export default function CreateBookForm() {
                 label="Name"
                 fullWidth
                 value={name}
+                required
                 onChange={(e) => setName(e.target.value)}
               />
             </MDBox>
@@ -254,6 +280,7 @@ export default function CreateBookForm() {
                               type="text"
                               value={specification.name}
                               onChange={(e) => handleEdit(index, e.target.value)}
+                              required
                               style={{
                                 width: "100%",
                                 border: "1px solid lightgray",

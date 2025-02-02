@@ -258,7 +258,9 @@ export default function CreateBookForm() {
                             lineHeight: "1.5", // Adjust the line height for proper vertical alignment
                           },
                         }}
-                        renderInput={(params) => <TextField {...params} label="Select Category" />}
+                        renderInput={(params) => (
+                          <TextField {...params} label="Select Category" required />
+                        )}
                       />
                     </Grid>
 
@@ -271,6 +273,7 @@ export default function CreateBookForm() {
                         label="Price"
                         fullWidth
                         value={price}
+                        required
                         onChange={(e) => setPrice(e.target.value)}
                       />
                     </Grid>
@@ -286,6 +289,7 @@ export default function CreateBookForm() {
                     label="Stock"
                     fullWidth
                     value={stock}
+                    required
                     onChange={(e) => setStock(e.target.value)}
                   />
                 </MDBox>

@@ -82,7 +82,7 @@ export default function CreateProductCategoryForm() {
       toast.success("success add new product category");
       navigate("/product-category");
     } catch (error) {
-      toast.success("success add new product category");
+      toast.error("failed update product category");
       setError(error.response.data.message);
     }
   };
@@ -135,6 +135,7 @@ export default function CreateProductCategoryForm() {
                 label="Name"
                 fullWidth
                 value={specsName}
+                required
                 onChange={(e) => setSpecsName(e.target.value)}
               />
             </MDBox>
@@ -160,7 +161,7 @@ export default function CreateProductCategoryForm() {
           width="30%"
         >
           <MDTypography variant="h5" fontWeight="medium" color="white" mt={1}>
-            Create New Product Category
+            Add New Product Category
           </MDTypography>
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
@@ -171,6 +172,7 @@ export default function CreateProductCategoryForm() {
                 label="Name"
                 fullWidth
                 value={name}
+                required
                 onChange={(e) => setName(e.target.value)}
               />
             </MDBox>
@@ -236,6 +238,7 @@ export default function CreateProductCategoryForm() {
                               type="text"
                               value={specification.name}
                               onChange={(e) => handleEdit(index, e.target.value)}
+                              required
                               style={{
                                 width: "100%",
                                 border: "1px solid lightgray",

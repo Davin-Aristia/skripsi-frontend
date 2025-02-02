@@ -47,7 +47,7 @@ export default function CreateVendorForm() {
         {
           company: vendor.company,
           email: vendor.email,
-          name: vendor.company,
+          name: vendor.name,
           phone_number: vendor.phoneNumber,
           address: vendor.address,
           account_name: vendor.accountName,
@@ -104,6 +104,7 @@ export default function CreateVendorForm() {
                     label="Company"
                     fullWidth
                     value={vendor.company}
+                    required
                     onChange={(e) => setVendor({ ...vendor, company: e.target.value })}
                   />
                 </MDBox>

@@ -324,7 +324,7 @@ export default function CreatePurchaseForm() {
           width="30%"
         >
           <MDTypography variant="h5" fontWeight="medium" color="white" mt={1}>
-            Update Purchase
+            Edit Purchase
           </MDTypography>
         </MDBox>
 
