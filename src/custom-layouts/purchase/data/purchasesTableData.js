@@ -90,8 +90,15 @@ export default function data({ query }) {
 
       toast.success("Purchase deleted successfully");
     } catch (error) {
-      toast.error("Failed to delete the purchase.");
-      console.error("Error deleting the purchase:", error);
+      if (
+        error.response.data.response ==
+        "this purchase has already been received in inventory and cannot be edited"
+      ) {
+        toast.error("This purchase has already been received in inventory and cannot be deleted");
+      } else {
+        toast.error("Failed to delete the purchase.");
+      }
+      console.error("Error deleting the purchase:", error.response.data.response);
     }
   };
 
@@ -113,7 +120,7 @@ export default function data({ query }) {
   const rows = purchases.map((purchase) => ({
     name: purchase.name,
     date: convertToLocalDate(purchase.date),
-    vendor: purchase.vendor.name,
+    vendor: purchase.vendor.company,
     total: purchase.total,
     action: (
       <MDBox display="flex" alignItems="center" mt={{ xs: 2, sm: 0 }} ml={{ xs: -1.5, sm: 0 }}>

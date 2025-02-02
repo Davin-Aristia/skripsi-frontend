@@ -44,7 +44,7 @@ export default function CreatePurchaseForm() {
 
   const initialPurchaseState = {
     date: "",
-    selectedVendor: {},
+    selectedVendor: null,
     total: 0,
   };
   const initialDetailWizard = {
@@ -299,14 +299,30 @@ export default function CreatePurchaseForm() {
                   setPurchase({ ...purchase, selectedVendor: newValue })
                 }
                 options={vendors}
-                getOptionLabel={(option) => option?.name || ""}
+                getOptionLabel={(option) => option?.company || ""}
                 sx={{
                   "& .MuiInputLabel-root": {
                     lineHeight: "1.5", // Adjust the line height for proper vertical alignment
                   },
                 }}
-                renderInput={(params) => <MDInput {...params} label="Select Vendor" />}
+                renderInput={(params) => <MDInput {...params} label="Select Vendor" required />}
               />
+              {purchase.selectedVendor && (
+                <MDBox mt={1}>
+                  <MDTypography variant="subtitle2" fontWeight="bold">
+                    Person Contact
+                  </MDTypography>
+                  <MDTypography variant="body2">
+                    Name: {purchase.selectedVendor.name || "N/A"}
+                  </MDTypography>
+                  <MDTypography variant="body2">
+                    Email: {purchase.selectedVendor.email || "N/A"}
+                  </MDTypography>
+                  <MDTypography variant="body2">
+                    Phone: {purchase.selectedVendor.phone_number || "N/A"}
+                  </MDTypography>
+                </MDBox>
+              )}
             </MDBox>
             <MDBox mb={2}>
               <MDInput
@@ -436,6 +452,7 @@ export default function CreatePurchaseForm() {
                           type="number"
                           value={detail.quantity}
                           onChange={(e) => handleEdit(index, "quantity", e.target.value)}
+                          required
                           style={{
                             width: "100%",
                             border: "1px solid lightgray",
@@ -452,6 +469,7 @@ export default function CreatePurchaseForm() {
                           type="number"
                           value={detail.price}
                           onChange={(e) => handleEdit(index, "price", e.target.value)}
+                          required
                           style={{
                             width: "100%",
                             border: "1px solid lightgray",
@@ -468,6 +486,7 @@ export default function CreatePurchaseForm() {
                           type="number"
                           value={detail.tax}
                           onChange={(e) => handleEdit(index, "tax", e.target.value)}
+                          required
                           style={{
                             width: "100%",
                             border: "1px solid lightgray",
@@ -480,7 +499,12 @@ export default function CreatePurchaseForm() {
                         />
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        <h5>{detail.subtotal}</h5>
+                        <h5>
+                          Rp{" "}
+                          {new Intl.NumberFormat("id-ID", {
+                            style: "decimal",
+                          }).format(detail.subtotal)}
+                        </h5>
                       </TableCell>
                       <TableCell align="center">
                         <MDButton

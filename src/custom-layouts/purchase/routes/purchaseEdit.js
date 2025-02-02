@@ -157,8 +157,15 @@ export default function CreatePurchaseForm() {
       toast.success("success update new purchase");
       navigate("/purchase");
     } catch (error) {
-      toast.error("failed update new purchase");
-      console.log(error.response.data.message);
+      if (
+        error.response.data.response ==
+        "this purchase has already been received in inventory and cannot be edited"
+      ) {
+        toast.error(error.response.data.response);
+      } else {
+        toast.error("failed update new purchase");
+      }
+      console.log(error.response.data.response);
     }
   };
 
@@ -353,7 +360,7 @@ export default function CreatePurchaseForm() {
                   setPurchase({ ...purchase, selectedVendor: newValue })
                 }
                 options={vendors}
-                getOptionLabel={(option) => option?.name || ""}
+                getOptionLabel={(option) => option?.company || ""}
                 sx={{
                   "& .MuiInputLabel-root": {
                     lineHeight: "1.5", // Adjust the line height for proper vertical alignment
@@ -361,6 +368,22 @@ export default function CreatePurchaseForm() {
                 }}
                 renderInput={(params) => <MDInput {...params} label="Select Vendor" />}
               />
+              {purchase.selectedVendor && (
+                <MDBox mt={1}>
+                  <MDTypography variant="subtitle2" fontWeight="bold">
+                    Person Contact
+                  </MDTypography>
+                  <MDTypography variant="body2">
+                    Name: {purchase.selectedVendor.name || "N/A"}
+                  </MDTypography>
+                  <MDTypography variant="body2">
+                    Email: {purchase.selectedVendor.email || "N/A"}
+                  </MDTypography>
+                  <MDTypography variant="body2">
+                    Phone: {purchase.selectedVendor.phone_number || "N/A"}
+                  </MDTypography>
+                </MDBox>
+              )}
             </MDBox>
             <MDBox mb={2}>
               <MDInput
@@ -482,7 +505,9 @@ export default function CreatePurchaseForm() {
                               lineHeight: "1.5", // Adjust the line height for proper vertical alignment
                             },
                           }}
-                          renderInput={(params) => <MDInput {...params} label="Select Product" />}
+                          renderInput={(params) => (
+                            <MDInput {...params} label="Select Product" required />
+                          )}
                         />
                       </TableCell>
                       <TableCell component="th" scope="row">
@@ -490,6 +515,7 @@ export default function CreatePurchaseForm() {
                           type="number"
                           value={detail.quantity}
                           onChange={(e) => handleEdit(index, "quantity", e.target.value)}
+                          required
                           style={{
                             width: "100%",
                             border: "1px solid lightgray",
@@ -506,6 +532,7 @@ export default function CreatePurchaseForm() {
                           type="number"
                           value={detail.price}
                           onChange={(e) => handleEdit(index, "price", e.target.value)}
+                          required
                           style={{
                             width: "100%",
                             border: "1px solid lightgray",
@@ -534,7 +561,12 @@ export default function CreatePurchaseForm() {
                         />
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        <h5>{detail.subtotal}</h5>
+                        <h5>
+                          Rp{" "}
+                          {new Intl.NumberFormat("id-ID", {
+                            style: "decimal",
+                          }).format(detail.subtotal)}
+                        </h5>
                       </TableCell>
                       <TableCell align="center">
                         <MDButton
