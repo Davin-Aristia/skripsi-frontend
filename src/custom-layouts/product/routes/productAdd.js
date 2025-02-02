@@ -35,7 +35,7 @@ export default function CreateBookForm() {
 
   const [name, setName] = useState("");
   const [stock, setStock] = useState("");
-  const [minStock, setMinStock] = useState("");
+  const [minStock, setMinStock] = useState(null);
   const [price, setPrice] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState([]);
@@ -91,7 +91,7 @@ export default function CreateBookForm() {
       setSelectedFile(null);
       setName("");
       setStock("");
-      setMinStock("");
+      setMinStock(null);
       setPrice("");
       setSpecs("");
 
@@ -286,8 +286,10 @@ export default function CreateBookForm() {
                     type="text"
                     label="MinStock"
                     fullWidth
-                    value={minStock}
-                    onChange={(e) => setMinStock(e.target.value)}
+                    value={minStock === null ? "" : minStock} // Ensure null is displayed as an empty field
+                    onChange={(e) =>
+                      setMinStock(e.target.value ? parseInt(e.target.value, 10) : null)
+                    }
                   />
                 </MDBox>
               </Grid>

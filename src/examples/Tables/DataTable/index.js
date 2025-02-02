@@ -230,12 +230,14 @@ function DataTable({
         <TableBody {...getTableBodyProps()}>
           {page.map((row, key) => {
             prepareRow(row);
-            const minStockCell = row.cells.find((cell) => cell.column.Header === "min_stock");
+            const minStockCell = row.cells.find((cell) => cell.column.Header === "min stock");
             const stockCell = row.cells.find((cell) => cell.column.Header === "stock");
 
             // Check if min_stock > stock and apply red style if true
             const isMinStockGreater =
               minStockCell && stockCell && minStockCell.value > stockCell.value;
+
+            const isMinStockNA = minStockCell && minStockCell.value === "N/A";
 
             return (
               <TableRow key={key} {...row.getRowProps()}>
@@ -245,7 +247,13 @@ function DataTable({
                     noBorder={noEndBorder && rows.length - 1 === key}
                     align={cell.column.align ? cell.column.align : "left"}
                     {...cell.getCellProps()}
-                    color={isMinStockGreater ? "red" : ""}
+                    color={
+                      isMinStockGreater
+                        ? "red"
+                        : isMinStockNA
+                        ? "#D28100" // Assuming "cream" is a valid color class or you can use hex/rgb value
+                        : ""
+                    }
                   >
                     {cell.render("Cell")}
                   </DataTableBodyCell>

@@ -105,7 +105,7 @@ export default function data({ query }) {
   const columns = [
     { Header: "name", accessor: "name", width: "30%", align: "left" },
     { Header: "stock", accessor: "stock", align: "left" },
-    { Header: "min_stock", accessor: "min_stock", align: "center" },
+    { Header: "min stock", accessor: "min_stock", align: "center" },
     { Header: "price", accessor: "price", align: "center" },
     { Header: "action", accessor: "action", align: "center" },
   ];
@@ -121,7 +121,7 @@ export default function data({ query }) {
     //   </MDBox>
     // ),
     stock: product.stock, // or another appropriate field
-    min_stock: product.min_stock,
+    min_stock: product.min_stock === null ? "N/A" : product.min_stock,
     price: `Rp ${new Intl.NumberFormat("id-ID", {
       style: "decimal",
       minimumFractionDigits: 2,
