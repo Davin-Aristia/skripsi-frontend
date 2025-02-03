@@ -121,7 +121,11 @@ export default function data({ query }) {
     name: purchase.name,
     date: convertToLocalDate(purchase.date),
     vendor: purchase.vendor.company,
-    total: purchase.total,
+    total: `Rp ${new Intl.NumberFormat("id-ID", {
+      style: "decimal",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(purchase.total)}`,
     action: (
       <MDBox display="flex" alignItems="center" mt={{ xs: 2, sm: 0 }} ml={{ xs: -1.5, sm: 0 }}>
         <NavLink to={`/purchase/${purchase.id}/edit`} style={{ textDecoration: "none" }}>

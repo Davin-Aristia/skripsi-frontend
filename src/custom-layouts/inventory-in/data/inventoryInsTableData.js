@@ -116,7 +116,11 @@ export default function data({ query }) {
     name: inventoryIn.name,
     date: convertToLocalDate(inventoryIn.date),
     purchase: inventoryIn.purchase,
-    total: inventoryIn.total,
+    total: `Rp ${new Intl.NumberFormat("id-ID", {
+      style: "decimal",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(inventoryIn.total)}`,
     action: (
       <MDBox display="flex" alignItems="center" mt={{ xs: 2, sm: 0 }} ml={{ xs: -1.5, sm: 0 }}>
         <NavLink to={`/inventory-in/${inventoryIn.id}/edit`} style={{ textDecoration: "none" }}>

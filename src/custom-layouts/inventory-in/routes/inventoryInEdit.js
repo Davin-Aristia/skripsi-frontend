@@ -99,7 +99,7 @@ export default function CreateInventoryInForm() {
         const response = await axios.get(`http://localhost:8080/inventory-ins/${id}`);
         const inventoryIn = response.data.response;
         setInventoryIn({
-          // name: inventoryIn.name,
+          name: inventoryIn.name,
           date: convertToLocalDate(inventoryIn.date),
           dueDate: convertToLocalDate(inventoryIn.due_date),
           billDate: convertToLocalDate(inventoryIn.bill_date),
@@ -322,18 +322,17 @@ export default function CreateInventoryInForm() {
   // };
 
   const handlePurchaseChange = async (event, newValue) => {
-    console.log("masuk purchase change");
     if (!newValue) return;
 
     try {
       const response = await axios.get(`http://localhost:8080/purchases/${newValue.id}`);
       const purchaseDetails = response.data.response.details;
-      const formattedDetails = purchaseDetails
+      const formattedDetails = (purchaseDetails || []) // Ensure it's always an array
+        .filter((detail) => !details.some((d) => d.id === detail.id)) // Filter out existing ones
         .map((detail) => ({
           ...detail,
-          product_name: detail.product?.name || "Unknown Product",
-        }))
-        .filter((detail) => !details.some((d) => d.id === detail.id));
+          product_name: detail.product?.name || "Unknown Product", // Add product_name
+        }));
 
       setInventoryIn({ ...inventoryIn, selectedPurchase: newValue });
       setRows(formattedDetails);
@@ -354,6 +353,30 @@ export default function CreateInventoryInForm() {
       prevRows.filter((row) => !selectedRows.some((selected) => selected.id === row.id))
     );
     handleCloseWizard();
+  };
+
+  const handleDateOrPurchaseChange = async (newDate, selectedPurchase) => {
+    if (!newDate || !selectedPurchase) return; // Ensure both values exist
+
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/vendors/${selectedPurchase.vendor_id}`
+      );
+      const vendor = response.data.response;
+
+      if (vendor?.net_term) {
+        const billDate = new Date(newDate); // Convert string to Date object
+        billDate.setDate(billDate.getDate() + vendor.net_term); // Add net_term days
+
+        setInventoryIn((prev) => ({
+          ...prev,
+          date: newDate,
+          dueDate: billDate.toISOString().split("T")[0], // Format as YYYY-MM-DD
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching vendor:", error);
+    }
   };
 
   return (
@@ -482,12 +505,16 @@ export default function CreateInventoryInForm() {
             </MDButton>
           </MDBox>
         )}
-        <MDBox pt={4} pb={3} px={3}>
+        <MDBox pt={5} pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit}>
+            <h3>{inventoryIn.name}</h3>
             <MDBox mb={2}>
               <Autocomplete
                 disablePortal
-                onChange={handlePurchaseChange}
+                onChange={(event, newValue) => {
+                  handlePurchaseChange(event, newValue);
+                  handleDateOrPurchaseChange(inventoryIn.date, newValue);
+                }}
                 value={inventoryIn.selectedPurchase}
                 options={purchases}
                 getOptionLabel={(option) => option?.name || ""}
@@ -496,7 +523,7 @@ export default function CreateInventoryInForm() {
                     lineHeight: "1.5", // Adjust the line height for proper vertical alignment
                   },
                 }}
-                renderInput={(params) => <MDInput {...params} label="Select Purchase" />}
+                renderInput={(params) => <MDInput {...params} label="Select Purchase" required />}
               />
             </MDBox>
             <MDBox mb={2}>
@@ -515,7 +542,12 @@ export default function CreateInventoryInForm() {
                 label="Date"
                 fullWidth
                 value={inventoryIn.date}
-                onChange={(e) => setInventoryIn({ ...inventoryIn, date: e.target.value })}
+                required
+                onChange={(e) => {
+                  const newDate = e.target.value;
+                  setInventoryIn((prev) => ({ ...prev, date: newDate }));
+                  handleDateOrPurchaseChange(newDate, inventoryIn.selectedPurchase);
+                }}
                 InputLabelProps={{
                   shrink: true, // Ensures label stays on top even when the input is empty
                 }}
@@ -755,7 +787,7 @@ export default function CreateInventoryInForm() {
 
             <MDBox mt={4} mb={1}>
               <MDButton variant="gradient" color="info" fullWidth type="submit">
-                create
+                edit
               </MDButton>
             </MDBox>
           </MDBox>

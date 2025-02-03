@@ -271,7 +271,6 @@ export default function CreateInventoryInForm() {
 
       setInventoryIn({ ...inventoryIn, selectedPurchase: newValue });
       setRows(formattedDetails);
-      console.log("formattedDetails", formattedDetails);
       setDetails([]);
     } catch (error) {
       console.error("Error fetching purchase details:", error);
@@ -289,6 +288,30 @@ export default function CreateInventoryInForm() {
       prevRows.filter((row) => !selectedRows.some((selected) => selected.id === row.id))
     );
     handleCloseWizard();
+  };
+
+  const handleDateOrPurchaseChange = async (newDate, selectedPurchase) => {
+    if (!newDate || !selectedPurchase) return; // Ensure both values exist
+
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/vendors/${selectedPurchase.vendor_id}`
+      );
+      const vendor = response.data.response;
+
+      if (vendor?.net_term) {
+        const billDate = new Date(newDate); // Convert string to Date object
+        billDate.setDate(billDate.getDate() + vendor.net_term); // Add net_term days
+
+        setInventoryIn((prev) => ({
+          ...prev,
+          date: newDate,
+          dueDate: billDate.toISOString().split("T")[0], // Format as YYYY-MM-DD
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching vendor:", error);
+    }
   };
 
   return (
@@ -408,7 +431,10 @@ export default function CreateInventoryInForm() {
             <MDBox mb={2}>
               <Autocomplete
                 disablePortal
-                onChange={handlePurchaseChange}
+                onChange={(event, newValue) => {
+                  handlePurchaseChange(event, newValue);
+                  handleDateOrPurchaseChange(inventoryIn.date, newValue);
+                }}
                 options={purchases}
                 getOptionLabel={(option) => option?.name || ""}
                 sx={{
@@ -416,7 +442,7 @@ export default function CreateInventoryInForm() {
                     lineHeight: "1.5", // Adjust the line height for proper vertical alignment
                   },
                 }}
-                renderInput={(params) => <MDInput {...params} label="Select Purchase" />}
+                renderInput={(params) => <MDInput {...params} label="Select Purchase" required />}
               />
             </MDBox>
             <MDBox mb={2}>
@@ -435,7 +461,12 @@ export default function CreateInventoryInForm() {
                 label="Date"
                 fullWidth
                 value={inventoryIn.date}
-                onChange={(e) => setInventoryIn({ ...inventoryIn, date: e.target.value })}
+                onChange={(e) => {
+                  const newDate = e.target.value;
+                  setInventoryIn((prev) => ({ ...prev, date: newDate }));
+                  handleDateOrPurchaseChange(newDate, inventoryIn.selectedPurchase);
+                }}
+                required
                 InputLabelProps={{
                   shrink: true, // Ensures label stays on top even when the input is empty
                 }}
@@ -447,6 +478,7 @@ export default function CreateInventoryInForm() {
                 label="Due Date"
                 fullWidth
                 value={inventoryIn.dueDate}
+                required
                 onChange={(e) => setInventoryIn({ ...inventoryIn, dueDate: e.target.value })}
                 InputLabelProps={{
                   shrink: true, // Ensures label stays on top even when the input is empty
