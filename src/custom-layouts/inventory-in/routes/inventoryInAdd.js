@@ -157,6 +157,7 @@ export default function CreateInventoryInForm() {
       headerName: "PPN",
       type: "number",
       flex: 1,
+      valueFormatter: (params) => `${params} %`,
     },
     {
       field: "subtotal",
@@ -172,7 +173,12 @@ export default function CreateInventoryInForm() {
   };
 
   const calculateSubtotal = (quantity, price, tax) => {
-    return (parseFloat(quantity) || 0) * (parseFloat(price) || 0) + (parseFloat(tax) || 0);
+    const qty = parseFloat(quantity) || 0;
+    const unitPrice = parseFloat(price) || 0;
+    const taxPercentage = parseFloat(tax) || 0;
+
+    // Calculate subtotal with tax as a percentage
+    return qty * unitPrice * (1 + taxPercentage / 100);
   };
 
   // const handleSelect = () => {
@@ -657,7 +663,7 @@ export default function CreateInventoryInForm() {
                         {detail.price}
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        {detail.tax}
+                        {detail.tax} %
                       </TableCell>
                       <TableCell component="th" scope="row">
                         <h5>{detail.subtotal}</h5>

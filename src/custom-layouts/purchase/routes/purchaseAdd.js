@@ -36,7 +36,7 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import Grid from "@mui/material/Grid";
+import InputAdornment from "@mui/material/InputAdornment";
 
 export default function CreatePurchaseForm() {
   const navigate = useNavigate();
@@ -121,7 +121,7 @@ export default function CreatePurchaseForm() {
       navigate("/purchase");
     } catch (error) {
       toast.error("failed add new purchase");
-      console.log(error.response.data.message);
+      console.log(error.response.data.response);
     }
   };
 
@@ -132,7 +132,12 @@ export default function CreatePurchaseForm() {
   };
 
   const calculateSubtotal = (quantity, price, tax) => {
-    return (parseFloat(quantity) || 0) * (parseFloat(price) || 0) + (parseFloat(tax) || 0);
+    const qty = parseFloat(quantity) || 0;
+    const unitPrice = parseFloat(price) || 0;
+    const taxPercentage = parseFloat(tax) || 0;
+
+    // Calculate subtotal with tax as a percentage
+    return qty * unitPrice * (1 + taxPercentage / 100);
   };
 
   const handleCreate = () => {
@@ -258,11 +263,24 @@ export default function CreatePurchaseForm() {
             </MDBox>
             <MDBox mb={2} mt={2}>
               <MDInput
-                type="number"
-                label="Tax"
+                type="text" // Use text to handle proper decimal input formatting
+                label="Tax (%)"
                 fullWidth
                 value={detailWizard.tax}
-                onChange={(e) => setDetailWizard({ ...detailWizard, tax: e.target.value })}
+                onChange={(e) => {
+                  let value = e.target.value;
+
+                  // Allow only numbers and one decimal point
+                  if (!/^\d{0,2}(\.\d{0,2})?$/.test(value)) return;
+
+                  // Ensure it does not exceed 99.99
+                  if (parseFloat(value) > 99.99) return;
+
+                  setDetailWizard({ ...detailWizard, tax: value });
+                }}
+                InputProps={{
+                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                }}
               />
             </MDBox>
           </MDBox>
@@ -482,21 +500,47 @@ export default function CreatePurchaseForm() {
                         />
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        <input
-                          type="number"
-                          value={detail.tax}
-                          onChange={(e) => handleEdit(index, "tax", e.target.value)}
-                          required
-                          style={{
-                            width: "100%",
-                            border: "1px solid lightgray",
-                            background: "transparent",
-                            outline: "none",
-                            padding: "5px",
-                            borderRadius: "4px",
-                            cursor: "text",
-                          }}
-                        />
+                        <div
+                          style={{ position: "relative", display: "inline-block", width: "100%" }}
+                        >
+                          <input
+                            type="text" // Use text type to handle proper decimal formatting
+                            value={detail.tax}
+                            onChange={(e) => {
+                              let value = e.target.value;
+
+                              // Allow only numbers and one decimal point
+                              if (!/^\d{0,2}(\.\d{0,2})?$/.test(value)) return;
+
+                              // Ensure it does not exceed 99.99
+                              if (parseFloat(value) > 99.99) return;
+
+                              handleEdit(index, "tax", value);
+                            }}
+                            required
+                            style={{
+                              width: "100%",
+                              border: "1px solid lightgray",
+                              background: "transparent",
+                              outline: "none",
+                              padding: "5px",
+                              borderRadius: "4px",
+                              cursor: "text",
+                              paddingRight: "20px", // Add space for % symbol
+                            }}
+                          />
+                          <span
+                            style={{
+                              position: "absolute",
+                              right: "10px",
+                              top: "50%",
+                              transform: "translateY(-50%)",
+                              color: "gray",
+                            }}
+                          >
+                            %
+                          </span>
+                        </div>
                       </TableCell>
                       <TableCell component="th" scope="row">
                         <h5>
