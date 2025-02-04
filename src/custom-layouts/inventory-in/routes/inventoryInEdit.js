@@ -114,6 +114,10 @@ export default function CreateInventoryInForm() {
           id: detail.purchase_detail_id,
           product: detail.product,
           quantity: detail.quantity || null,
+          receipt_quantity:
+            detail.purchase_detail.quantity -
+              detail.purchase_detail.receipt_quantity +
+              detail.quantity || null,
           price: detail.price || null,
           tax: detail.tax || null,
           subtotal: detail.subtotal || 0,
@@ -130,6 +134,7 @@ export default function CreateInventoryInForm() {
           .map((detail) => ({
             ...detail,
             product_name: detail.product?.name || "Unknown Product",
+            receipt_quantity: detail.quantity - detail.receipt_quantity,
           }))
           .filter((detail) => !transformedDetails.some((d) => d.id === detail.id)); // Exclude selected ones
 
@@ -203,7 +208,7 @@ export default function CreateInventoryInForm() {
   const columns = [
     { field: "product_name", headerName: "Product", flex: 1 },
     {
-      field: "quantity",
+      field: "receipt_quantity",
       headerName: "Quantity",
       type: "number",
       flex: 1,
@@ -348,7 +353,14 @@ export default function CreateInventoryInForm() {
   };
 
   const handleSelect = () => {
-    setDetails((prevDetails) => [...prevDetails, ...selectedRows]); // Add selected rows to details
+    // setDetails((prevDetails) => [...prevDetails, ...selectedRows]); // Add selected rows to details
+    setDetails((prevDetails) => [
+      ...prevDetails,
+      ...selectedRows.map((row) => ({
+        ...row,
+        quantity: row.receipt_quantity, // Add quantity from receipt_quantity
+      })),
+    ]);
     setRows((prevRows) =>
       prevRows.filter((row) => !selectedRows.some((selected) => selected.id === row.id))
     );

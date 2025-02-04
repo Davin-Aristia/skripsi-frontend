@@ -141,7 +141,7 @@ export default function CreateInventoryInForm() {
   const columns = [
     { field: "product_name", headerName: "Product", flex: 1 },
     {
-      field: "quantity",
+      field: "receipt_quantity",
       headerName: "Quantity",
       type: "number",
       flex: 1,
@@ -265,7 +265,8 @@ export default function CreateInventoryInForm() {
       const formattedDetails = purchaseDetails
         ? purchaseDetails.map((detail) => ({
             ...detail,
-            product_name: detail.product?.name || "Unknown Product", // Handle potential null product
+            product_name: detail.product?.name || "Unknown Product",
+            receipt_quantity: detail.quantity - detail.receipt_quantity,
           }))
         : [];
 
@@ -283,7 +284,14 @@ export default function CreateInventoryInForm() {
   };
 
   const handleSelect = () => {
-    setDetails((prevDetails) => [...prevDetails, ...selectedRows]); // Add selected rows to details
+    // setDetails((prevDetails) => [...prevDetails, ...selectedRows]); // Add selected rows to details
+    setDetails((prevDetails) => [
+      ...prevDetails,
+      ...selectedRows.map((row) => ({
+        ...row,
+        quantity: row.receipt_quantity, // Add quantity from receipt_quantity
+      })),
+    ]);
     setRows((prevRows) =>
       prevRows.filter((row) => !selectedRows.some((selected) => selected.id === row.id))
     );
