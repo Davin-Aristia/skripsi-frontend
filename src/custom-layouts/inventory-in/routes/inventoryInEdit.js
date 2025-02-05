@@ -110,7 +110,7 @@ export default function CreateInventoryInForm() {
           createdAt: convertToLocalDate(inventoryIn.created_at),
           updatedAt: convertToLocalDate(inventoryIn.updated_at),
         });
-        const transformedDetails = inventoryIn.stock_moves.map((detail) => ({
+        const transformedDetails = (inventoryIn.stock_moves || []).map((detail) => ({
           id: detail.purchase_detail_id,
           product: detail.product,
           quantity: detail.quantity || null,
@@ -124,7 +124,6 @@ export default function CreateInventoryInForm() {
         }));
 
         setDetails(transformedDetails);
-
         const purchaseResponse = await axios.get(
           `http://localhost:8080/purchases/${inventoryIn.purchase_object.id}`
         );
@@ -338,12 +337,20 @@ export default function CreateInventoryInForm() {
     try {
       const response = await axios.get(`http://localhost:8080/purchases/${newValue.id}`);
       const purchaseDetails = response.data.response.details;
-      const formattedDetails = (purchaseDetails || []) // Ensure it's always an array
-        .filter((detail) => !details.some((d) => d.id === detail.id)) // Filter out existing ones
-        .map((detail) => ({
-          ...detail,
-          product_name: detail.product?.name || "Unknown Product", // Add product_name
-        }));
+      // const formattedDetails = (purchaseDetails || []) // Ensure it's always an array
+      //   .filter((detail) => !details.some((d) => d.id === detail.id)) // Filter out existing ones
+      //   .map((detail) => ({
+      //     ...detail,
+      //     product_name: detail.product?.name || "Unknown Product", // Add product_name
+      //     receipt_quantity: detail.quantity - detail.receipt_quantity,
+      //   }));
+      const formattedDetails = purchaseDetails
+        ? purchaseDetails.map((detail) => ({
+            ...detail,
+            product_name: detail.product?.name || "Unknown Product",
+            receipt_quantity: detail.quantity - detail.receipt_quantity,
+          }))
+        : [];
 
       setInventoryIn({ ...inventoryIn, selectedPurchase: newValue });
       setRows(formattedDetails);
