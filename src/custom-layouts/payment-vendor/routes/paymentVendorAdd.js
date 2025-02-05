@@ -122,8 +122,8 @@ export default function CreatePaymentVendorForm() {
   const columns = [
     { field: "name", headerName: "Inventory Number", flex: 1 },
     {
-      field: "total",
-      headerName: "Residual Amounr",
+      field: "residual_amount",
+      headerName: "Residual Amount",
       type: "number",
       flex: 1,
     },
@@ -209,7 +209,14 @@ export default function CreatePaymentVendorForm() {
   };
 
   const handleSelect = () => {
-    setDetails((prevDetails) => [...prevDetails, ...selectedRows]); // Add selected rows to details
+    // setDetails((prevDetails) => [...prevDetails, ...selectedRows]); // Add selected rows to details
+    setDetails((prevDetails) => [
+      ...prevDetails,
+      ...selectedRows.map((row) => ({
+        ...row,
+        amount: row.residual_amount, // Add quantity from receipt_quantity
+      })),
+    ]);
     setRows((prevRows) =>
       prevRows.filter((row) => !selectedRows.some((selected) => selected.id === row.id))
     );
@@ -284,7 +291,7 @@ export default function CreatePaymentVendorForm() {
                     lineHeight: "1.5", // Adjust the line height for proper vertical alignment
                   },
                 }}
-                renderInput={(params) => <MDInput {...params} label="Select Vendor" />}
+                renderInput={(params) => <MDInput {...params} label="Select Vendor" required />}
               />
             </MDBox>
             <MDBox mb={2}>
@@ -293,6 +300,7 @@ export default function CreatePaymentVendorForm() {
                 label="Date"
                 fullWidth
                 value={paymentVendor.date}
+                required
                 onChange={(e) => setPaymentVendor({ ...paymentVendor, date: e.target.value })}
                 InputLabelProps={{
                   shrink: true, // Ensures label stays on top even when the input is empty
@@ -364,6 +372,7 @@ export default function CreatePaymentVendorForm() {
                         <input
                           type="number"
                           value={detail.amount}
+                          required
                           onChange={(e) => handleEdit(index, "amount", e.target.value)}
                           style={{
                             width: "100%",

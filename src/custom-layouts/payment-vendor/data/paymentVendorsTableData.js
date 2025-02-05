@@ -119,7 +119,11 @@ export default function data({ query }) {
     name: paymentVendor.name,
     date: convertToLocalDate(paymentVendor.date),
     vendor: paymentVendor.vendor.name,
-    total: paymentVendor.total,
+    total: `Rp ${new Intl.NumberFormat("id-ID", {
+      style: "decimal",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(paymentVendor.total)}`,
     action: (
       <MDBox display="flex" alignItems="center" mt={{ xs: 2, sm: 0 }} ml={{ xs: -1.5, sm: 0 }}>
         <NavLink to={`/vendor-payment/${paymentVendor.id}/edit`} style={{ textDecoration: "none" }}>
