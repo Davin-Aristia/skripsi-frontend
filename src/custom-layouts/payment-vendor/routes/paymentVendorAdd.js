@@ -150,7 +150,7 @@ export default function CreatePaymentVendorForm() {
       if (i === index) {
         return {
           ...detail,
-          [fieldName]: newValue, // Update the field without recalculating subtotal
+          [fieldName]: fieldName === "amount" ? parseFloat(newValue) || 0 : newValue,
         };
       }
       return detail;

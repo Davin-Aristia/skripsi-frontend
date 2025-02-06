@@ -91,9 +91,10 @@ export default function CreatePaymentCustomerForm() {
           updatedAt: convertToLocalDate(payment.updated_at),
         });
         const transformedDetails = payment.details.map((detail) => ({
-          id: detail.inventory_in_id,
+          id: detail.inventory_out_id,
           name: detail.name,
           amount: detail.amount || 0,
+          residual_amount: detail.inventory_out.residual_amount + detail.amount,
         }));
 
         setDetails(transformedDetails);
@@ -102,13 +103,17 @@ export default function CreatePaymentCustomerForm() {
           `http://localhost:8080/customers/${payment.customer.id}`
         );
         const customerInventory = customerResponse.data.response.available_inventory || [];
+        console.log("customerInventory", customerInventory);
+        const availableRows = customerInventory.filter(
+          (detail) => !transformedDetails.some((d) => d.id === detail.id)
+        );
 
-        const availableRows = customerInventory
-          .map((detail) => ({
-            ...detail,
-            product_name: detail.product?.name || "Unknown Product",
-          }))
-          .filter((detail) => !transformedDetails.some((d) => d.id === detail.id)); // Exclude selected ones
+        // const availableRows = customerInventory
+        //   .map((detail) => ({
+        //     ...detail,
+        //     product_name: detail.product?.name || "Unknown Product",
+        //   }))
+        //   .filter((detail) => !transformedDetails.some((d) => d.id === detail.id)); // Exclude selected ones
 
         setRows(availableRows);
       } catch (error) {
@@ -139,7 +144,7 @@ export default function CreatePaymentCustomerForm() {
 
     if (details.length > 0) {
       newPaymentCustomer.details = details.map((item) => ({
-        inventory_in_id: item.id,
+        inventory_out_id: item.id,
         amount: parseFloat(item.amount),
       }));
     }
@@ -168,7 +173,7 @@ export default function CreatePaymentCustomerForm() {
   const columns = [
     { field: "name", headerName: "Inventory Number", flex: 1 },
     {
-      field: "total",
+      field: "residual_amount",
       headerName: "Residual Amount",
       type: "number",
       flex: 1,
@@ -196,7 +201,7 @@ export default function CreatePaymentCustomerForm() {
       if (i === index) {
         return {
           ...detail,
-          [fieldName]: newValue, // Update the field without recalculating subtotal
+          [fieldName]: fieldName === "amount" ? parseFloat(newValue) || 0 : newValue,
         };
       }
       return detail;
@@ -206,6 +211,7 @@ export default function CreatePaymentCustomerForm() {
   };
 
   useEffect(() => {
+    console.log("details", details);
     const total = details.reduce((sum, detail) => sum + (detail.amount || 0), 0);
     setPaymentCustomer((prevPaymentCustomer) => ({ ...prevPaymentCustomer, total }));
   }, [details]);
@@ -255,7 +261,14 @@ export default function CreatePaymentCustomerForm() {
   };
 
   const handleSelect = () => {
-    setDetails((prevDetails) => [...prevDetails, ...selectedRows]); // Add selected rows to details
+    // setDetails((prevDetails) => [...prevDetails, ...selectedRows]); // Add selected rows to details
+    setDetails((prevDetails) => [
+      ...prevDetails,
+      ...selectedRows.map((row) => ({
+        ...row,
+        amount: row.residual_amount, // Add quantity from receipt_quantity
+      })),
+    ]);
     setRows((prevRows) =>
       prevRows.filter((row) => !selectedRows.some((selected) => selected.id === row.id))
     );
@@ -331,7 +344,7 @@ export default function CreatePaymentCustomerForm() {
                     lineHeight: "1.5", // Adjust the line height for proper vertical alignment
                   },
                 }}
-                renderInput={(params) => <MDInput {...params} label="Select Customer" />}
+                renderInput={(params) => <MDInput {...params} label="Select Customer" required />}
               />
             </MDBox>
             <MDBox mb={2}>
@@ -340,6 +353,7 @@ export default function CreatePaymentCustomerForm() {
                 label="Date"
                 fullWidth
                 value={paymentCustomer.date}
+                required
                 onChange={(e) => setPaymentCustomer({ ...paymentCustomer, date: e.target.value })}
                 InputLabelProps={{
                   shrink: true, // Ensures label stays on top even when the input is empty
@@ -411,6 +425,7 @@ export default function CreatePaymentCustomerForm() {
                         <input
                           type="number"
                           value={detail.amount}
+                          required
                           onChange={(e) => handleEdit(index, "amount", e.target.value)}
                           style={{
                             width: "100%",

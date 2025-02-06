@@ -119,7 +119,7 @@ export default function CreateInventoryOutForm() {
       navigate("/inventory-out");
     } catch (error) {
       toast.error("failed add new inventoryOut");
-      console.log(error.response.data.message);
+      console.log(error.response.data.response);
     }
   };
 
