@@ -10,6 +10,9 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Autocomplete from "@mui/material/Autocomplete";
 import MDInput from "components/MDInput";
+import MDButton from "components/MDButton";
+import Icon from "@mui/material/Icon";
+import MDBox from "components/MDBox";
 
 function POSPage() {
   const [products, setProducts] = useState([]);
@@ -17,7 +20,11 @@ function POSPage() {
   const [cart, setCart] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
   const [categories, setCategories] = useState([]);
+  const [customers, setCustomers] = useState([]);
+  const [vendors, setVendors] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState({});
+  const [selectedCustomers, setSelectedCustomer] = useState({});
+  const [selectedVendors, setSelectedVendor] = useState({});
 
   const toastOptions = {
     autoClose: 1500,
@@ -150,7 +157,32 @@ function POSPage() {
   };
 
   useEffect(() => {
-    fetchCategories();
+    (async () => {
+      try {
+        // const [categoriesResponse, customersResponse, vendorsResponse] = await axios.get(`http://localhost:8080/product-categories`);
+        const [categoriesResponse, customersResponse, vendorsResponse] = await Promise.all([
+          axios.get(`http://localhost:8080/product-categories`),
+          axios.get(`http://localhost:8080/customers`),
+          axios.get(`http://localhost:8080/vendors`),
+        ]);
+
+        const fetchedCategories = categoriesResponse.data.response;
+        const fetchedCustomer = customersResponse.data.response;
+        const fetchedVendors = vendorsResponse.data.response;
+
+        setCategories(fetchedCategories);
+        setCustomers(fetchedCustomer);
+        setVendors(fetchedVendors);
+
+        let selected = fetchedCategories[0];
+        if (fetchedCategories.length > 0) {
+          setSelectedCategory(selected);
+        }
+        fetchProducts(selected);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    })();
   }, []);
 
   useEffect(() => {
@@ -218,11 +250,26 @@ function POSPage() {
           <div style={{ display: "none" }}>
             <ComponentToPrint cart={cart} totalAmount={totalAmount} ref={componentRef} />
           </div>
+          <MDBox display="flex" alignItems="center" gap={2}>
+            <h1 style={{ margin: 0 }}>Sales</h1>
+            <Autocomplete
+              disablePortal
+              value={selectedCustomers}
+              onChange={(e, newValue) => setSelectedCustomer(newValue)}
+              options={customers}
+              disableClearable
+              getOptionLabel={(option) => option?.name || ""}
+              sx={{
+                width: 250, // Adjust width as needed
+                "& .MuiInputLabel-root": { lineHeight: "1.5" },
+              }}
+              renderInput={(params) => <MDInput {...params} label="Select Customer" required />}
+            />
+          </MDBox>
           <div className="table-responsive bg-dark">
             <table className="table table-responsive table-dark table-hover">
               <thead>
                 <tr>
-                  <td>#</td>
                   <td>Name</td>
                   <td>Price</td>
                   <td>Qty</td>
@@ -234,25 +281,48 @@ function POSPage() {
                 {cart
                   ? cart.map((cartProduct, key) => (
                       <tr key={key}>
-                        <td>{cartProduct.id}</td>
                         <td>{cartProduct.name}</td>
                         <td>{cartProduct.price}</td>
                         <td>{cartProduct.quantity}</td>
-                        <td>{cartProduct.totalAmount}</td>
                         <td>
-                          <button
-                            className="btn btn-danger btn-sm"
+                          Rp{" "}
+                          {new Intl.NumberFormat("id-ID", {
+                            style: "decimal",
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }).format(cartProduct.totalAmount)}
+                        </td>
+                        <td>
+                          <MDButton
+                            variant="text"
+                            color="info"
+                            iconOnly
                             onClick={() => removeProduct(cartProduct)}
                           >
-                            Remove
-                          </button>
+                            <Icon>shop</Icon>
+                          </MDButton>
+                          <MDButton
+                            variant="text"
+                            color="error"
+                            iconOnly
+                            onClick={() => removeProduct(cartProduct)}
+                          >
+                            <Icon>delete</Icon>
+                          </MDButton>
                         </td>
                       </tr>
                     ))
                   : "No Item in Cart"}
               </tbody>
             </table>
-            <h2 className="px-2 text-white">Total Amount: ${totalAmount}</h2>
+            <h2 className="px-2 text-white">
+              Total: Rp{" "}
+              {new Intl.NumberFormat("id-ID", {
+                style: "decimal",
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              }).format(totalAmount)}
+            </h2>
           </div>
 
           <div className="mt-3">
