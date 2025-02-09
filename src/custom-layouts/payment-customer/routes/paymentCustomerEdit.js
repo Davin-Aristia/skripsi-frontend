@@ -44,8 +44,15 @@ export default function CreatePaymentCustomerForm() {
   const { authToken } = useAuth();
   const { id } = useParams();
 
+  const paymentOptions = [
+    { label: "Cash", value: "cash" },
+    { label: "Credit", value: "credit" },
+    { label: "Debit", value: "debit" },
+  ];
+
   const initialPaymentCustomerState = {
     date: "",
+    paymentMethod: null,
     selectedCustomer: {},
     total: 0,
   };
@@ -86,6 +93,7 @@ export default function CreatePaymentCustomerForm() {
           // name: payment.name,
           date: convertToLocalDate(payment.date),
           selectedCustomer: payment.customer,
+          paymentMethod: payment.payment_method,
           total: 0,
           createdAt: convertToLocalDate(payment.created_at),
           updatedAt: convertToLocalDate(payment.updated_at),
@@ -103,7 +111,7 @@ export default function CreatePaymentCustomerForm() {
           `http://localhost:8080/customers/${payment.customer.id}`
         );
         const customerInventory = customerResponse.data.response.available_inventory || [];
-        console.log("customerInventory", customerInventory);
+        console.log("payment", payment);
         const availableRows = customerInventory.filter(
           (detail) => !transformedDetails.some((d) => d.id === detail.id)
         );
@@ -138,6 +146,7 @@ export default function CreatePaymentCustomerForm() {
 
     const newPaymentCustomer = {
       date: ensureDateTimeFormat(paymentCustomer.date),
+      payment_method: paymentCustomer.paymentMethod,
       customer_id: paymentCustomer.selectedCustomer.id,
       total: parseFloat(paymentCustomer.total),
     };
@@ -326,7 +335,22 @@ export default function CreatePaymentCustomerForm() {
           width="30%"
         >
           <MDTypography variant="h5" fontWeight="medium" color="white" mt={1}>
-            Add New Payment
+            Edit Customer Payment
+          </MDTypography>
+        </MDBox>
+
+        <MDBox
+          sx={{
+            position: "absolute",
+            top: 15, // Adjust the top spacing
+            right: 10, // Align to the right
+          }}
+        >
+          <MDTypography variant="body2" fontWeight="medium" sx={{ color: "grey.600" }}>
+            Create Date: {paymentCustomer.createdAt || "-"}
+          </MDTypography>
+          <MDTypography variant="body2" fontWeight="medium" sx={{ color: "grey.600" }}>
+            Last Edit: {paymentCustomer.updatedAt || "-"}
           </MDTypography>
         </MDBox>
 
@@ -345,6 +369,26 @@ export default function CreatePaymentCustomerForm() {
                   },
                 }}
                 renderInput={(params) => <MDInput {...params} label="Select Customer" required />}
+              />
+            </MDBox>
+            <MDBox mb={2}>
+              <Autocomplete
+                disablePortal
+                onChange={(event, newValue) =>
+                  setPaymentCustomer({ ...paymentCustomer, paymentMethod: newValue?.value || null })
+                }
+                value={
+                  paymentOptions.find((option) => option.value === paymentCustomer.paymentMethod) ||
+                  null
+                }
+                options={paymentOptions}
+                getOptionLabel={(option) => option?.label || ""}
+                sx={{
+                  "& .MuiInputLabel-root": {
+                    lineHeight: "1.5", // Adjust the line height for proper vertical alignment
+                  },
+                }}
+                renderInput={(params) => <MDInput {...params} label="Payment Method" />}
               />
             </MDBox>
             <MDBox mb={2}>
@@ -491,7 +535,7 @@ export default function CreatePaymentCustomerForm() {
 
             <MDBox mt={4} mb={1}>
               <MDButton variant="gradient" color="info" fullWidth type="submit">
-                create
+                edit
               </MDButton>
             </MDBox>
           </MDBox>

@@ -322,7 +322,22 @@ export default function CreatePaymentVendorForm() {
           width="30%"
         >
           <MDTypography variant="h5" fontWeight="medium" color="white" mt={1}>
-            Add New Payment
+            Edit Vendor Payment
+          </MDTypography>
+        </MDBox>
+
+        <MDBox
+          sx={{
+            position: "absolute",
+            top: 15, // Adjust the top spacing
+            right: 10, // Align to the right
+          }}
+        >
+          <MDTypography variant="body2" fontWeight="medium" sx={{ color: "grey.600" }}>
+            Create Date: {paymentVendor.createdAt || "-"}
+          </MDTypography>
+          <MDTypography variant="body2" fontWeight="medium" sx={{ color: "grey.600" }}>
+            Last Edit: {paymentVendor.updatedAt || "-"}
           </MDTypography>
         </MDBox>
 
@@ -334,7 +349,7 @@ export default function CreatePaymentVendorForm() {
                 onChange={handleVendorChange}
                 value={paymentVendor.selectedVendor}
                 options={vendors}
-                getOptionLabel={(option) => option?.name || ""}
+                getOptionLabel={(option) => option?.company || ""}
                 sx={{
                   "& .MuiInputLabel-root": {
                     lineHeight: "1.5", // Adjust the line height for proper vertical alignment
@@ -487,7 +502,7 @@ export default function CreatePaymentVendorForm() {
 
             <MDBox mt={4} mb={1}>
               <MDButton variant="gradient" color="info" fullWidth type="submit">
-                create
+                edit
               </MDButton>
             </MDBox>
           </MDBox>

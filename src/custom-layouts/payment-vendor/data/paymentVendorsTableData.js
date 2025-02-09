@@ -44,7 +44,7 @@ export default function data({ query }) {
   const { darkMode } = controller;
 
   const fetchData = async () => {
-    let link = `http://localhost:8080/payments`;
+    let link = `http://localhost:8080/payments?payment_type=vendor`;
     axios
       .get(link)
       .then((response) => {
@@ -118,7 +118,7 @@ export default function data({ query }) {
   const rows = paymentVendors.map((paymentVendor) => ({
     name: paymentVendor.name,
     date: convertToLocalDate(paymentVendor.date),
-    vendor: paymentVendor.vendor.name,
+    vendor: paymentVendor.vendor.company,
     total: `Rp ${new Intl.NumberFormat("id-ID", {
       style: "decimal",
       minimumFractionDigits: 2,

@@ -44,7 +44,7 @@ export default function data({ query }) {
   const { darkMode } = controller;
 
   const fetchData = async () => {
-    let link = `http://localhost:8080/payments`;
+    let link = `http://localhost:8080/payments?payment_type=customer`;
     axios
       .get(link)
       .then((response) => {

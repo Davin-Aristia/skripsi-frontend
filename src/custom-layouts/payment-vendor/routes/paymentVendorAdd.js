@@ -285,7 +285,7 @@ export default function CreatePaymentVendorForm() {
                 disablePortal
                 onChange={handleVendorChange}
                 options={vendors}
-                getOptionLabel={(option) => option?.name || ""}
+                getOptionLabel={(option) => option?.company || ""}
                 sx={{
                   "& .MuiInputLabel-root": {
                     lineHeight: "1.5", // Adjust the line height for proper vertical alignment

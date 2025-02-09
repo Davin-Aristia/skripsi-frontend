@@ -15,6 +15,10 @@ import {
   Button,
   Card,
   Icon,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -45,6 +49,7 @@ export default function CreatePaymentCustomerForm() {
 
   const initialPaymentCustomerState = {
     date: "",
+    paymentMethod: null,
     selectedCustomer: {},
     total: 0,
   };
@@ -89,6 +94,7 @@ export default function CreatePaymentCustomerForm() {
 
     const newPaymentCustomer = {
       date: ensureDateTimeFormat(paymentCustomer.date),
+      payment_method: paymentCustomer.paymentMethod,
       customer_id: paymentCustomer.selectedCustomer.id,
       total: parseFloat(paymentCustomer.total),
     };
@@ -294,6 +300,26 @@ export default function CreatePaymentCustomerForm() {
                   },
                 }}
                 renderInput={(params) => <MDInput {...params} label="Select Customer" required />}
+              />
+            </MDBox>
+            <MDBox mb={2}>
+              <Autocomplete
+                disablePortal
+                onChange={(event, newValue) =>
+                  setPaymentCustomer({ ...paymentCustomer, paymentMethod: newValue?.value || null })
+                }
+                options={[
+                  { label: "Cash", value: "cash" },
+                  { label: "Credit", value: "credit" },
+                  { label: "Debit", value: "debit" },
+                ]}
+                getOptionLabel={(option) => option?.label || ""}
+                sx={{
+                  "& .MuiInputLabel-root": {
+                    lineHeight: "1.5", // Adjust the line height for proper vertical alignment
+                  },
+                }}
+                renderInput={(params) => <MDInput {...params} label="Payment Method" />}
               />
             </MDBox>
             <MDBox mb={2}>

@@ -125,6 +125,7 @@ export default function CreateInventoryOutForm() {
 
     const newInventoryOut = {
       date: ensureDateTimeFormat(inventoryOut.date),
+      consignment: inventoryOut.consignment,
       customer_id: inventoryOut.selectedCustomer.id,
       total: parseFloat(inventoryOut.total),
     };
@@ -312,7 +313,7 @@ export default function CreateInventoryOutForm() {
           width="30%"
         >
           <MDTypography variant="h5" fontWeight="medium" color="white" mt={1}>
-            Update InventoryOut
+            Edit InventoryOut
           </MDTypography>
         </MDBox>
 

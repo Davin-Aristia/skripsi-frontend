@@ -89,6 +89,7 @@ export default function CreateInventoryOutForm() {
 
     const newInventoryOut = {
       date: ensureDateTimeFormat(inventoryOut.date),
+      consignment: true,
       customer_id: inventoryOut.selectedCustomer.id,
       total: parseFloat(inventoryOut.total),
     };
