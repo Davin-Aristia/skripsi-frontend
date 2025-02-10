@@ -16,7 +16,7 @@ Coded by www.creative-tim.com
 import React, { useState, useEffect } from "react";
 
 // react-router-dom components
-import { useLocation, NavLink } from "react-router-dom";
+import { useLocation, NavLink, useNavigate } from "react-router-dom";
 
 // prop-types is a library for typechecking of props.
 import PropTypes from "prop-types";
@@ -51,6 +51,8 @@ import {
 } from "context";
 
 function Sidenav({ color, brand, brandName, routes, ...rest }) {
+  const navigate = useNavigate();
+
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentSidenav, whiteSidenav, darkMode, sidenavColor } = controller;
   const location = useLocation();
@@ -63,6 +65,12 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
   } else if (whiteSidenav && darkMode) {
     textColor = "inherit";
   }
+
+  const handleSignOut = () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("role");
+    navigate("/sign-in"); // Redirect to sign-in page
+  };
 
   const closeSidenav = () => setMiniSidenav(dispatch, true);
 
@@ -274,10 +282,20 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
             <Icon sx={{ fontWeight: "bold" }}>close</Icon>
           </MDTypography>
         </MDBox>
-        <MDBox component={NavLink} to="/" display="flex" alignItems="center">
+        <MDBox
+          component={NavLink}
+          to="/"
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          width="100%"
+        >
           {brand && <MDBox component="img" src={brand} alt="Brand" width="2rem" />}
           <MDBox
             width={!brandName && "100%"}
+            display="flex"
+            justifyContent="center"
+            textAlign="center"
             sx={(theme) => sidenavLogoLabel(theme, { miniSidenav })}
           >
             <MDTypography component="h6" variant="button" fontWeight="medium" color={textColor}>
@@ -310,6 +328,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
           variant="contained"
           color="error"
           fullWidth
+          onClick={handleSignOut}
           sx={{
             fontWeight: "bold",
             textTransform: "uppercase",

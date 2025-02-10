@@ -65,13 +65,14 @@ function Basic() {
         password,
       });
       localStorage.setItem("authToken", response.data.response.token);
+      localStorage.setItem("role", response.data.response.role);
 
       // Clear the form fields after submission
       setEmail("");
       setPassword("");
 
       // Optionally refetch data or update the state to reflect the new book in the UI
-      navigate("/product", {
+      navigate("/point-of-sales", {
         state: { message: response.data.message, severity: "success" },
       });
     } catch (error) {

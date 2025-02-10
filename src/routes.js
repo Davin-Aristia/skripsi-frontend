@@ -270,14 +270,14 @@ const routes = [
       },
     ],
   },
-  // {
-  //   type: "collapse",
-  //   name: "Sign In Custom",
-  //   key: "sign-in-custom",
-  //   icon: <Icon fontSize="small">login</Icon>,
-  //   route: "/sign-in",
-  //   component: <SignInCustom />,
-  // },
+  {
+    type: "collapse",
+    name: "Sign In Custom",
+    key: "sign-in-custom",
+    icon: <Icon fontSize="small">login</Icon>,
+    route: "/sign-in",
+    component: <SignInCustom />,
+  },
   // {
   //   type: "collapse",
   //   name: "Billing",
@@ -336,4 +336,62 @@ const routes = [
   },
 ];
 
-export default routes;
+const userRole = localStorage.getItem("role");
+
+const filteredRoutes =
+  userRole === "owner"
+    ? routes // Show all routes if user is owner
+    : [
+        ...inventoryInRoutes,
+        ...inventoryOutRoutes,
+        {
+          type: "collapse",
+          name: "Inventory",
+          key: "inventory",
+          icon: <Icon fontSize="small">inventory</Icon>,
+          collapse: [
+            {
+              type: "collapse",
+              name: "Inventory In",
+              key: "inventory-in",
+              icon: (
+                <Icon fontSize="small" style={{ marginLeft: "30px" }}>
+                  archive
+                </Icon>
+              ),
+              route: "/inventory-in",
+              component: <InventoryIn />,
+            },
+            {
+              type: "collapse",
+              name: "Inventory Out",
+              key: "inventory-out",
+              icon: (
+                <Icon fontSize="small" style={{ marginLeft: "30px" }}>
+                  unarchive
+                </Icon>
+              ),
+              route: "/inventory-out",
+              component: <InventoryOut />,
+            },
+          ],
+        },
+        {
+          type: "collapse",
+          name: "Sign In Custom",
+          key: "sign-in-custom",
+          icon: <Icon fontSize="small">login</Icon>,
+          route: "/sign-in",
+          component: <SignInCustom />,
+        },
+        {
+          type: "collapse",
+          name: "Point of Sales",
+          key: "point-of-sales",
+          icon: <Icon fontSize="small">point_of_sale</Icon>,
+          route: "/point-of-sales",
+          component: <PointOfSales />,
+        },
+      ];
+
+export default filteredRoutes;
