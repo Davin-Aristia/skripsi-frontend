@@ -164,9 +164,15 @@ export default function App() {
 
   // const filteredRoutes = routes.filter((route) => route.roles?.includes(userRole));
   const filteredRoutes = useMemo(
-    () => routes.filter((route) => route.roles?.includes(userRole)),
+    () => routes.filter((route) => !route.roles || route.roles?.includes(userRole)),
     [userRole, routes] // Recompute when userRole or routes change
   );
+
+  const defaultRoute = useMemo(() => {
+    if (userRole === "owner") return "/product";
+    if (userRole === "staff") return "/point-of-sales";
+    return "/sign-in"; // Default route if role is unknown or not set
+  }, [userRole]);
 
   return direction === "rtl" ? (
     <CacheProvider value={rtlCache}>
@@ -213,7 +219,7 @@ export default function App() {
       {layout === "vr" && <Configurator />}
       <Routes>
         {getRoutes(filteredRoutes)}
-        <Route path="*" element={<Navigate to="/dashboard" />} />
+        <Route path="*" element={<Navigate to={defaultRoute} />} />
       </Routes>
       <ToastContainer toastStyle={{ fontSize: "16px" }} />
     </ThemeProvider>

@@ -65,14 +65,23 @@ function Basic() {
         password,
       });
       localStorage.setItem("authToken", response.data.response.token);
-      localStorage.setItem("role", response.data.response.role);
+      const role = response.data.response.role;
+      localStorage.setItem("role", role);
 
       // Clear the form fields after submission
       setEmail("");
       setPassword("");
 
+      let path = "/sign-in"; // Default to sign-in if role is invalid
+
+      if (role === "staff") {
+        path = "/point-of-sales";
+      } else if (role === "owner") {
+        path = "/product";
+      }
+
       // Optionally refetch data or update the state to reflect the new book in the UI
-      navigate("/point-of-sales", {
+      navigate(path, {
         state: { message: response.data.message, severity: "success" },
       });
       window.dispatchEvent(new Event("storage"));
