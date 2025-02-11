@@ -75,6 +75,7 @@ function Basic() {
       navigate("/point-of-sales", {
         state: { message: response.data.message, severity: "success" },
       });
+      window.dispatchEvent(new Event("storage"));
     } catch (error) {
       if (error.response?.data) {
         setError(error.response.data.response);

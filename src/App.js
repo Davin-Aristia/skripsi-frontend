@@ -71,6 +71,8 @@ export default function App() {
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
 
+  const [userRole, setUserRole] = useState(localStorage.getItem("role") || "no-role");
+
   // Cache for the rtl
   useMemo(() => {
     const cacheRtl = createCache({
@@ -148,6 +150,24 @@ export default function App() {
     </MDBox>
   );
 
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setUserRole(localStorage.getItem("role") || "no-role");
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+
+  // const filteredRoutes = routes.filter((route) => route.roles?.includes(userRole));
+  const filteredRoutes = useMemo(
+    () => routes.filter((route) => route.roles?.includes(userRole)),
+    [userRole, routes] // Recompute when userRole or routes change
+  );
+
   return direction === "rtl" ? (
     <CacheProvider value={rtlCache}>
       <ThemeProvider theme={darkMode ? themeDarkRTL : themeRTL}>
@@ -158,7 +178,7 @@ export default function App() {
               color={sidenavColor}
               brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
               brandName="COMPUTER STORE"
-              routes={routes}
+              routes={filteredRoutes}
               onMouseEnter={handleOnMouseEnter}
               onMouseLeave={handleOnMouseLeave}
             />
@@ -168,7 +188,7 @@ export default function App() {
         )}
         {layout === "vr" && <Configurator />}
         <Routes>
-          {getRoutes(routes)}
+          {getRoutes(filteredRoutes)}
           <Route path="*" element={<Navigate to="/dashboard" />} />
         </Routes>
       </ThemeProvider>
@@ -182,7 +202,7 @@ export default function App() {
             color={sidenavColor}
             // brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
             brandName="COMPUTER STORE"
-            routes={routes}
+            routes={filteredRoutes}
             onMouseEnter={handleOnMouseEnter}
             onMouseLeave={handleOnMouseLeave}
           />
@@ -192,7 +212,7 @@ export default function App() {
       )}
       {layout === "vr" && <Configurator />}
       <Routes>
-        {getRoutes(routes)}
+        {getRoutes(filteredRoutes)}
         <Route path="*" element={<Navigate to="/dashboard" />} />
       </Routes>
       <ToastContainer toastStyle={{ fontSize: "16px" }} />

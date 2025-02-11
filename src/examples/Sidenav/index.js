@@ -52,6 +52,11 @@ import {
 
 function Sidenav({ color, brand, brandName, routes, ...rest }) {
   const navigate = useNavigate();
+  const [openStates, setOpenStates] = useState({});
+
+  const handleClick = (key) => {
+    setOpenStates((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentSidenav, whiteSidenav, darkMode, sidenavColor } = controller;
@@ -97,31 +102,178 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
   // Render all the routes from the routes.js (All the visible items on the Sidenav)
   // const renderRoutes = routes.map(
   // function renderRoutes(routes) {
+  // const renderRoutes = routes.map(
+  //   ({ type, name, icon, title, noCollapse, key, href, route, collapse }) => {
+  //     let returnValue;
+
+  //     if (type === "collapse") {
+  //       console.log("routess", routes);
+  //       // returnValue = href ? (
+  //       //   <Link
+  //       //     href={href}
+  //       //     key={key}
+  //       //     target="_blank"
+  //       //     rel="noreferrer"
+  //       //     sx={{ textDecoration: "none" }}
+  //       //   >
+  //       //     <SidenavCollapse
+  //       //       name={name}
+  //       //       icon={icon}
+  //       //       active={key === collapseName}
+  //       //       noCollapse={noCollapse}
+  //       //     />
+  //       //   </Link>
+  //       // ) : (
+  //       //   <NavLink key={key} to={route}>
+  //       //     <SidenavCollapse name={name} icon={icon} active={key === collapseName} />
+  //       //   </NavLink>
+  //       // );
+  //       if (href) {
+  //         returnValue = (
+  //           <Link
+  //             href={href}
+  //             key={key}
+  //             target="_blank"
+  //             rel="noreferrer"
+  //             sx={{ textDecoration: "none" }}
+  //           >
+  //             <SidenavCollapse
+  //               name={name}
+  //               icon={icon}
+  //               active={location.pathname === route || location.pathname.startsWith(`${route}/`)}
+  //               // active={key === collapseName}
+  //               noCollapse={noCollapse}
+  //             />
+  //           </Link>
+  //         );
+  //       } else if (!collapse) {
+  //         returnValue = (
+  //           <NavLink key={key} to={route}>
+  //             <SidenavCollapse
+  //               name={name}
+  //               icon={icon}
+  //               active={location.pathname === route || location.pathname.startsWith(`${route}/`)}
+  //             />
+  //           </NavLink>
+  //         );
+  //       } else {
+  //         // const [open, setOpen] = useState(false);
+  //         // const handleClick = () => setOpen(!open);
+
+  //         returnValue = (
+  //           <React.Fragment key={key}>
+  //             {/* <ListItemText primary={name} onClick={handleClick} style={{ cursor: "pointer" }}> */}
+  //             <SidenavCollapse
+  //               name={name}
+  //               icon={icon}
+  //               active={location.pathname === route || location.pathname.startsWith(`${route}/`)}
+  //               onClick={handleClick(key)}
+  //               hasChild={true}
+  //             />
+  //             {/* </ListItemText> */}
+  //             <Collapse in={openStates[key]} timeout="auto" unmountOnExit>
+  //               <List component="div" disablePadding>
+  //                 {/* {renderRoutes(collapse)} Recursively render nested routes */}
+  //                 {/* <NavLink key={key} to={route}>
+  //                   <SidenavCollapse name={name} icon={icon} active={key === collapseName} />
+  //                 </NavLink>
+  //                 <NavLink key={key} to={route}>
+  //                   <SidenavCollapse name={name} icon={icon} active={key === collapseName} />
+  //                 </NavLink> */}
+
+  //                 {collapse.map((subItem) => {
+  //                   const {
+  //                     type,
+  //                     name: subName,
+  //                     icon: subIcon,
+  //                     key: subKey,
+  //                     route,
+  //                     title,
+  //                   } = subItem;
+
+  //                   // Render based on the type of the sub-item
+  //                   if (type === "collapse") {
+  //                     return (
+  //                       <NavLink key={subKey} to={route}>
+  //                         {/* <ListItemButton sx={{ pl: 4, mt: -2, mb: -2 }}> */}
+  //                         {/* <ListItemButton sx={{ pl: 4 }}> */}
+  //                         <SidenavCollapse
+  //                           name={subName}
+  //                           icon={subIcon}
+  //                           active={
+  //                             location.pathname === route ||
+  //                             location.pathname.startsWith(`${route}/`)
+  //                           }
+  //                         />
+  //                         {/* </ListItemButton> */}
+  //                       </NavLink>
+  //                     );
+  //                   } else if (type === "title") {
+  //                     return (
+  //                       <MDTypography
+  //                         key={subKey}
+  //                         color={textColor}
+  //                         display="block"
+  //                         variant="caption"
+  //                         fontWeight="bold"
+  //                         textTransform="uppercase"
+  //                         pl={3}
+  //                         mt={2}
+  //                         mb={1}
+  //                         ml={4}
+  //                       >
+  //                         {title}
+  //                       </MDTypography>
+  //                     );
+  //                   }
+
+  //                   // Handle other types if needed
+  //                   return null;
+  //                 })}
+  //               </List>
+  //             </Collapse>
+  //           </React.Fragment>
+  //         );
+  //       }
+  //     } else if (type === "title") {
+  //       returnValue = (
+  //         <MDTypography
+  //           key={key}
+  //           color={textColor}
+  //           display="block"
+  //           variant="caption"
+  //           fontWeight="bold"
+  //           textTransform="uppercase"
+  //           pl={3}
+  //           mt={2}
+  //           mb={1}
+  //           ml={1}
+  //         >
+  //           {title}
+  //         </MDTypography>
+  //       );
+  //     } else if (type === "divider") {
+  //       returnValue = (
+  //         <Divider
+  //           key={key}
+  //           light={
+  //             (!darkMode && !whiteSidenav && !transparentSidenav) ||
+  //             (darkMode && !transparentSidenav && whiteSidenav)
+  //           }
+  //         />
+  //       );
+  //     }
+
+  //     console.log("returnValue", returnValue);
+  //     return returnValue;
+  //   }
+  // );
+
   const renderRoutes = routes.map(
     ({ type, name, icon, title, noCollapse, key, href, route, collapse }) => {
       let returnValue;
 
       if (type === "collapse") {
-        // returnValue = href ? (
-        //   <Link
-        //     href={href}
-        //     key={key}
-        //     target="_blank"
-        //     rel="noreferrer"
-        //     sx={{ textDecoration: "none" }}
-        //   >
-        //     <SidenavCollapse
-        //       name={name}
-        //       icon={icon}
-        //       active={key === collapseName}
-        //       noCollapse={noCollapse}
-        //     />
-        //   </Link>
-        // ) : (
-        //   <NavLink key={key} to={route}>
-        //     <SidenavCollapse name={name} icon={icon} active={key === collapseName} />
-        //   </NavLink>
-        // );
         if (href) {
           returnValue = (
             <Link
@@ -135,7 +287,6 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
                 name={name}
                 icon={icon}
                 active={location.pathname === route || location.pathname.startsWith(`${route}/`)}
-                // active={key === collapseName}
                 noCollapse={noCollapse}
               />
             </Link>
@@ -151,30 +302,17 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
             </NavLink>
           );
         } else {
-          const [open, setOpen] = useState(false);
-          const handleClick = () => setOpen(!open);
-
           returnValue = (
             <React.Fragment key={key}>
-              {/* <ListItemText primary={name} onClick={handleClick} style={{ cursor: "pointer" }}> */}
               <SidenavCollapse
                 name={name}
                 icon={icon}
                 active={location.pathname === route || location.pathname.startsWith(`${route}/`)}
-                onClick={handleClick}
+                onClick={() => handleClick(key)}
                 hasChild={true}
               />
-              {/* </ListItemText> */}
-              <Collapse in={open} timeout="auto" unmountOnExit>
+              <Collapse in={openStates[key]} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
-                  {/* {renderRoutes(collapse)} Recursively render nested routes */}
-                  {/* <NavLink key={key} to={route}>
-                    <SidenavCollapse name={name} icon={icon} active={key === collapseName} />
-                  </NavLink>
-                  <NavLink key={key} to={route}>
-                    <SidenavCollapse name={name} icon={icon} active={key === collapseName} />
-                  </NavLink> */}
-
                   {collapse.map((subItem) => {
                     const {
                       type,
@@ -185,12 +323,9 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
                       title,
                     } = subItem;
 
-                    // Render based on the type of the sub-item
                     if (type === "collapse") {
                       return (
                         <NavLink key={subKey} to={route}>
-                          {/* <ListItemButton sx={{ pl: 4, mt: -2, mb: -2 }}> */}
-                          {/* <ListItemButton sx={{ pl: 4 }}> */}
                           <SidenavCollapse
                             name={subName}
                             icon={subIcon}
@@ -199,7 +334,6 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
                               location.pathname.startsWith(`${route}/`)
                             }
                           />
-                          {/* </ListItemButton> */}
                         </NavLink>
                       );
                     } else if (type === "title") {
@@ -221,7 +355,6 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
                       );
                     }
 
-                    // Handle other types if needed
                     return null;
                   })}
                 </List>
