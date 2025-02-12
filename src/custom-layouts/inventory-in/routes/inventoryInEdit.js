@@ -198,7 +198,7 @@ export default function CreateInventoryInForm() {
       bill_number: inventoryIn.billNumber,
       delivery_number: inventoryIn.deliveryNumber,
       purchase_id: inventoryIn.selectedPurchase?.id === 0 ? null : inventoryIn.selectedPurchase?.id,
-      vendor_id: inventoryIn.selectedVendor.id,
+      vendor_id: inventoryIn.selectedVendor.id === 0 ? null : inventoryIn.selectedVendor.id,
       total: parseFloat(inventoryIn.total),
     };
 
