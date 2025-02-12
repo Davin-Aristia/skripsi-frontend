@@ -46,7 +46,11 @@ export default function data({ query }) {
   const fetchData = async () => {
     let link = `http://localhost:8080/inventory-outs`;
     axios
-      .get(link)
+      .get(link, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      })
       .then((response) => {
         setInventoryOuts(response.data.response || []);
       })

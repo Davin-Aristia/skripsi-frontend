@@ -69,8 +69,16 @@ export default function CreatePurchaseForm() {
       try {
         // Fetch both vendors and products simultaneously
         const [vendorsResponse, productsResponse] = await Promise.all([
-          axios.get(`http://localhost:8080/vendors`),
-          axios.get(`http://localhost:8080/products`),
+          axios.get(`http://localhost:8080/vendors`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }),
+          axios.get(`http://localhost:8080/products`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }),
         ]);
 
         // Extract the data from the responses
@@ -89,7 +97,11 @@ export default function CreatePurchaseForm() {
   useEffect(() => {
     (async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/purchases/${id}`);
+        const response = await axios.get(`http://localhost:8080/purchases/${id}`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
         const purchase = response.data.response;
         setPurchase({
           name: purchase.name,

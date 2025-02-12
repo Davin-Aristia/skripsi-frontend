@@ -80,9 +80,21 @@ export default function CreateInventoryInForm() {
       try {
         // Fetch both purchases and products simultaneously
         const [purchasesResponse, productsResponse, vendorsResponse] = await Promise.all([
-          axios.get(`http://localhost:8080/purchases`),
-          axios.get(`http://localhost:8080/products`),
-          axios.get(`http://localhost:8080/vendors`),
+          axios.get(`http://localhost:8080/purchases`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }),
+          axios.get(`http://localhost:8080/products`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }),
+          axios.get(`http://localhost:8080/vendors`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }),
         ]);
 
         // Extract the data from the responses
@@ -103,7 +115,11 @@ export default function CreateInventoryInForm() {
   useEffect(() => {
     (async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/inventory-ins/${id}`);
+        const response = await axios.get(`http://localhost:8080/inventory-ins/${id}`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
         const inventoryIn = response.data.response;
         setInventoryIn({
           name: inventoryIn.name,
@@ -136,7 +152,12 @@ export default function CreateInventoryInForm() {
 
         if (inventoryIn.purchase_id) {
           const purchaseResponse = await axios.get(
-            `http://localhost:8080/purchases/${inventoryIn.purchase_object.id}`
+            `http://localhost:8080/purchases/${inventoryIn.purchase_object.id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${authToken}`,
+              },
+            }
           );
           const purchaseDetails = purchaseResponse.data.response.details || [];
 
@@ -348,7 +369,11 @@ export default function CreateInventoryInForm() {
     if (!newValue) return;
 
     try {
-      const response = await axios.get(`http://localhost:8080/purchases/${newValue.id}`);
+      const response = await axios.get(`http://localhost:8080/purchases/${newValue.id}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
       const purchaseDetails = response.data.response.details;
       // const formattedDetails = (purchaseDetails || []) // Ensure it's always an array
       //   .filter((detail) => !details.some((d) => d.id === detail.id)) // Filter out existing ones
@@ -403,7 +428,12 @@ export default function CreateInventoryInForm() {
         vendor = selectedVendor;
       } else {
         const response = await axios.get(
-          `http://localhost:8080/vendors/${selectedPurchase.vendor_id}`
+          `http://localhost:8080/vendors/${selectedPurchase.vendor_id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
         );
         vendor = response.data.response;
       }

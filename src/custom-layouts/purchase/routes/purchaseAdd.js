@@ -67,8 +67,16 @@ export default function CreatePurchaseForm() {
       try {
         // Fetch both vendors and products simultaneously
         const [vendorsResponse, productsResponse] = await Promise.all([
-          axios.get(`http://localhost:8080/vendors`),
-          axios.get(`http://localhost:8080/products`),
+          axios.get(`http://localhost:8080/vendors`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }),
+          axios.get(`http://localhost:8080/products`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }),
         ]);
 
         // Extract the data from the responses

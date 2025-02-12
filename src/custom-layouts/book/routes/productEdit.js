@@ -35,7 +35,11 @@ export default function CreateBookForm() {
   useEffect(() => {
     const fetchProductData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/books/${id}`);
+        const response = await axios.get(`http://localhost:8080/books/${id}`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
         const product = response.data.response;
         setTitle(product.title);
         setAuthor(product.author);

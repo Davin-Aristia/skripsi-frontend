@@ -92,7 +92,11 @@ function Products() {
 
   const fetchData = async () => {
     axios
-      .get(`http://localhost:8080/books`)
+      .get(`http://localhost:8080/books`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      })
       .then((response) => {
         setBooks(response.data.response || []);
       })

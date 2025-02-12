@@ -50,9 +50,14 @@ export default function data({ query }) {
   const { darkMode } = controller;
 
   const fetchData = async () => {
+    console.log("authToken", authToken);
     let link = `http://localhost:8080/product-categories`;
     axios
-      .get(link)
+      .get(link, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      })
       .then((response) => {
         setProductCategories(response.data.response || []);
         setLoading(false);

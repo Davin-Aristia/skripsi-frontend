@@ -46,7 +46,11 @@ export default function data({ query }) {
   const fetchData = async () => {
     let link = `http://localhost:8080/payments?payment_type=customer`;
     axios
-      .get(link)
+      .get(link, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      })
       .then((response) => {
         setPaymentCustomers(response.data.response || []);
       })

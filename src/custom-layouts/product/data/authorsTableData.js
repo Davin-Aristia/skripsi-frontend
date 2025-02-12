@@ -52,7 +52,11 @@ export default function data({ query }) {
   const fetchData = async () => {
     let link = `http://localhost:8080/products`;
     axios
-      .get(link)
+      .get(link, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      })
       .then((response) => {
         setProducts(response.data.response || []);
         setLoading(false);

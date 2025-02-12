@@ -71,6 +71,9 @@ function POSPage() {
   const fetchProducts = async (selected = null) => {
     setIsLoading(true);
     const result = await axios.get("http://localhost:8080/products", {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
       params: {
         category: selected ? selected.id : selectedCategory?.id,
       },
@@ -192,9 +195,21 @@ function POSPage() {
       try {
         // const [categoriesResponse, customersResponse, vendorsResponse] = await axios.get(`http://localhost:8080/product-categories`);
         const [categoriesResponse, customersResponse, vendorsResponse] = await Promise.all([
-          axios.get(`http://localhost:8080/product-categories`),
-          axios.get(`http://localhost:8080/customers`),
-          axios.get(`http://localhost:8080/vendors`),
+          axios.get("http://localhost:8080/product-categories", {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }),
+          axios.get("http://localhost:8080/customers", {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }),
+          axios.get("http://localhost:8080/vendors", {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }),
         ]);
 
         const fetchedCategories = categoriesResponse.data.response;

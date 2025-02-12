@@ -39,7 +39,11 @@ export default function CreateVendorForm() {
   useEffect(() => {
     (async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/vendors/${id}`);
+        const response = await axios.get(`http://localhost:8080/vendors/${id}`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
         const vendor = response.data.response;
         setVendor({
           company: vendor.company,

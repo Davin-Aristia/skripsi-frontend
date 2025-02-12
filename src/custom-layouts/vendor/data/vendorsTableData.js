@@ -46,7 +46,11 @@ export default function data({ query }) {
   const fetchData = async () => {
     let link = `http://localhost:8080/vendors`;
     axios
-      .get(link)
+      .get(link, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      })
       .then((response) => {
         setVendors(response.data.response || []);
       })

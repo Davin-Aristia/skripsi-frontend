@@ -62,7 +62,13 @@ export default function CreatePaymentVendorForm() {
     (async () => {
       try {
         // Fetch both purchases and products simultaneously
-        const [vendorsResponse] = await Promise.all([axios.get(`http://localhost:8080/vendors`)]);
+        const [vendorsResponse] = await Promise.all([
+          axios.get(`http://localhost:8080/vendors`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }),
+        ]);
 
         // Extract the data from the responses
         const vendors = vendorsResponse.data.response;
@@ -78,7 +84,11 @@ export default function CreatePaymentVendorForm() {
   useEffect(() => {
     (async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/payments/${id}`);
+        const response = await axios.get(`http://localhost:8080/payments/${id}`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
         const payment = response.data.response;
         setPaymentVendor({
           // name: payment.name,
@@ -98,7 +108,12 @@ export default function CreatePaymentVendorForm() {
         setDetails(transformedDetails);
 
         const vendorResponse = await axios.get(
-          `http://localhost:8080/vendors/${payment.vendor.id}`
+          `http://localhost:8080/vendors/${payment.vendor.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
         );
         const vendorInventory = vendorResponse.data.response.available_inventory || [];
         const availableRows = vendorInventory.filter(
@@ -233,7 +248,11 @@ export default function CreatePaymentVendorForm() {
     if (!newValue) return;
 
     try {
-      const response = await axios.get(`http://localhost:8080/vendors/${newValue.id}`);
+      const response = await axios.get(`http://localhost:8080/vendors/${newValue.id}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
       const vendorDetails = response.data.response.available_inventory;
       // const formattedDetails = vendorDetails
       //   ? vendorDetails.map((detail) => ({

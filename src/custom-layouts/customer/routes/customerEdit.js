@@ -33,7 +33,11 @@ export default function CreateCustomerForm() {
   useEffect(() => {
     (async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/customers/${id}`);
+        const response = await axios.get(`http://localhost:8080/customers/${id}`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
         const customer = response.data.response;
         setCustomer({
           email: customer.email,

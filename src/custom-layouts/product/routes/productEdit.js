@@ -58,7 +58,11 @@ export default function CreateBookForm() {
   useEffect(() => {
     const fetchProductData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/products/${id}`);
+        const response = await axios.get(`http://localhost:8080/products/${id}`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
         const product = response.data.response;
         setName(product.name);
         setStock(product.stock);
@@ -80,7 +84,11 @@ export default function CreateBookForm() {
         const formattedUpdateDate = convertToLocalDate(product.updated_at);
         setUpdatedAt(formattedUpdateDate);
 
-        const categoriesResponse = await axios.get(`http://localhost:8080/product-categories`);
+        const categoriesResponse = await axios.get(`http://localhost:8080/product-categories`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
         const productCategories = categoriesResponse.data.response;
         setCategories(productCategories);
         setSelectedCategory(
@@ -149,7 +157,14 @@ export default function CreateBookForm() {
 
     if (newValue) {
       try {
-        const response = await axios.get(`http://localhost:8080/product-categories/${newValue.id}`);
+        const response = await axios.get(
+          `http://localhost:8080/product-categories/${newValue.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
+        );
         const transformedSpecs = (response.data.response.specifications || []).map((spec) => ({
           ...spec,
           description: "", // Add the empty description key

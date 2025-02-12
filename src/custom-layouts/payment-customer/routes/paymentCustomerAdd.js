@@ -74,7 +74,11 @@ export default function CreatePaymentCustomerForm() {
       try {
         // Fetch both purchases and products simultaneously
         const [customersResponse] = await Promise.all([
-          axios.get(`http://localhost:8080/customers`),
+          axios.get(`http://localhost:8080/customers`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }),
         ]);
 
         // Extract the data from the responses
@@ -193,7 +197,11 @@ export default function CreatePaymentCustomerForm() {
     if (!newValue) return;
 
     try {
-      const response = await axios.get(`http://localhost:8080/customers/${newValue.id}`);
+      const response = await axios.get(`http://localhost:8080/customers/${newValue.id}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
       const customerDetails = response.data.response.available_inventory;
       // const formattedDetails = customerDetails
       //   ? customerDetails.map((detail) => ({

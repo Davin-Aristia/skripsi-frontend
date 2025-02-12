@@ -46,7 +46,11 @@ export default function CreateBookForm() {
   useEffect(() => {
     const fetchProductData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/product-categories`);
+        const response = await axios.get(`http://localhost:8080/product-categories`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
         const productCategories = response.data.response;
         setCategories(productCategories);
       } catch (error) {
@@ -109,7 +113,14 @@ export default function CreateBookForm() {
 
     if (newValue) {
       try {
-        const response = await axios.get(`http://localhost:8080/product-categories/${newValue.id}`);
+        const response = await axios.get(
+          `http://localhost:8080/product-categories/${newValue.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
+        );
         const transformedSpecs = (response.data.response.specifications || []).map((spec) => ({
           ...spec,
           description: "", // Add the empty description key

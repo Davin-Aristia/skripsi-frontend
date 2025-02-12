@@ -68,8 +68,16 @@ export default function CreateInventoryOutForm() {
       try {
         // Fetch both customers and products simultaneously
         const [customersResponse, productsResponse] = await Promise.all([
-          axios.get(`http://localhost:8080/customers`),
-          axios.get(`http://localhost:8080/products`),
+          axios.get(`http://localhost:8080/customers`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }),
+          axios.get(`http://localhost:8080/products`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }),
         ]);
 
         // Extract the data from the responses
@@ -88,7 +96,11 @@ export default function CreateInventoryOutForm() {
   useEffect(() => {
     (async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/inventory-outs/${id}`);
+        const response = await axios.get(`http://localhost:8080/inventory-outs/${id}`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
         const inventoryOut = response.data.response;
         setInventoryOut({
           name: inventoryOut.name,

@@ -70,7 +70,11 @@ export default function CreatePaymentCustomerForm() {
       try {
         // Fetch both purchases and products simultaneously
         const [customersResponse] = await Promise.all([
-          axios.get(`http://localhost:8080/customers`),
+          axios.get(`http://localhost:8080/customers`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }),
         ]);
 
         // Extract the data from the responses
@@ -87,7 +91,11 @@ export default function CreatePaymentCustomerForm() {
   useEffect(() => {
     (async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/payments/${id}`);
+        const response = await axios.get(`http://localhost:8080/payments/${id}`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
         const payment = response.data.response;
         setPaymentCustomer({
           // name: payment.name,
@@ -108,7 +116,12 @@ export default function CreatePaymentCustomerForm() {
         setDetails(transformedDetails);
 
         const customerResponse = await axios.get(
-          `http://localhost:8080/customers/${payment.customer.id}`
+          `http://localhost:8080/customers/${payment.customer.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
         );
         const customerInventory = customerResponse.data.response.available_inventory || [];
         console.log("payment", payment);
@@ -246,7 +259,11 @@ export default function CreatePaymentCustomerForm() {
     if (!newValue) return;
 
     try {
-      const response = await axios.get(`http://localhost:8080/customers/${newValue.id}`);
+      const response = await axios.get(`http://localhost:8080/customers/${newValue.id}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
       const customerDetails = response.data.response.available_inventory;
       // const formattedDetails = customerDetails
       //   ? customerDetails.map((detail) => ({
