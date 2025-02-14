@@ -47,6 +47,7 @@ import InventoryIn from "custom-layouts/inventory-in";
 import PaymentVendor from "custom-layouts/payment-vendor";
 import InventoryOut from "custom-layouts/inventory-out";
 import PaymentCustomer from "custom-layouts/payment-customer";
+import Report from "custom-layouts/report";
 import Billing from "layouts/billing";
 // import RTL from "layouts/rtl";
 import Notifications from "layouts/notifications";
@@ -255,7 +256,7 @@ const routes = [
           </Icon>
         ),
         route: "/purchase-report",
-        component: <Tables />,
+        component: <Report />,
         roles: ["owner"],
       },
       {
@@ -287,7 +288,7 @@ const routes = [
     ],
   },
   {
-    type: "collapse",
+    type: "sub-route",
     name: "Sign In Custom",
     key: "sign-in-custom",
     icon: <Icon fontSize="small">login</Icon>,
