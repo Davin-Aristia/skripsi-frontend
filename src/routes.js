@@ -47,7 +47,10 @@ import InventoryIn from "custom-layouts/inventory-in";
 import PaymentVendor from "custom-layouts/payment-vendor";
 import InventoryOut from "custom-layouts/inventory-out";
 import PaymentCustomer from "custom-layouts/payment-customer";
-import Report from "custom-layouts/report";
+import PurchaseReport from "custom-layouts/report/purchase";
+import SalesReport from "custom-layouts/report/sales";
+import InventoryReport from "custom-layouts/report/inventory";
+// import PreviewReport from "custom-layouts/report/previewReport";
 import Billing from "layouts/billing";
 // import RTL from "layouts/rtl";
 import Notifications from "layouts/notifications";
@@ -67,6 +70,7 @@ import paymentVendorRoutes from "custom-layouts/payment-vendor/routes";
 import inventoryOutRoutes from "custom-layouts/inventory-out/routes";
 import paymentCustomerRoutes from "custom-layouts/payment-customer/routes";
 import SignInCustom from "custom-layouts/authentication/sign-in";
+import PreviewReport from "custom-layouts/report";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
@@ -81,6 +85,7 @@ const routes = [
   ...paymentVendorRoutes,
   ...inventoryOutRoutes,
   ...paymentCustomerRoutes,
+  ...PreviewReport,
   // {
   //   type: "collapse",
   //   name: "Dashboard",
@@ -256,7 +261,7 @@ const routes = [
           </Icon>
         ),
         route: "/purchase-report",
-        component: <Report />,
+        component: <PurchaseReport />,
         roles: ["owner"],
       },
       {
@@ -269,7 +274,7 @@ const routes = [
           </Icon>
         ),
         route: "/sales-report",
-        component: <Tables />,
+        component: <SalesReport />,
         roles: ["owner"],
       },
       {
@@ -282,7 +287,7 @@ const routes = [
           </Icon>
         ),
         route: "/inventory-report",
-        component: <Tables />,
+        component: <InventoryReport />,
         roles: ["owner"],
       },
     ],
