@@ -126,6 +126,13 @@ export default function CreatePurchaseForm() {
     }
   };
 
+  const convertToLocalDate = (utcDateString) => {
+    const date = new Date(utcDateString);
+    const jakartaOffset = 7 * 60;
+    const jakartaTime = new Date(date.getTime() + jakartaOffset * 60 * 1000);
+    return jakartaTime.toISOString().split("T")[0];
+  };
+
   const exportSimpleExcel = async (fromDate, toDate, vendorId) => {
     const data = await fetchPurchaseData(fromDate, toDate, vendorId);
     if (data.length === 0) {
@@ -139,24 +146,80 @@ export default function CreatePurchaseForm() {
     worksheet.columns = [
       { header: "No", key: "no", width: 10 },
       { header: "Purchase Order", key: "name", width: 30 },
-      { header: "Date", key: "date", width: 30 },
-      { header: "Vendor", key: "vendor", width: 15 },
+      { header: "Date", key: "date", width: 15 },
+      { header: "Vendor", key: "vendor", width: 20 },
       { header: "Total", key: "total", width: 15 },
     ];
+
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.alignment = { horizontal: "center", vertical: "middle" }; // Center align
+      cell.font = { bold: true }; // Make header bold
+      cell.border = {
+        top: { style: "thin" },
+        left: { style: "thin" },
+        bottom: { style: "thin" },
+        right: { style: "thin" },
+      };
+    });
 
     // data.forEach((item) => {
     //   worksheet.addRow(item);
     // });
 
-    console.log("data", data);
+    let totalSum = 0;
     data.forEach((item, index) => {
-      worksheet.addRow({
+      totalSum += item.total;
+      const row = worksheet.addRow({
         no: index + 1, // Incremental number starting from 1
         name: item.name,
-        date: item.date,
+        date: convertToLocalDate(item.date),
         vendor: item.vendor,
-        total: item.total,
+        total: `Rp ${new Intl.NumberFormat("id-ID", {
+          style: "decimal",
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(item.total)}`,
       });
+
+      row.eachCell((cell, colNumber) => {
+        cell.border = {
+          top: { style: "thin" },
+          left: { style: "thin" },
+          bottom: { style: "thin" },
+          right: { style: "thin" },
+        };
+
+        if (colNumber === 1 || colNumber === 3) {
+          // 1 = No, 3 = Date
+          cell.alignment = { horizontal: "center" };
+        }
+      });
+    });
+
+    const totalRow = worksheet.addRow([
+      "Total",
+      "",
+      "",
+      "",
+      `Rp ${new Intl.NumberFormat("id-ID", {
+        style: "decimal",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(totalSum)}`,
+    ]);
+
+    // Merge first 4 cells for "Total" label
+    worksheet.mergeCells(`A${totalRow.number}:D${totalRow.number}`);
+    totalRow.getCell(1).alignment = { horizontal: "right" }; // Right align "Total"
+    totalRow.getCell(1).font = { bold: true }; // Bold font for "Total"
+    totalRow.getCell(5).font = { bold: true }; // Bold font for total value
+    totalRow.eachCell((cell) => {
+      cell.border = {
+        top: { style: "thin" },
+        left: { style: "thin" },
+        bottom: { style: "thin" },
+        right: { style: "thin" },
+      };
     });
 
     const buffer = await workbook.xlsx.writeBuffer();

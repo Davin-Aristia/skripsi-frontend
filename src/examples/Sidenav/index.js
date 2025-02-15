@@ -63,6 +63,25 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
   const location = useLocation();
   // const collapseName = location.pathname.replace("/", "");
 
+  useEffect(() => {
+    // Loop through all routes and check if any sub-item route matches the current pathname
+    routes.forEach(({ key, collapse }) => {
+      if (collapse) {
+        const isAnyActive = collapse.some(
+          (subItem) =>
+            location.pathname === subItem.route || location.pathname.startsWith(`${subItem.route}/`)
+        );
+
+        if (isAnyActive) {
+          setOpenStates((prev) => ({
+            ...prev,
+            [key]: true, // Open the parent menu if any sub-item is active
+          }));
+        }
+      }
+    });
+  }, [location.pathname, routes]);
+
   let textColor = "white";
 
   if (transparentSidenav || (whiteSidenav && !darkMode)) {
