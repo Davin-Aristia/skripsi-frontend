@@ -81,14 +81,33 @@ export default function data({ query }) {
   };
 
   // Handle send email action
-  const handleSendEmail = () => {
+  const handleSendEmail = async () => {
     if (!selectedData) {
       alert("No data selected!");
       return;
     }
 
-    alert(`Sending email for inventory-out ID: ${selectedData.response.id}`);
-    setOpenDialog(false);
+    const id = selectedData.response.id; // Get ID from selected data
+    if (!id) {
+      alert("Invalid ID!");
+      return;
+    }
+    console.log("id", id);
+
+    try {
+      const response = await axios.post(`http://localhost:8080/inventory-outs/email/${id}`, null, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      alert("Email sent successfully!");
+      console.log("Email response:", response.data);
+      setOpenDialog(false);
+    } catch (error) {
+      console.error("Failed to send email:", error);
+      alert("Failed to send email. Please try again.");
+    }
   };
 
   // Close dialog
