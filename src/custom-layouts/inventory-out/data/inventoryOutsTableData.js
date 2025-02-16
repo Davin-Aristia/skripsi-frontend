@@ -28,17 +28,73 @@ import { useAuth } from "custom-layouts/authentication";
 // Material Dashboard 2 React context
 import { useMaterialUIController } from "context";
 import { NavLink } from "react-router-dom";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Button,
+  IconButton,
+  Box,
+} from "@mui/material";
 
 import DataTable from "examples/Tables/DataTable";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+
+import { InvoicePrint } from "printout/Invoice";
+import { useReactToPrint } from "react-to-print";
 
 export default function data({ query }) {
   const [inventoryOuts, setInventoryOuts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const { authToken } = useAuth();
+  const [selectedData, setSelectedData] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const printRef = useRef(null);
+
+  const handlePrintClick = async (id) => {
+    try {
+      const response = await axios.get(`http://localhost:8080/inventory-outs/${id}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      console.log("API Response:", response.data);
+      setSelectedData(response.data); // Store fetched data
+      setOpenDialog(true);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  // Handle print action
+  const handleReactToPrint = useReactToPrint({
+    content: () => printRef.current,
+  });
+
+  const handlePrint = () => {
+    handleReactToPrint();
+  };
+
+  // Handle send email action
+  const handleSendEmail = () => {
+    if (!selectedData) {
+      alert("No data selected!");
+      return;
+    }
+
+    alert(`Sending email for inventory-out ID: ${selectedData.response.id}`);
+    setOpenDialog(false);
+  };
+
+  // Close dialog
+  const handleClose = () => {
+    setOpenDialog(false);
+  };
 
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
@@ -139,21 +195,61 @@ export default function data({ query }) {
         >
           <Icon>delete</Icon>
         </MDButton>
+        <MDButton
+          variant="text"
+          color="info"
+          iconOnly
+          onClick={() => handlePrintClick(inventoryOut.id)}
+        >
+          <Icon>print</Icon>
+        </MDButton>
       </MDBox>
     ),
   }));
 
   return (
-    <DataTable
-      table={{ columns, rows }}
-      isSorted={true}
-      entriesPerPage={false}
-      showTotalEntries={true}
-      canSearch={true}
-      noEndBorder
-      currentPage={currentPage}
-      onPageChange={handlePageChange}
-      onPageSizeChange={handlePageSizeChange}
-    />
+    <>
+      <div style={{ display: "none" }}>
+        {selectedData ? (
+          <div style={{ display: "none" }}>
+            <InvoicePrint ref={printRef} invoice={selectedData} />
+          </div>
+        ) : (
+          <p>Loading invoice data...</p>
+        )}
+      </div>
+      <Dialog open={openDialog} onClose={handleClose}>
+        <DialogTitle>
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <span>Invoice</span>
+            <IconButton aria-label="close" onClick={handleClose}>
+              <Icon>close</Icon>
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <DialogContent dividers>
+          <p>Do you want to print invoice or send this as an email?</p>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handlePrint} color="primary">
+            Print
+          </Button>
+          <MDButton onClick={handleSendEmail} color="info" variant="gradient">
+            Send Email
+          </MDButton>
+        </DialogActions>
+      </Dialog>
+      <DataTable
+        table={{ columns, rows }}
+        isSorted={true}
+        entriesPerPage={false}
+        showTotalEntries={true}
+        canSearch={true}
+        noEndBorder
+        currentPage={currentPage}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
+      />
+    </>
   );
 }
