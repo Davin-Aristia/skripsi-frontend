@@ -151,7 +151,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
           </IconButton>
           <Breadcrumbs icon="home" title={route[route.length - 1]} route={route} light={light} />
         </MDBox>
-        {isMini ? null : (
+        {/* {isMini ? null : (
           <MDBox sx={(theme) => navbarRow(theme, { isMini })}>
             <MDBox pr={1}>
               <MDInput label="Search here" />
@@ -197,7 +197,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
               {renderMenu()}
             </MDBox>
           </MDBox>
-        )}
+        )} */}
       </Toolbar>
     </AppBar>
   );

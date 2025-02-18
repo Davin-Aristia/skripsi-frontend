@@ -139,9 +139,9 @@ function Products() {
     <DashboardLayout>
       <DashboardNavbar />
       {/* <button onClick={exportSimpleExcel}>Download Simple Excel</button> */}
-      <Button variant="contained" onClick={handleOpenWizard}>
+      {/* <Button variant="contained" onClick={handleOpenWizard}>
         Export Books
-      </Button>
+      </Button> */}
 
       <Dialog open={open} onClose={handleCloseWizard}>
         <DialogTitle>Select Date Range</DialogTitle>
