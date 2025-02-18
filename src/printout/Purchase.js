@@ -2,7 +2,6 @@ import React from "react";
 import PropTypes from "prop-types";
 
 export const PurchasePrint = React.forwardRef(({ purchase }, ref) => {
-  console.log("purchaseee", purchase);
   return (
     <div
       ref={ref}
@@ -42,7 +41,7 @@ export const PurchasePrint = React.forwardRef(({ purchase }, ref) => {
           </tr>
         </thead>
         <tbody>
-          {purchase?.response.details.map((item, index) => (
+          {(purchase?.response.details || []).map((item, index) => (
             <tr key={index}>
               <td style={tableCellStyle}>
                 {item.purchase_detail?.product?.name || item.product?.name || "Unknown"}

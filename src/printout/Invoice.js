@@ -41,7 +41,7 @@ export const InvoicePrint = React.forwardRef(({ invoice }, ref) => {
           </tr>
         </thead>
         <tbody>
-          {invoice?.response.stock_moves.map((item, index) => (
+          {(invoice?.response.stock_moves || []).map((item, index) => (
             <tr key={index}>
               <td style={tableCellStyle}>
                 {item.purchase_detail?.product?.name || item.product?.name || "Unknown"}
