@@ -99,8 +99,12 @@ export default function data({ query }) {
 
       toast.success("PaymentCustomer deleted successfully");
     } catch (error) {
-      toast.error("Failed to delete the paymentCustomer.");
-      console.error("Error deleting the paymentCustomer:", error);
+      if (error.response && error.response.data && error.response.data.response) {
+        toast.error(error.response.data.response);
+      } else {
+        toast.error("Something went wrong with the server");
+      }
+      console.log("error:", error);
     }
   };
 

@@ -67,8 +67,12 @@ export default function CreateVendorForm() {
       toast.success("success add new vendor");
       navigate("/vendor");
     } catch (error) {
-      toast.error("failed add new vendor");
-      setError(error.response.data.message);
+      if (error.response && error.response.data && error.response.data.response) {
+        toast.error(error.response.data.response);
+      } else {
+        toast.error("Something went wrong with the server");
+      }
+      console.log("error:", error);
     }
   };
 

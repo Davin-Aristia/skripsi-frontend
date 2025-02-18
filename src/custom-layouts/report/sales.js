@@ -97,8 +97,12 @@ export default function CreateSalesForm() {
       toast.success("success add new sales");
       navigate("/sales");
     } catch (error) {
-      toast.error("failed add new sales");
-      console.log(error.response.data.response);
+      if (error.response && error.response.data && error.response.data.response) {
+        toast.error(error.response.data.response);
+      } else {
+        toast.error("Something went wrong with the server");
+      }
+      console.log("error:", error);
     }
   };
 
@@ -120,9 +124,12 @@ export default function CreateSalesForm() {
 
       return response.data.response || []; // Ensure it returns an array
     } catch (error) {
-      toast.error("Failed to fetch sales report data");
-      console.error(error.response?.data?.response || error);
-      return [];
+      if (error.response && error.response.data && error.response.data.response) {
+        toast.error(error.response.data.response);
+      } else {
+        toast.error("Something went wrong with the server");
+      }
+      console.log("error:", error);
     }
   };
 

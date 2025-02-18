@@ -82,8 +82,12 @@ export default function CreateProductCategoryForm() {
       toast.success("success add new product category");
       navigate("/product-category");
     } catch (error) {
-      toast.error("failed update product category");
-      setError(error.response.data.message);
+      if (error.response && error.response.data && error.response.data.response) {
+        toast.error(error.response.data.response);
+      } else {
+        toast.error("Something went wrong with the server");
+      }
+      console.log("error:", error);
     }
   };
 

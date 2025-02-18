@@ -187,8 +187,12 @@ export default function CreatePaymentCustomerForm() {
       toast.success("success update payment");
       navigate("/customer-payment");
     } catch (error) {
-      toast.error("failed update payment");
-      console.log(error.response.data.response);
+      if (error.response && error.response.data && error.response.data.response) {
+        toast.error(error.response.data.response);
+      } else {
+        toast.error("Something went wrong with the server");
+      }
+      console.log("error:", error);
     }
   };
 

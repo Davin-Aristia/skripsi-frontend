@@ -126,8 +126,12 @@ export default function CreatePaymentCustomerForm() {
       toast.success("success add new payment");
       navigate("/customer-payment");
     } catch (error) {
-      toast.error("failed add new inventory out");
-      console.log(error.response.data.response);
+      if (error.response && error.response.data && error.response.data.response) {
+        toast.error(error.response.data.response);
+      } else {
+        toast.error("Something went wrong with the server");
+      }
+      console.log("error:", error);
     }
   };
 

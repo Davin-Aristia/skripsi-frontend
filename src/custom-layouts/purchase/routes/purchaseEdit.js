@@ -169,15 +169,12 @@ export default function CreatePurchaseForm() {
       toast.success("success update new purchase");
       navigate("/purchase");
     } catch (error) {
-      if (
-        error.response.data.response ==
-        "this purchase has already been received in inventory and cannot be edited"
-      ) {
+      if (error.response && error.response.data && error.response.data.response) {
         toast.error(error.response.data.response);
       } else {
-        toast.error("failed update new purchase");
+        toast.error("Something went wrong with the server");
       }
-      console.log(error.response.data.response);
+      console.log("error:", error);
     }
   };
 

@@ -103,8 +103,12 @@ export default function CreateBookForm() {
       toast.success("success add new product");
       navigate("/product");
     } catch (error) {
-      toast.error("failed create product");
-      console.log(error.response.data.response);
+      if (error.response && error.response.data && error.response.data.response) {
+        toast.error(error.response.data.response);
+      } else {
+        toast.error("Something went wrong with the server");
+      }
+      console.log("error:", error);
     }
   };
 

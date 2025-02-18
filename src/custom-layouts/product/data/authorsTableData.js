@@ -101,8 +101,12 @@ export default function data({ query }) {
 
       toast.success("Product deleted successfully");
     } catch (error) {
-      toast.error("Failed to delete the product.");
-      console.error("Error deleting the product:", error);
+      if (error.response && error.response.data && error.response.data.response) {
+        toast.error(error.response.data.response);
+      } else {
+        toast.error("Something went wrong with the server");
+      }
+      console.log("error:", error);
     }
   };
 

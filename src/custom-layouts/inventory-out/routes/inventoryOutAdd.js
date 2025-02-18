@@ -127,8 +127,12 @@ export default function CreateInventoryOutForm() {
       toast.success("success add new inventoryOut");
       navigate("/inventory-out");
     } catch (error) {
-      toast.error("failed add new inventoryOut");
-      console.log(error.response.data.response);
+      if (error.response && error.response.data && error.response.data.response) {
+        toast.error(error.response.data.response);
+      } else {
+        toast.error("Something went wrong with the server");
+      }
+      console.log("error:", error);
     }
   };
 

@@ -120,8 +120,12 @@ export default function CreatePaymentVendorForm() {
       toast.success("success add new payment");
       navigate("/vendor-payment");
     } catch (error) {
-      toast.error("failed add new inventory in");
-      console.log(error.response.data.response);
+      if (error.response && error.response.data && error.response.data.response) {
+        toast.error(error.response.data.response);
+      } else {
+        toast.error("Something went wrong with the server");
+      }
+      console.log("error:", error);
     }
   };
 

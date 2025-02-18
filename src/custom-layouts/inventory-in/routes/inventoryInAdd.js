@@ -141,8 +141,12 @@ export default function CreateInventoryInForm() {
       toast.success("success add new inventory in");
       navigate("/inventory-in");
     } catch (error) {
-      toast.error("failed add new inventory in");
-      console.log(error.response.data.response);
+      if (error.response && error.response.data && error.response.data.response) {
+        toast.error(error.response.data.response);
+      } else {
+        toast.error("Something went wrong with the server");
+      }
+      console.log("error:", error);
     }
   };
 

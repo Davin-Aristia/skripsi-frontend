@@ -25,7 +25,7 @@ import Switch from "@mui/material/Switch";
 import Grid from "@mui/material/Grid";
 import MuiLink from "@mui/material/Link";
 import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
+import { toast } from "react-toastify";
 
 // @mui icons
 import FacebookIcon from "@mui/icons-material/Facebook";
@@ -86,17 +86,18 @@ function Basic() {
       });
       window.dispatchEvent(new Event("storage"));
     } catch (error) {
-      if (error.response?.data) {
-        setError(error.response.data.response);
+      if (error.response && error.response.data && error.response.data.response) {
+        toast.error(error.response.data.response);
       } else {
-        setError("Something wrong with the server");
+        toast.error("Something went wrong with the server");
       }
+      console.log("error:", error);
     }
   };
 
   return (
     <BasicLayout image={bgImage}>
-      <Snackbar
+      {/* <Snackbar
         open={Boolean(error)}
         autoHideDuration={4000}
         onClose={() => setError("")}
@@ -105,7 +106,7 @@ function Basic() {
         <Alert onClose={() => setError("")} severity="error" sx={{ width: "100%" }}>
           {error}
         </Alert>
-      </Snackbar>
+      </Snackbar> */}
       <Card>
         <MDBox
           variant="gradient"

@@ -107,13 +107,13 @@ export default function data({ query }) {
   // Handle send email action
   const handleSendEmail = async () => {
     if (!selectedData) {
-      alert("No data selected!");
+      toast.error("No data selected!");
       return;
     }
 
     const id = selectedData.response.id; // Get ID from selected data
     if (!id) {
-      alert("Invalid ID!");
+      toast.error("Invalid ID!");
       return;
     }
     console.log("id", id);
@@ -125,12 +125,16 @@ export default function data({ query }) {
         },
       });
 
-      alert("Email sent successfully!");
+      toast.success("Email sent successfully!");
       console.log("Email response:", response.data);
       setOpenDialog(false);
     } catch (error) {
-      console.error("Failed to send email:", error);
-      alert("Failed to send email. Please try again.");
+      if (error.response && error.response.data && error.response.data.response) {
+        toast.error(error.response.data.response);
+      } else {
+        toast.error("Something went wrong with the server");
+      }
+      console.log("error:", error);
     }
   };
 
@@ -169,15 +173,12 @@ export default function data({ query }) {
 
       toast.success("Purchase deleted successfully");
     } catch (error) {
-      if (
-        error.response.data.response ==
-        "this purchase has already been received in inventory and cannot be edited"
-      ) {
-        toast.error("This purchase has already been received in inventory and cannot be deleted");
+      if (error.response && error.response.data && error.response.data.response) {
+        toast.error(error.response.data.response);
       } else {
-        toast.error("Failed to delete the purchase.");
+        toast.error("Something went wrong with the server");
       }
-      console.error("Error deleting the purchase:", error.response.data.response);
+      console.log("error:", error);
     }
   };
 

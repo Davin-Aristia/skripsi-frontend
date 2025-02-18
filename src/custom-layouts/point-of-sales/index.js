@@ -376,8 +376,12 @@ function POSPage() {
       toast.success("success checkout");
       navigate("/point-of-sales");
     } catch (error) {
-      toast.error("failed checkout");
-      console.log(error.response.data.response);
+      if (error.response && error.response.data && error.response.data.response) {
+        toast.error(error.response.data.response);
+      } else {
+        toast.error("Something went wrong with the server");
+      }
+      console.log("error:", error);
     }
   };
 

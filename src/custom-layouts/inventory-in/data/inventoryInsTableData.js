@@ -96,8 +96,12 @@ export default function data({ query }) {
 
       toast.success("InventoryIn deleted successfully");
     } catch (error) {
-      toast.error("Failed to delete the inventoryIn.");
-      console.error("Error deleting the inventoryIn:", error);
+      if (error.response && error.response.data && error.response.data.response) {
+        toast.error(error.response.data.response);
+      } else {
+        toast.error("Something went wrong with the server");
+      }
+      console.log("error:", error);
     }
   };
 
