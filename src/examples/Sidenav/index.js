@@ -329,6 +329,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
                 active={location.pathname === route || location.pathname.startsWith(`${route}/`)}
                 onClick={() => handleClick(key)}
                 hasChild={true}
+                open={openStates[key] || false}
               />
               <Collapse in={openStates[key]} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>

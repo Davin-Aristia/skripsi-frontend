@@ -149,7 +149,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
               {miniSidenav ? "menu_open" : "menu"}
             </Icon>
           </IconButton>
-          <Breadcrumbs icon="home" title={route[route.length - 1]} route={route} light={light} />
+          <Breadcrumbs icon="store" title={route[route.length - 1]} route={route} light={light} />
         </MDBox>
         {/* {isMini ? null : (
           <MDBox sx={(theme) => navbarRow(theme, { isMini })}>

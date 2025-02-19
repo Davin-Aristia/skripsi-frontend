@@ -39,7 +39,7 @@ function Breadcrumbs({ icon, title, route, light }) {
           },
         }}
       >
-        <Link to="/">
+        <Link to="/point-of-sales">
           <MDTypography
             component="span"
             variant="body2"
@@ -50,21 +50,32 @@ function Breadcrumbs({ icon, title, route, light }) {
             <Icon>{icon}</Icon>
           </MDTypography>
         </Link>
-        {routes.map((el) => (
-          <Link to={`/${el}`} key={el}>
-            <MDTypography
-              component="span"
-              variant="button"
-              fontWeight="regular"
-              textTransform="capitalize"
-              color={light ? "white" : "dark"}
-              opacity={light ? 0.8 : 0.5}
-              sx={{ lineHeight: 0 }}
-            >
-              {el}
-            </MDTypography>
-          </Link>
-        ))}
+        {routes
+          .filter((el) => isNaN(el)) // Remove numbers (IDs)
+          .map((el) => {
+            const cleanRoute = String(el)
+              .replace(/\/:\w+/g, "")
+              .replace(/\/+$/, "");
+
+            console.log("el:", el, "cleanRoute:", cleanRoute);
+            // console.log("Full routes array:", routes);
+
+            return (
+              <Link to={`/${el}`} key={el}>
+                <MDTypography
+                  component="span"
+                  variant="button"
+                  fontWeight="regular"
+                  textTransform="capitalize"
+                  color={light ? "white" : "dark"}
+                  opacity={light ? 0.8 : 0.5}
+                  sx={{ lineHeight: 0 }}
+                >
+                  {cleanRoute}
+                </MDTypography>
+              </Link>
+            );
+          })}
         <MDTypography
           variant="button"
           fontWeight="regular"

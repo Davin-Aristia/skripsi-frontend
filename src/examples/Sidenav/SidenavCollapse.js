@@ -38,19 +38,25 @@ import {
 // Material Dashboard 2 React context
 import { useMaterialUIController } from "context";
 
-function SidenavCollapse({ icon, name, active, hasChild = false, ...rest }) {
+function SidenavCollapse({ icon, name, active, hasChild = false, open, ...rest }) {
   const [controller] = useMaterialUIController();
   const { miniSidenav, transparentSidenav, whiteSidenav, darkMode, sidenavColor } = controller;
-  const [open, setOpen] = useState(false);
+  // const [open, setOpen] = useState(false);
 
-  const handleClick = () => {
-    if (hasChild) {
-      setOpen(!open); // Toggle open state if there are children
-    }
-  };
+  // const handleClick = () => {
+  //   if (hasChild) {
+  //     setOpen(!open); // Toggle open state if there are children
+  //   }
+  // };
+
+  // const handleClick = () => {
+  //   if (hasChild) {
+  //     setOpenStates((prev) => ({ ...prev, [key]: !prev[key] }));
+  //   }
+  // };
 
   return (
-    <ListItem component="li" onClick={handleClick}>
+    <ListItem component="li">
       <MDBox
         {...rest}
         sx={(theme) =>
@@ -111,6 +117,7 @@ SidenavCollapse.propTypes = {
   icon: PropTypes.node.isRequired,
   name: PropTypes.string.isRequired,
   active: PropTypes.bool,
+  open: PropTypes.bool,
   hasChild: PropTypes.bool,
 };
 
