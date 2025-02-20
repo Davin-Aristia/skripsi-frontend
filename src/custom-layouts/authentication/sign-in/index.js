@@ -60,6 +60,7 @@ function Basic() {
 
     try {
       // Send POST request to the API
+      console.log("ni pst prtm?");
       const response = await axios.post("http://localhost:8080/users/signin", {
         email,
         password,
@@ -67,6 +68,7 @@ function Basic() {
       localStorage.setItem("authToken", response.data.response.token);
       const role = response.data.response.role;
       localStorage.setItem("role", role);
+      console.log("sblm/sesudah?");
 
       // Clear the form fields after submission
       setEmail("");

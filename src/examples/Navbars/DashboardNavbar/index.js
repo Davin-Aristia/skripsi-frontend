@@ -60,6 +60,15 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const [openMenu, setOpenMenu] = useState(false);
   const route = useLocation().pathname.split("/").slice(1);
 
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    if (pathname === "/point-of-sales") {
+      // Close mini sidenav when the user navigates to the point-of-sales route
+      setMiniSidenav(dispatch, true);
+    }
+  }, [pathname]);
+
   // const handleInputChange = (event) => {
   //   const value = event.target.value;
   //   if (onSearchChange) {
