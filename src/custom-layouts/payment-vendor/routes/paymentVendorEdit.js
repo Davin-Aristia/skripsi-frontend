@@ -118,6 +118,10 @@ export default function CreatePaymentVendorForm() {
           (detail) => !transformedDetails.some((d) => d.id === detail.id)
         );
 
+        const filteredVendorDetails = availableRows
+          ? availableRows.filter((detail) => detail.residual_amount > 0)
+          : [];
+
         // const availableRows = vendorInventory
         //   .map((detail) => ({
         //     ...detail,
@@ -125,7 +129,7 @@ export default function CreatePaymentVendorForm() {
         //   }))
         //   .filter((detail) => !transformedDetails.some((d) => d.id === detail.id)); // Exclude selected ones
 
-        setRows(availableRows);
+        setRows(filteredVendorDetails);
       } catch (error) {
         console.error("Error fetching vendor:", error);
       }
@@ -263,8 +267,12 @@ export default function CreatePaymentVendorForm() {
       //     }))
       //   : [];
 
+      const filteredVendorDetails = vendorDetails
+        ? vendorDetails.filter((detail) => detail.residual_amount > 0)
+        : [];
+
       setPaymentVendor({ ...paymentVendor, selectedVendor: newValue });
-      setRows(vendorDetails);
+      setRows(filteredVendorDetails);
       // console.log("formattedDetails", formattedDetails);
       setDetails([]);
     } catch (error) {

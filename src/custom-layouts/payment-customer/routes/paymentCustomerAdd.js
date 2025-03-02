@@ -215,8 +215,12 @@ export default function CreatePaymentCustomerForm() {
       //     }))
       //   : [];
 
+      const filteredCustomerDetails = customerDetails
+        ? customerDetails.filter((detail) => detail.residual_amount > 0)
+        : [];
+
       setPaymentCustomer({ ...paymentCustomer, selectedCustomer: newValue });
-      setRows(customerDetails);
+      setRows(filteredCustomerDetails);
       // console.log("formattedDetails", formattedDetails);
       setDetails([]);
     } catch (error) {

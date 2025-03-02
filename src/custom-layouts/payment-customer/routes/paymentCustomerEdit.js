@@ -127,6 +127,10 @@ export default function CreatePaymentCustomerForm() {
           (detail) => !transformedDetails.some((d) => d.id === detail.id)
         );
 
+        const filteredCustomerDetails = availableRows
+          ? availableRows.filter((detail) => detail.residual_amount > 0)
+          : [];
+
         // const availableRows = customerInventory
         //   .map((detail) => ({
         //     ...detail,
@@ -134,7 +138,7 @@ export default function CreatePaymentCustomerForm() {
         //   }))
         //   .filter((detail) => !transformedDetails.some((d) => d.id === detail.id)); // Exclude selected ones
 
-        setRows(availableRows);
+        setRows(filteredCustomerDetails);
       } catch (error) {
         console.error("Error fetching customer:", error);
       }
@@ -274,8 +278,12 @@ export default function CreatePaymentCustomerForm() {
       //     }))
       //   : [];
 
+      const filteredCustomerDetails = customerDetails
+        ? customerDetails.filter((detail) => detail.residual_amount > 0)
+        : [];
+
       setPaymentCustomer({ ...paymentCustomer, selectedCustomer: newValue });
-      setRows(customerDetails);
+      setRows(filteredCustomerDetails);
       // console.log("formattedDetails", formattedDetails);
       setDetails([]);
     } catch (error) {

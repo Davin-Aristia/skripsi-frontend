@@ -160,6 +160,7 @@ export default function CreateInventoryInForm() {
           const purchaseDetails = purchaseResponse.data.response.details || [];
 
           const availableRows = purchaseDetails
+            .filter((detail) => detail.quantity - detail.receipt_quantity > 0)
             .map((detail) => ({
               ...detail,
               product_name: detail.product?.name || "Unknown Product",
@@ -381,11 +382,13 @@ export default function CreateInventoryInForm() {
       //     receipt_quantity: detail.quantity - detail.receipt_quantity,
       //   }));
       const formattedDetails = purchaseDetails
-        ? purchaseDetails.map((detail) => ({
-            ...detail,
-            product_name: detail.product?.name || "Unknown Product",
-            receipt_quantity: detail.quantity - detail.receipt_quantity,
-          }))
+        ? purchaseDetails
+            .filter((detail) => detail.quantity - detail.receipt_quantity > 0)
+            .map((detail) => ({
+              ...detail,
+              product_name: detail.product?.name || "Unknown Product",
+              receipt_quantity: detail.quantity - detail.receipt_quantity,
+            }))
         : [];
 
       setInventoryIn({ ...inventoryIn, selectedPurchase: newValue });

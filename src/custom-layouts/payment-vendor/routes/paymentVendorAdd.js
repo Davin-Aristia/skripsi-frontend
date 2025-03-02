@@ -209,8 +209,12 @@ export default function CreatePaymentVendorForm() {
       //     }))
       //   : [];
 
+      const filteredVendorDetails = vendorDetails
+        ? vendorDetails.filter((detail) => detail.residual_amount > 0)
+        : [];
+
       setPaymentVendor({ ...paymentVendor, selectedVendor: newValue });
-      setRows(vendorDetails);
+      setRows(filteredVendorDetails);
       // console.log("formattedDetails", formattedDetails);
       setDetails([]);
     } catch (error) {
