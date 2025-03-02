@@ -329,11 +329,13 @@ function POSPage() {
 
     try {
       // Send POST request to the API
-      const consignmentResponse = await API.post("/inventory-ins", newInventoryIn, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
+      if (consignment.length > 0) {
+        const consignmentResponse = await API.post("/inventory-ins", newInventoryIn, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+      }
 
       const response = await API.post("/inventory-outs", newInventoryOut, {
         headers: {
@@ -364,10 +366,14 @@ function POSPage() {
 
       // Clear the form fields after submission
       setCart([]);
+      setConsignment([]);
+      setSelectedCustomer({});
+      setSelectedVendor({});
+      setOpen(false);
 
       // Optionally refetch data or update the state to reflect the new book in the UI
       toast.success("success checkout");
-      navigate("/point-of-sales");
+      // navigate("/point-of-sales");
     } catch (error) {
       if (error.response && error.response.data && error.response.data.response) {
         toast.error(error.response.data.response);
