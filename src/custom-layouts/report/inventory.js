@@ -24,6 +24,7 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
 import { useAuth } from "custom-layouts/authentication";
+import API from "custom-layouts/authentication/axiosConfig";
 
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -49,12 +50,12 @@ export default function CreateInventoryForm() {
     (async () => {
       try {
         const [productsResponse, categoriesResponse] = await Promise.all([
-          axios.get(`http://localhost:8080/products`, {
+          API.get(`/products`, {
             headers: {
               Authorization: `Bearer ${authToken}`,
             },
           }),
-          axios.get(`http://localhost:8080/product-categories`, {
+          API.get(`/product-categories`, {
             headers: {
               Authorization: `Bearer ${authToken}`,
             },
@@ -85,7 +86,7 @@ export default function CreateInventoryForm() {
 
     try {
       // Send POST request to the API
-      const response = await axios.post("http://localhost:8080/reports/inventory", queryParam, {
+      const response = await API.post("/reports/inventory", queryParam, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -115,7 +116,7 @@ export default function CreateInventoryForm() {
         category_id: categoryId?.id ?? null,
       };
 
-      const response = await axios.post("http://localhost:8080/reports/inventory", queryParam, {
+      const response = await API.post("/reports/inventory", queryParam, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${authToken}`,

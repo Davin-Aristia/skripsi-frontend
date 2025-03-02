@@ -23,6 +23,7 @@ import MDBox from "components/MDBox";
 import MDButton from "components/MDButton";
 
 import { useAuth } from "custom-layouts/authentication";
+import API from "custom-layouts/authentication/axiosConfig";
 
 // Material Dashboard 2 React context
 import { useMaterialUIController } from "context";
@@ -51,13 +52,12 @@ export default function data({ query }) {
 
   const fetchData = async () => {
     console.log("authToken", authToken);
-    let link = `http://localhost:8080/product-categories`;
-    axios
-      .get(link, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      })
+    let link = `/product-categories`;
+    API.get(link, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
       .then((response) => {
         setProductCategories(response.data.response || []);
         setLoading(false);
@@ -83,7 +83,7 @@ export default function data({ query }) {
 
   const deleteProductCategory = async (productCategoryId) => {
     try {
-      await axios.delete(`http://localhost:8080/product-categories/${productCategoryId}`, {
+      await API.delete(`/product-categories/${productCategoryId}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },

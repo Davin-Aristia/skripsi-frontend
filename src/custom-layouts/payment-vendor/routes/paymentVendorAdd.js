@@ -24,6 +24,7 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
 import { useAuth } from "custom-layouts/authentication";
+import API from "custom-layouts/authentication/axiosConfig";
 
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -69,7 +70,7 @@ export default function CreatePaymentVendorForm() {
       try {
         // Fetch both purchases and products simultaneously
         const [vendorsResponse] = await Promise.all([
-          axios.get(`http://localhost:8080/vendors`, {
+          API.get(`/vendors`, {
             headers: {
               Authorization: `Bearer ${authToken}`,
             },
@@ -106,7 +107,7 @@ export default function CreatePaymentVendorForm() {
 
     try {
       // Send POST request to the API
-      const response = await axios.post("http://localhost:8080/payments", newPaymentVendor, {
+      const response = await API.post("/payments", newPaymentVendor, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -195,7 +196,7 @@ export default function CreatePaymentVendorForm() {
     if (!newValue) return;
 
     try {
-      const response = await axios.get(`http://localhost:8080/vendors/${newValue.id}`, {
+      const response = await API.get(`/vendors/${newValue.id}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },

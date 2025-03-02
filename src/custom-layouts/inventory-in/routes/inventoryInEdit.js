@@ -25,6 +25,7 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
 import { useAuth } from "custom-layouts/authentication";
+import API from "custom-layouts/authentication/axiosConfig";
 
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -80,17 +81,17 @@ export default function CreateInventoryInForm() {
       try {
         // Fetch both purchases and products simultaneously
         const [purchasesResponse, productsResponse, vendorsResponse] = await Promise.all([
-          axios.get(`http://localhost:8080/purchases`, {
+          API.get(`/purchases`, {
             headers: {
               Authorization: `Bearer ${authToken}`,
             },
           }),
-          axios.get(`http://localhost:8080/products`, {
+          API.get(`/products`, {
             headers: {
               Authorization: `Bearer ${authToken}`,
             },
           }),
-          axios.get(`http://localhost:8080/vendors`, {
+          API.get(`/vendors`, {
             headers: {
               Authorization: `Bearer ${authToken}`,
             },
@@ -115,7 +116,7 @@ export default function CreateInventoryInForm() {
   useEffect(() => {
     (async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/inventory-ins/${id}`, {
+        const response = await API.get(`/inventory-ins/${id}`, {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
@@ -151,14 +152,11 @@ export default function CreateInventoryInForm() {
         setDetails(transformedDetails);
 
         if (inventoryIn.purchase_id) {
-          const purchaseResponse = await axios.get(
-            `http://localhost:8080/purchases/${inventoryIn.purchase_object.id}`,
-            {
-              headers: {
-                Authorization: `Bearer ${authToken}`,
-              },
-            }
-          );
+          const purchaseResponse = await API.get(`/purchases/${inventoryIn.purchase_object.id}`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          });
           const purchaseDetails = purchaseResponse.data.response.details || [];
 
           const availableRows = purchaseDetails
@@ -215,15 +213,11 @@ export default function CreateInventoryInForm() {
 
     try {
       // Send POST request to the API
-      const response = await axios.put(
-        `http://localhost:8080/inventory-ins/${id}`,
-        newInventoryIn,
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        }
-      );
+      const response = await API.put(`/inventory-ins/${id}`, newInventoryIn, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
 
       // Clear the form fields after submission
       setInventoryIn(initialInventoryInState);
@@ -373,7 +367,7 @@ export default function CreateInventoryInForm() {
     if (!newValue) return;
 
     try {
-      const response = await axios.get(`http://localhost:8080/purchases/${newValue.id}`, {
+      const response = await API.get(`/purchases/${newValue.id}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -431,14 +425,11 @@ export default function CreateInventoryInForm() {
       if (inventoryIn.consignment) {
         vendor = selectedVendor;
       } else {
-        const response = await axios.get(
-          `http://localhost:8080/vendors/${selectedPurchase.vendor_id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-            },
-          }
-        );
+        const response = await API.get(`/vendors/${selectedPurchase.vendor_id}`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
         vendor = response.data.response;
       }
 

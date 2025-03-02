@@ -24,6 +24,7 @@ import MDButton from "components/MDButton";
 import { toast } from "react-toastify";
 
 import { useAuth } from "custom-layouts/authentication";
+import API from "custom-layouts/authentication/axiosConfig";
 
 // Material Dashboard 2 React context
 import { useMaterialUIController } from "context";
@@ -59,13 +60,12 @@ export default function data({ query }) {
   const { darkMode } = controller;
 
   const fetchData = async () => {
-    let link = `http://localhost:8080/purchases`;
-    axios
-      .get(link, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      })
+    let link = `/purchases`;
+    API.get(link, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
       .then((response) => {
         setPurchases(response.data.response || []);
       })
@@ -81,7 +81,7 @@ export default function data({ query }) {
 
   const handlePrintClick = async (id) => {
     try {
-      const response = await axios.get(`http://localhost:8080/purchases/${id}`, {
+      const response = await API.get(`/purchases/${id}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -119,7 +119,7 @@ export default function data({ query }) {
     console.log("id", id);
 
     try {
-      const response = await axios.post(`http://localhost:8080/purchases/email/${id}`, null, {
+      const response = await API.post(`/purchases/email/${id}`, null, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -154,7 +154,7 @@ export default function data({ query }) {
 
   const deletePurchase = async (purchaseId) => {
     try {
-      await axios.delete(`http://localhost:8080/purchases/${purchaseId}`, {
+      await API.delete(`/purchases/${purchaseId}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },

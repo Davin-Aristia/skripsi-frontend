@@ -2,6 +2,10 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { toast } from "react-toastify";
 
+const API = axios.create({
+  baseURL: "http://LAPTOP-VEGD3CL5:8080", // Change this to your backend URL
+});
+
 // Function to check token expiration
 const isTokenExpired = () => {
   const token = localStorage.getItem("authToken");
@@ -45,3 +49,5 @@ const logout = () => {
   localStorage.removeItem("role");
   window.location.href = "/sign-in"; // Redirect to login
 };
+
+export default API;

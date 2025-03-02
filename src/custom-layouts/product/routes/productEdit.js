@@ -15,6 +15,7 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
 import { useAuth } from "custom-layouts/authentication";
+import API from "custom-layouts/authentication/axiosConfig";
 
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -58,7 +59,7 @@ export default function CreateBookForm() {
   useEffect(() => {
     const fetchProductData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/products/${id}`, {
+        const response = await API.get(`/products/${id}`, {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
@@ -84,7 +85,7 @@ export default function CreateBookForm() {
         const formattedUpdateDate = convertToLocalDate(product.updated_at);
         setUpdatedAt(formattedUpdateDate);
 
-        const categoriesResponse = await axios.get(`http://localhost:8080/product-categories`, {
+        const categoriesResponse = await API.get(`/product-categories`, {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
@@ -137,7 +138,7 @@ export default function CreateBookForm() {
     }
 
     try {
-      const response = await axios.put(`http://localhost:8080/products/${id}`, BookUpdate, {
+      const response = await API.put(`/products/${id}`, BookUpdate, {
         headers: {
           Authorization: `Bearer ${authToken}`,
           "Content-Type": "multipart/form-data",
@@ -161,14 +162,11 @@ export default function CreateBookForm() {
 
     if (newValue) {
       try {
-        const response = await axios.get(
-          `http://localhost:8080/product-categories/${newValue.id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-            },
-          }
-        );
+        const response = await API.get(`/product-categories/${newValue.id}`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
         const transformedSpecs = (response.data.response.specifications || []).map((spec) => ({
           ...spec,
           description: "", // Add the empty description key

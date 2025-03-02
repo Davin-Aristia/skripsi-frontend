@@ -24,6 +24,7 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
 import { useAuth } from "custom-layouts/authentication";
+import API from "custom-layouts/authentication/axiosConfig";
 
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -63,7 +64,7 @@ export default function CreatePaymentVendorForm() {
       try {
         // Fetch both purchases and products simultaneously
         const [vendorsResponse] = await Promise.all([
-          axios.get(`http://localhost:8080/vendors`, {
+          API.get(`/vendors`, {
             headers: {
               Authorization: `Bearer ${authToken}`,
             },
@@ -84,7 +85,7 @@ export default function CreatePaymentVendorForm() {
   useEffect(() => {
     (async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/payments/${id}`, {
+        const response = await API.get(`/payments/${id}`, {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
@@ -107,14 +108,11 @@ export default function CreatePaymentVendorForm() {
 
         setDetails(transformedDetails);
 
-        const vendorResponse = await axios.get(
-          `http://localhost:8080/vendors/${payment.vendor.id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-            },
-          }
-        );
+        const vendorResponse = await API.get(`/vendors/${payment.vendor.id}`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
         const vendorInventory = vendorResponse.data.response.available_inventory || [];
         const availableRows = vendorInventory.filter(
           (detail) => !transformedDetails.some((d) => d.id === detail.id)
@@ -163,7 +161,7 @@ export default function CreatePaymentVendorForm() {
 
     try {
       // Send POST request to the API
-      const response = await axios.put(`http://localhost:8080/payments/${id}`, newPaymentVendor, {
+      const response = await API.put(`/payments/${id}`, newPaymentVendor, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -252,7 +250,7 @@ export default function CreatePaymentVendorForm() {
     if (!newValue) return;
 
     try {
-      const response = await axios.get(`http://localhost:8080/vendors/${newValue.id}`, {
+      const response = await API.get(`/vendors/${newValue.id}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },

@@ -11,6 +11,7 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
 import { useAuth } from "custom-layouts/authentication";
+import API from "custom-layouts/authentication/axiosConfig";
 
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -36,7 +37,7 @@ export default function CreateCustomerForm() {
     e.preventDefault();
 
     try {
-      const response = await axios.post("http://localhost:8080/customers", customer, {
+      const response = await API.post("/customers", customer, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },

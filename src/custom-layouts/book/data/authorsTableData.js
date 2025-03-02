@@ -53,12 +53,11 @@ export default function data({ setAlert, query }) {
 
   const fetchData = async () => {
     console.log("query", query);
-    let link = `http://localhost:8080/books`;
+    let link = `/books`;
     if (query) {
       link += "?title=" + query;
     }
-    axios
-      .get(link)
+    API.get(link)
       .then((response) => {
         setBooks(response.data.response || []);
         setLoading(false);
@@ -87,7 +86,7 @@ export default function data({ setAlert, query }) {
 
   const deleteBook = async (bookId) => {
     try {
-      await axios.delete(`http://localhost:8080/books/${bookId}`, {
+      await API.delete(`/books/${bookId}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },

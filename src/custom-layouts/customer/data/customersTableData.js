@@ -24,6 +24,7 @@ import MDButton from "components/MDButton";
 import { toast } from "react-toastify";
 
 import { useAuth } from "custom-layouts/authentication";
+import API from "custom-layouts/authentication/axiosConfig";
 
 // Material Dashboard 2 React context
 import { useMaterialUIController } from "context";
@@ -44,13 +45,12 @@ export default function data({ query }) {
   const { darkMode } = controller;
 
   const fetchData = async () => {
-    let link = `http://localhost:8080/customers`;
-    axios
-      .get(link, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      })
+    let link = `/customers`;
+    API.get(link, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
       .then((response) => {
         setCustomers(response.data.response || []);
       })
@@ -75,7 +75,7 @@ export default function data({ query }) {
 
   const deleteCustomer = async (customerId) => {
     try {
-      await axios.delete(`http://localhost:8080/customers/${customerId}`, {
+      await API.delete(`/customers/${customerId}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },

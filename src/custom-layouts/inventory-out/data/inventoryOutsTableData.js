@@ -24,6 +24,7 @@ import MDButton from "components/MDButton";
 import { toast } from "react-toastify";
 
 import { useAuth } from "custom-layouts/authentication";
+import API from "custom-layouts/authentication/axiosConfig";
 
 // Material Dashboard 2 React context
 import { useMaterialUIController } from "context";
@@ -57,7 +58,7 @@ export default function data({ query }) {
 
   const handlePrintClick = async (id) => {
     try {
-      const response = await axios.get(`http://localhost:8080/inventory-outs/${id}`, {
+      const response = await API.get(`/inventory-outs/${id}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -94,7 +95,7 @@ export default function data({ query }) {
     }
 
     try {
-      const response = await axios.post(`http://localhost:8080/inventory-outs/email/${id}`, null, {
+      const response = await API.post(`/inventory-outs/email/${id}`, null, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -122,13 +123,12 @@ export default function data({ query }) {
   const { darkMode } = controller;
 
   const fetchData = async () => {
-    let link = `http://localhost:8080/inventory-outs`;
-    axios
-      .get(link, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      })
+    let link = `/inventory-outs`;
+    API.get(link, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
       .then((response) => {
         setInventoryOuts(response.data.response || []);
       })
@@ -153,7 +153,7 @@ export default function data({ query }) {
 
   const deleteInventoryOut = async (inventoryOutId) => {
     try {
-      await axios.delete(`http://localhost:8080/inventory-outs/${inventoryOutId}`, {
+      await API.delete(`/inventory-outs/${inventoryOutId}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },

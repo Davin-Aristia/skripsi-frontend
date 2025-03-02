@@ -35,7 +35,7 @@ export default function CreateBookForm() {
   useEffect(() => {
     const fetchProductData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/books/${id}`, {
+        const response = await API.get(`/books/${id}`, {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
@@ -58,8 +58,8 @@ export default function CreateBookForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.put(
-        `http://localhost:8080/books/${id}`,
+      const response = await API.put(
+        `/books/${id}`,
         {
           title,
           author,

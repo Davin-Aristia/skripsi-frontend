@@ -14,6 +14,7 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import MDBox from "components/MDBox";
 import { useAuth } from "custom-layouts/authentication";
+import API from "custom-layouts/authentication/axiosConfig";
 import {
   Dialog,
   DialogTitle,
@@ -58,7 +59,7 @@ function POSPage() {
   };
 
   // const fetchCategories = async () => {
-  //   const categoriesResult = await axios.get(`http://localhost:8080/product-categories`);
+  //   const categoriesResult = await API.get(`/product-categories`);
   //   const fetchedCategories = categoriesResult.data.response;
   //   setCategories(fetchedCategories);
   //   let selected = fetchedCategories[0];
@@ -70,7 +71,7 @@ function POSPage() {
 
   const fetchProducts = async (selected = null) => {
     setIsLoading(true);
-    const result = await axios.get("http://localhost:8080/products", {
+    const result = await API.get("/products", {
       headers: {
         Authorization: `Bearer ${authToken}`,
       },
@@ -193,28 +194,28 @@ function POSPage() {
   useEffect(() => {
     (async () => {
       try {
-        // const [categoriesResponse, customersResponse, vendorsResponse] = await axios.get(`http://localhost:8080/product-categories`);
+        // const [categoriesResponse, customersResponse, vendorsResponse] = await API.get(`/product-categories`);
         const [categoriesResponse, customersResponse, vendorsResponse] = await Promise.all([
-          axios.get("http://localhost:8080/product-categories", {
+          API.get("/product-categories", {
             headers: {
               Authorization: `Bearer ${authToken}`,
             },
           }),
-          axios.get("http://localhost:8080/customers", {
+          API.get("/customers", {
             headers: {
               Authorization: `Bearer ${authToken}`,
             },
           }),
-          axios.get("http://localhost:8080/vendors", {
+          API.get("/vendors", {
             headers: {
               Authorization: `Bearer ${authToken}`,
             },
           }),
         ]);
 
-        const fetchedCategories = categoriesResponse.data.response;
-        const fetchedCustomer = customersResponse.data.response;
-        const fetchedVendors = vendorsResponse.data.response;
+        const fetchedCategories = categoriesResponse.data.response || [];
+        const fetchedCustomer = customersResponse.data.response || [];
+        const fetchedVendors = vendorsResponse.data.response || [];
 
         setCategories(fetchedCategories);
         setCustomers(fetchedCustomer);
@@ -328,17 +329,13 @@ function POSPage() {
 
     try {
       // Send POST request to the API
-      const consignmentResponse = await axios.post(
-        "http://localhost:8080/inventory-ins",
-        newInventoryIn,
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        }
-      );
+      const consignmentResponse = await API.post("/inventory-ins", newInventoryIn, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
 
-      const response = await axios.post("http://localhost:8080/inventory-outs", newInventoryOut, {
+      const response = await API.post("/inventory-outs", newInventoryOut, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -359,15 +356,11 @@ function POSPage() {
         ],
       };
 
-      const paymentResponse = await axios.post(
-        "http://localhost:8080/payments",
-        newPaymentCustomer,
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        }
-      );
+      const paymentResponse = await API.post("/payments", newPaymentCustomer, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
 
       // Clear the form fields after submission
       setCart([]);
@@ -573,7 +566,7 @@ function POSPage() {
             <div style={{ display: "none" }}>
               <ComponentToPrint cart={cart} totalAmount={totalAmount} ref={componentRef} />
             </div>
-            {consignment.length > 0 && (
+            {consignment && consignment.length > 0 && (
               <>
                 <MDBox display="flex" alignItems="center" gap={2} mb={2}>
                   <h1 style={{ margin: 0 }}>Consignment</h1>

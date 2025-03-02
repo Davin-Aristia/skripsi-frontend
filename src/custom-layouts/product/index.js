@@ -53,6 +53,7 @@ import { NavLink } from "react-router-dom";
 
 // Data
 import AuthorsTableData from "custom-layouts/product/data/authorsTableData";
+import API from "custom-layouts/authentication/axiosConfig";
 
 function Products() {
   // const [alert, setAlert] = useState({ open: false, severity: null, message: "" });
@@ -91,12 +92,11 @@ function Products() {
   };
 
   const fetchData = async () => {
-    axios
-      .get(`http://localhost:8080/books`, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      })
+    API.get(`/books`, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
       .then((response) => {
         setBooks(response.data.response || []);
       })

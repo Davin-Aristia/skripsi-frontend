@@ -24,6 +24,7 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
 import { useAuth } from "custom-layouts/authentication";
+import API from "custom-layouts/authentication/axiosConfig";
 
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -70,7 +71,7 @@ export default function CreatePaymentCustomerForm() {
       try {
         // Fetch both purchases and products simultaneously
         const [customersResponse] = await Promise.all([
-          axios.get(`http://localhost:8080/customers`, {
+          API.get(`/customers`, {
             headers: {
               Authorization: `Bearer ${authToken}`,
             },
@@ -91,7 +92,7 @@ export default function CreatePaymentCustomerForm() {
   useEffect(() => {
     (async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/payments/${id}`, {
+        const response = await API.get(`/payments/${id}`, {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
@@ -115,14 +116,11 @@ export default function CreatePaymentCustomerForm() {
 
         setDetails(transformedDetails);
 
-        const customerResponse = await axios.get(
-          `http://localhost:8080/customers/${payment.customer.id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-            },
-          }
-        );
+        const customerResponse = await API.get(`/customers/${payment.customer.id}`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
         const customerInventory = customerResponse.data.response.available_inventory || [];
         console.log("payment", payment);
         const availableRows = customerInventory.filter(
@@ -173,7 +171,7 @@ export default function CreatePaymentCustomerForm() {
 
     try {
       // Send POST request to the API
-      const response = await axios.put(`http://localhost:8080/payments/${id}`, newPaymentCustomer, {
+      const response = await API.put(`/payments/${id}`, newPaymentCustomer, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -263,7 +261,7 @@ export default function CreatePaymentCustomerForm() {
     if (!newValue) return;
 
     try {
-      const response = await axios.get(`http://localhost:8080/customers/${newValue.id}`, {
+      const response = await API.get(`/customers/${newValue.id}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },

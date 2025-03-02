@@ -24,6 +24,7 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
 import { useAuth } from "custom-layouts/authentication";
+import API from "custom-layouts/authentication/axiosConfig";
 
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -69,12 +70,12 @@ export default function CreatePurchaseForm() {
       try {
         // Fetch both vendors and products simultaneously
         const [vendorsResponse, productsResponse] = await Promise.all([
-          axios.get(`http://localhost:8080/vendors`, {
+          API.get(`/vendors`, {
             headers: {
               Authorization: `Bearer ${authToken}`,
             },
           }),
-          axios.get(`http://localhost:8080/products`, {
+          API.get(`/products`, {
             headers: {
               Authorization: `Bearer ${authToken}`,
             },
@@ -97,7 +98,7 @@ export default function CreatePurchaseForm() {
   useEffect(() => {
     (async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/purchases/${id}`, {
+        const response = await API.get(`/purchases/${id}`, {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
@@ -155,7 +156,7 @@ export default function CreatePurchaseForm() {
 
     try {
       // Send POST request to the API
-      const response = await axios.put(`http://localhost:8080/purchases/${id}`, newPurchase, {
+      const response = await API.put(`/purchases/${id}`, newPurchase, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },

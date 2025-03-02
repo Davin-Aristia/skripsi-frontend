@@ -11,6 +11,7 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
 import { useAuth } from "custom-layouts/authentication";
+import API from "custom-layouts/authentication/axiosConfig";
 
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -33,7 +34,7 @@ export default function CreateCustomerForm() {
   useEffect(() => {
     (async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/customers/${id}`, {
+        const response = await API.get(`/customers/${id}`, {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
@@ -64,7 +65,7 @@ export default function CreateCustomerForm() {
     e.preventDefault();
 
     try {
-      const response = await axios.put(`http://localhost:8080/customers/${id}`, customer, {
+      const response = await API.put(`/customers/${id}`, customer, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },

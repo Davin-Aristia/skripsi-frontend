@@ -99,8 +99,7 @@ function Products() {
   };
 
   const fetchData = async () => {
-    axios
-      .get(`http://localhost:8080/books`)
+    API.get(`/books`)
       .then((response) => {
         setBooks(response.data.response || []);
       })

@@ -24,6 +24,7 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
 import { useAuth } from "custom-layouts/authentication";
+import API from "custom-layouts/authentication/axiosConfig";
 
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -66,12 +67,12 @@ export default function CreateInventoryOutForm() {
       try {
         // Fetch both customers and products simultaneously
         const [customersResponse, productsResponse] = await Promise.all([
-          axios.get(`http://localhost:8080/customers`, {
+          API.get(`/customers`, {
             headers: {
               Authorization: `Bearer ${authToken}`,
             },
           }),
-          axios.get(`http://localhost:8080/products`, {
+          API.get(`/products`, {
             headers: {
               Authorization: `Bearer ${authToken}`,
             },
@@ -113,7 +114,7 @@ export default function CreateInventoryOutForm() {
 
     try {
       // Send POST request to the API
-      const response = await axios.post("http://localhost:8080/inventory-outs", newInventoryOut, {
+      const response = await API.post("/inventory-outs", newInventoryOut, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },

@@ -44,7 +44,7 @@ export default function CreateBookForm() {
 
     try {
       // Send POST request to the API
-      const response = await axios.post("http://localhost:8080/books", newBook, {
+      const response = await API.post("/books", newBook, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },

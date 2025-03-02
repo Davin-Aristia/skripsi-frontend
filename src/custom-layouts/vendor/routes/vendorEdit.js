@@ -11,6 +11,7 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
 import { useAuth } from "custom-layouts/authentication";
+import API from "custom-layouts/authentication/axiosConfig";
 
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -39,7 +40,7 @@ export default function CreateVendorForm() {
   useEffect(() => {
     (async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/vendors/${id}`, {
+        const response = await API.get(`/vendors/${id}`, {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
@@ -78,8 +79,8 @@ export default function CreateVendorForm() {
     console.log(vendor.netTerm);
 
     try {
-      const response = await axios.put(
-        `http://localhost:8080/vendors/${id}`,
+      const response = await API.put(
+        `/vendors/${id}`,
         {
           company: vendor.company,
           email: vendor.email,

@@ -31,6 +31,7 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
 import { useAuth } from "custom-layouts/authentication";
+import API from "custom-layouts/authentication/axiosConfig";
 
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -57,7 +58,7 @@ export default function CreateBookForm() {
   useEffect(() => {
     const fetchProductData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/product-categories/${id}`, {
+        const response = await API.get(`/product-categories/${id}`, {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
@@ -88,8 +89,8 @@ export default function CreateBookForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.put(
-        `http://localhost:8080/product-categories/${id}`,
+      const response = await API.put(
+        `/product-categories/${id}`,
         {
           name,
           description,

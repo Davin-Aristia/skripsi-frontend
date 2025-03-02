@@ -11,6 +11,7 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
 import { useAuth } from "custom-layouts/authentication";
+import API from "custom-layouts/authentication/axiosConfig";
 
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -42,8 +43,8 @@ export default function CreateVendorForm() {
     e.preventDefault();
 
     try {
-      const response = await axios.post(
-        "http://localhost:8080/vendors",
+      const response = await API.post(
+        "/vendors",
         {
           company: vendor.company,
           email: vendor.email,
