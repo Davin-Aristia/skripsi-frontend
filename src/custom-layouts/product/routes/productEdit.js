@@ -32,6 +32,7 @@ import Paper from "@mui/material/Paper";
 
 import { IconButton } from "@mui/material";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import CircularProgress from "@mui/material/CircularProgress";
 
 export default function CreateBookForm() {
   // State to store form inputs
@@ -49,6 +50,7 @@ export default function CreateBookForm() {
   const [histories, setHistories] = useState([]);
   const [createdAt, setCreatedAt] = useState("");
   const [updatedAt, setUpdatedAt] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [categories, setCategories] = useState([]);
   const [imagePreview, setImagePreview] = useState(null);
@@ -116,6 +118,9 @@ export default function CreateBookForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (isSubmitting) return; // Prevent further submission if already submitting
+    setIsSubmitting(true);
+
     const BookUpdate = {
       name,
       stock: parseInt(stock, 10), // Convert stock to an integer
@@ -154,6 +159,8 @@ export default function CreateBookForm() {
         toast.error("Something went wrong with the server");
       }
       console.log("error:", error);
+    } finally {
+      setIsSubmitting(false); // Reset the submitting state
     }
   };
 
@@ -488,8 +495,14 @@ export default function CreateBookForm() {
               </Grid>
             </Grid>
             <MDBox mt={4} mb={1}>
-              <MDButton variant="gradient" color="info" fullWidth type="submit">
-                edit
+              <MDButton
+                variant="gradient"
+                color="info"
+                fullWidth
+                type="submit"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? <CircularProgress size={20} color="inherit" /> : "Edit"}
               </MDButton>
             </MDBox>
           </MDBox>

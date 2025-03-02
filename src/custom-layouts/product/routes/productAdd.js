@@ -29,6 +29,8 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 
+import CircularProgress from "@mui/material/CircularProgress";
+
 export default function CreateBookForm() {
   // State to store form inputs
   const navigate = useNavigate();
@@ -41,6 +43,7 @@ export default function CreateBookForm() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState([]);
   const [specs, setSpecs] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [categories, setCategories] = useState([]);
 
@@ -65,6 +68,9 @@ export default function CreateBookForm() {
   // Function to handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent the default form submission behavior
+
+    if (isSubmitting) return; // Prevent further submission if already submitting
+    setIsSubmitting(true);
 
     // Create a new book object
     const newBook = {
@@ -110,6 +116,8 @@ export default function CreateBookForm() {
         toast.error("Something went wrong with the server");
       }
       console.log("error:", error);
+    } finally {
+      setIsSubmitting(false); // Reset the submitting state
     }
   };
 
@@ -313,8 +321,14 @@ export default function CreateBookForm() {
               </Grid>
             </Grid>
             <MDBox mt={4} mb={1}>
-              <MDButton variant="gradient" color="info" fullWidth type="submit">
-                create
+              <MDButton
+                variant="gradient"
+                color="info"
+                fullWidth
+                type="submit"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? <CircularProgress size={20} color="inherit" /> : "Create"}
               </MDButton>
             </MDBox>
           </MDBox>

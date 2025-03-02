@@ -57,9 +57,6 @@ function Breadcrumbs({ icon, title, route, light }) {
               .replace(/\/:\w+/g, "")
               .replace(/\/+$/, "");
 
-            console.log("el:", el, "cleanRoute:", cleanRoute);
-            // console.log("Full routes array:", routes);
-
             return (
               <Link to={`/${el}`} key={el}>
                 <MDTypography
