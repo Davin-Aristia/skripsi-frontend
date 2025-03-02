@@ -215,6 +215,17 @@ export default function CreateInventoryForm() {
     }
 
     navigate("/preview-inventory", { state: { reportData: data } });
+    // const previewUrl = "/preview-inventory";
+    // const newTab = window.open(previewUrl, "_blank");
+
+    // if (newTab) {
+    //   newTab.onload = () => {
+    //     newTab.postMessage({ reportData: data }, window.location.origin);
+    //     // newTab.postMessage({ reportData: data }, window.location.origin);
+    //   };
+    // } else {
+    //   toast.error("Popup blocked! Please allow pop-ups for this site.");
+    // }
   };
 
   const ensureDateTimeFormat = (date) => {

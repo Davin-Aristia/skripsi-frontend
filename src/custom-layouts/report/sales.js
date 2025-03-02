@@ -110,9 +110,9 @@ export default function CreateSalesForm() {
   const fetchSalesData = async (fromDate, toDate, customerId) => {
     try {
       const queryParam = {
-        date_from: ensureDateTimeFormat(fromDate),
-        date_to: ensureDateTimeFormat(toDate),
-        customer_id: customerId.id,
+        date_from: fromDate ? ensureDateTimeFormat(fromDate) : null,
+        date_to: toDate ? ensureDateTimeFormat(toDate) : null,
+        customer_id: customerId?.id ?? null,
       };
       console.log("queryParam", queryParam);
 

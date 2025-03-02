@@ -1,9 +1,24 @@
+// import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import BasicLayout from "examples/LayoutContainers/PageLayout";
 
 const PreviewReport = () => {
   const location = useLocation();
   const { reportData } = location.state || {};
+
+  // const [reportData, setReportData] = useState([]);
+
+  // useEffect(() => {
+  //   const receiveMessage = (event) => {
+  //     console.log("Received message:", event.data);
+  //     if (event.origin !== window.location.origin) return;
+  //     console.warn("Ignored message from different origin:", event.origin);
+  //     setReportData(event.data.reportData);
+  //   };
+
+  //   window.addEventListener("message", receiveMessage);
+  //   return () => window.removeEventListener("message", receiveMessage);
+  // }, []);
 
   return (
     <BasicLayout>

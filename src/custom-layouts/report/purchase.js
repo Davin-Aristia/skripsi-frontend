@@ -110,11 +110,10 @@ export default function CreatePurchaseForm() {
   const fetchPurchaseData = async (fromDate, toDate, vendorId) => {
     try {
       const queryParam = {
-        date_from: ensureDateTimeFormat(fromDate),
-        date_to: ensureDateTimeFormat(toDate),
-        vendor_id: vendorId.id,
+        date_from: fromDate ? ensureDateTimeFormat(fromDate) : null,
+        date_to: toDate ? ensureDateTimeFormat(toDate) : null,
+        vendor_id: vendorId?.id ?? null, // If vendorId is undefined or null, set it as null
       };
-      console.log("queryParam", queryParam);
 
       const response = await API.post("/reports/purchase", queryParam, {
         headers: {
