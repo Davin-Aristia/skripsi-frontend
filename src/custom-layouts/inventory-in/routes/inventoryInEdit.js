@@ -210,6 +210,9 @@ export default function CreateInventoryInForm() {
         tax: parseFloat(item.tax),
         subtotal: parseFloat(item.subtotal),
       }));
+    } else {
+      toast.error("You must add at least one product!");
+      return;
     }
 
     try {

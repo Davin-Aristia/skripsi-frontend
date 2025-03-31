@@ -171,6 +171,9 @@ export default function CreatePaymentCustomerForm() {
         inventory_out_id: item.id,
         amount: parseFloat(item.amount),
       }));
+    } else {
+      toast.error("You must add at least one payment detail!");
+      return;
     }
 
     try {
