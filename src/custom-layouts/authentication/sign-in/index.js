@@ -49,7 +49,7 @@ function Basic() {
   const navigate = useNavigate();
 
   const [rememberMe, setRememberMe] = useState(false);
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const [error, setError] = useState(null);
@@ -62,7 +62,7 @@ function Basic() {
     try {
       // Send POST request to the API
       const response = await API.post("/users/signin", {
-        email,
+        username,
         password,
       });
       localStorage.setItem("authToken", response.data.response.token);
@@ -70,7 +70,7 @@ function Basic() {
       localStorage.setItem("role", role);
 
       // Clear the form fields after submission
-      setEmail("");
+      setUsername("");
       setPassword("");
 
       let path = "/sign-in"; // Default to sign-in if role is invalid
@@ -145,11 +145,12 @@ function Basic() {
           <MDBox component="form" role="form" onSubmit={handleLogin}>
             <MDBox mb={2}>
               <MDInput
-                type="email"
-                label="Email"
+                type="username"
+                label="Username"
                 fullWidth
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={username}
+                required
+                onChange={(e) => setUsername(e.target.value)}
               />
             </MDBox>
             <MDBox mb={2}>
@@ -158,6 +159,7 @@ function Basic() {
                 label="Password"
                 fullWidth
                 value={password}
+                required
                 onChange={(e) => setPassword(e.target.value)}
               />
             </MDBox>

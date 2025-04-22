@@ -45,23 +45,33 @@ const PreviewReport = () => {
               <th width="10%">Stock</th>
               <th width="10%">Min Stock</th>
               <th width="25%" style={{ textAlign: "right" }}>
-                Total
+                Price
               </th>
             </tr>
           </thead>
           <tbody>
-            {reportData.map((item, index) => (
-              <tr key={index}>
-                <td style={{ textAlign: "center" }}>{index + 1}</td>
-                <td>{item.name}</td>
-                <td style={{ textAlign: "center" }}>{item.category}</td>
-                <td>{item.stock}</td>
-                <td>{item.min_stock}</td>
-                <td style={{ textAlign: "right" }}>
-                  Rp {new Intl.NumberFormat("id-ID").format(item.price)}
-                </td>
-              </tr>
-            ))}
+            {reportData.map((item, index) => {
+              let rowColor = "inherit";
+
+              if (item.min_stock == null) {
+                rowColor = "#D28100"; // orange
+              } else if (item.stock < item.min_stock) {
+                rowColor = "red";
+              }
+
+              return (
+                <tr key={index} style={{ color: rowColor }}>
+                  <td style={{ textAlign: "center" }}>{index + 1}</td>
+                  <td>{item.name}</td>
+                  <td style={{ textAlign: "center" }}>{item.category}</td>
+                  <td>{item.stock}</td>
+                  <td>{item.min_stock != null ? item.min_stock : "N/A"}</td>
+                  <td style={{ textAlign: "right" }}>
+                    Rp {new Intl.NumberFormat("id-ID").format(item.price)}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
 

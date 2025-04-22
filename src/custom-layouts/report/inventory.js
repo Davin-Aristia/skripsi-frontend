@@ -10,11 +10,11 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  IconButton,
-  Box,
-  Button,
+  Select,
+  FormControl,
+  InputLabel,
   Card,
-  Icon,
+  MenuItem,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -41,6 +41,7 @@ export default function CreateInventoryForm() {
   const initialInventoryState = {
     selectedProduct: null,
     selectedCategory: null,
+    selectedFilter: "both",
   };
   const [inventory, setInventory] = useState(initialInventoryState);
   const [products, setProducts] = useState([]);
@@ -82,6 +83,7 @@ export default function CreateInventoryForm() {
     const queryParam = {
       product_id: inventory.selectedProduct.id,
       category_id: inventory.selectedCategory.id,
+      filter: inventory.selectedFilter,
     };
 
     try {
@@ -109,11 +111,12 @@ export default function CreateInventoryForm() {
     }
   };
 
-  const fetchInventoryData = async (productId, categoryId) => {
+  const fetchInventoryData = async (productId, categoryId, filter) => {
     try {
       const queryParam = {
         product_id: productId?.id ?? null,
         category_id: categoryId?.id ?? null,
+        filter: filter ?? null,
       };
 
       const response = await API.post("/reports/inventory", queryParam, {
@@ -134,8 +137,8 @@ export default function CreateInventoryForm() {
     }
   };
 
-  const exportSimpleExcel = async (productId, categoryId) => {
-    const data = await fetchInventoryData(productId, categoryId);
+  const exportSimpleExcel = async (productId, categoryId, filter) => {
+    const data = await fetchInventoryData(productId, categoryId, filter);
     if (data.length === 0) {
       toast.error("No data available for export");
       return;
@@ -176,13 +179,19 @@ export default function CreateInventoryForm() {
         name: item.name,
         category: item.category,
         stock: item.stock,
-        min_stock: item.min_stock,
+        min_stock: item.min_stock || "N/A",
         price: `Rp ${new Intl.NumberFormat("id-ID", {
           style: "decimal",
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         }).format(item.price)}`,
       });
+
+      if (item.min_stock == null) {
+        row.font = { color: { argb: "FFD28100" } }; // orange
+      } else if (item.stock < item.min_stock) {
+        row.font = { color: { argb: "FFFF0000" } }; // red
+      }
 
       row.eachCell((cell, colNumber) => {
         cell.border = {
@@ -207,8 +216,8 @@ export default function CreateInventoryForm() {
     toast.success("Export successful");
   };
 
-  const handlePreview = async (productId, categoryId) => {
-    const data = await fetchInventoryData(productId, categoryId);
+  const handlePreview = async (productId, categoryId, filter) => {
+    const data = await fetchInventoryData(productId, categoryId, filter);
     if (data.length === 0) {
       toast.error("No data available for preview");
       return;
@@ -304,6 +313,36 @@ export default function CreateInventoryForm() {
                   />
                 </MDBox>
               </Grid>
+              <Grid item xs={4}>
+                <MDBox mb={2}>
+                  <Autocomplete
+                    disablePortal
+                    options={[
+                      { label: "No Filter", value: "no_filter" },
+                      { label: "Below Min Stock", value: "below" },
+                      { label: "Null Min Stock", value: "null" },
+                      { label: "Null and Below Min Stock", value: "both" },
+                    ]}
+                    getOptionLabel={(option) => option.label}
+                    isOptionEqualToValue={(option, value) => option.value === value?.value}
+                    value={
+                      [
+                        { label: "No Filter", value: "no_filter" },
+                        { label: "Below Min Stock", value: "below" },
+                        { label: "Null Min Stock", value: "null" },
+                        { label: "Null and Below Min Stock", value: "both" },
+                      ].find((opt) => opt.value === inventory.selectedFilter) || null
+                    }
+                    onChange={(event, newValue) =>
+                      setInventory({
+                        ...inventory,
+                        selectedFilter: newValue ? newValue.value : null,
+                      })
+                    }
+                    renderInput={(params) => <MDInput {...params} label="Stock Filter" />}
+                  />
+                </MDBox>
+              </Grid>
             </Grid>
             <MDBox>
               <Grid container spacing={0}>
@@ -313,7 +352,11 @@ export default function CreateInventoryForm() {
                       variant="gradient"
                       color="info"
                       onClick={() =>
-                        handlePreview(inventory.selectedProduct, inventory.selectedCategory)
+                        handlePreview(
+                          inventory.selectedProduct,
+                          inventory.selectedCategory,
+                          inventory.selectedFilter
+                        )
                       }
                       sx={{ marginTop: "20px" }}
                     >
@@ -327,7 +370,11 @@ export default function CreateInventoryForm() {
                       variant="gradient"
                       color="info"
                       onClick={() =>
-                        exportSimpleExcel(inventory.selectedProduct, inventory.selectedCategory)
+                        exportSimpleExcel(
+                          inventory.selectedProduct,
+                          inventory.selectedCategory,
+                          inventory.selectedFilter
+                        )
                       }
                       sx={{ marginTop: "20px" }}
                     >

@@ -561,7 +561,14 @@ function POSPage() {
                     >
                       <p>{product.name}</p>
                       <img src={product.image} className="img-fluid" alt={product.name} />
-                      <p>${product.price}</p>
+                      <p>
+                        Rp{" "}
+                        {new Intl.NumberFormat("id-ID", {
+                          style: "decimal",
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }).format(product.price)}
+                      </p>
                     </div>
                   </div>
                 ))}
