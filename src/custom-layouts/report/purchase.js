@@ -360,7 +360,7 @@ export default function CreatePurchaseForm() {
                       }
                       sx={{ marginTop: "20px" }}
                     >
-                      Print to Excel
+                      Export to Excel
                     </MDButton>
                   </MDBox>
                 </Grid>

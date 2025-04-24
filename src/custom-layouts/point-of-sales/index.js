@@ -559,7 +559,18 @@ function POSPage() {
                       className="pos-item px-3 text-center border"
                       onClick={() => addProductToCart(product)}
                     >
-                      <p>{product.name}</p>
+                      <p
+                        style={{
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          display: "block", // Required for ellipsis
+                          width: "100%", // Optional: Adjust to your layout
+                        }}
+                        title={product.name}
+                      >
+                        {product.name}
+                      </p>
                       <img src={product.image} className="img-fluid" alt={product.name} />
                       <p>
                         Rp{" "}

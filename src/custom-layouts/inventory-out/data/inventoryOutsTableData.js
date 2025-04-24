@@ -254,7 +254,10 @@ export default function data({ query }) {
           </Box>
         </DialogTitle>
         <DialogContent dividers>
-          <p>Do you want to print invoice or send this as an email?</p>
+          <p>
+            Do you want to print invoice or send this as an email (
+            {selectedData?.response?.customer?.email})?
+          </p>
         </DialogContent>
         <DialogActions>
           <Button onClick={handlePrint} color="primary">

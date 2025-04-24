@@ -64,8 +64,10 @@ const PreviewReport = () => {
                   <td style={{ textAlign: "center" }}>{index + 1}</td>
                   <td>{item.name}</td>
                   <td style={{ textAlign: "center" }}>{item.category}</td>
-                  <td>{item.stock}</td>
-                  <td>{item.min_stock != null ? item.min_stock : "N/A"}</td>
+                  <td style={{ textAlign: "right" }}>{item.stock}</td>
+                  <td style={{ textAlign: "right" }}>
+                    {item.min_stock != null ? item.min_stock : "N/A"}
+                  </td>
                   <td style={{ textAlign: "right" }}>
                     Rp {new Intl.NumberFormat("id-ID").format(item.price)}
                   </td>

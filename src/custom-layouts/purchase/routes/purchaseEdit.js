@@ -444,7 +444,7 @@ export default function CreatePurchaseForm() {
                   <TableRow>
                     <MDBox
                       component="th"
-                      width="auto"
+                      width="40%"
                       py={1.5}
                       px={3}
                       sx={({ palette: { light }, borders: { borderWidth } }) => ({
@@ -456,7 +456,7 @@ export default function CreatePurchaseForm() {
                     </MDBox>
                     <MDBox
                       component="th"
-                      width="auto"
+                      width="10%"
                       py={1.5}
                       px={3}
                       sx={({ palette: { light }, borders: { borderWidth } }) => ({
@@ -468,7 +468,7 @@ export default function CreatePurchaseForm() {
                     </MDBox>
                     <MDBox
                       component="th"
-                      width="auto"
+                      width="15%"
                       py={1.5}
                       px={3}
                       sx={({ palette: { light }, borders: { borderWidth } }) => ({
@@ -480,7 +480,7 @@ export default function CreatePurchaseForm() {
                     </MDBox>
                     <MDBox
                       component="th"
-                      width="auto"
+                      width="10%"
                       py={1.5}
                       px={3}
                       sx={({ palette: { light }, borders: { borderWidth } }) => ({
@@ -492,7 +492,7 @@ export default function CreatePurchaseForm() {
                     </MDBox>
                     <MDBox
                       component="th"
-                      width="auto"
+                      width="15%"
                       py={1.5}
                       px={3}
                       sx={({ palette: { light }, borders: { borderWidth } }) => ({
@@ -500,11 +500,11 @@ export default function CreatePurchaseForm() {
                         borderTop: `${borderWidth[2]} solid ${light.main}`,
                       })}
                     >
-                      Subtotal
+                      Subtotal (Rp)
                     </MDBox>
                     <MDBox
                       component="th"
-                      width="auto"
+                      width="10%"
                       py={1.5}
                       px={3}
                       sx={({ palette: { light }, borders: { borderWidth } }) => ({
@@ -530,6 +530,7 @@ export default function CreatePurchaseForm() {
                             handleEdit(index, "selectedProduct", newValue)
                           }
                           options={products}
+                          fullWidth
                           getOptionLabel={(option) => option?.name || ""}
                           sx={{
                             "& .MuiInputLabel-root": {
@@ -537,7 +538,7 @@ export default function CreatePurchaseForm() {
                             },
                           }}
                           renderInput={(params) => (
-                            <MDInput {...params} label="Select Product" required />
+                            <MDInput {...params} label="Select Product" required fullWidth />
                           )}
                         />
                       </TableCell>
@@ -618,9 +619,8 @@ export default function CreatePurchaseForm() {
                           </span>
                         </div>
                       </TableCell>
-                      <TableCell component="th" scope="row">
+                      <TableCell component="th" scope="row" align="right">
                         <h5>
-                          Rp{" "}
                           {new Intl.NumberFormat("id-ID", {
                             style: "decimal",
                           }).format(detail.subtotal)}

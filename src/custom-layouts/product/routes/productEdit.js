@@ -330,170 +330,166 @@ export default function CreateBookForm() {
                 </MDBox>
               </Grid>
             </Grid>
-            <Grid container spacing={8}>
-              {specs && specs.length > 0 && (
-                <Grid item xs={6}>
-                  <h3 style={{ padding: "50px 0px 15px 0px" }}>Specifications</h3>
-                  <TableContainer component={Paper}>
-                    <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
-                      <MDBox component="thead">
-                        <TableRow>
-                          <MDBox
-                            component="th"
-                            width="auto"
-                            py={1.5}
-                            px={3}
-                            sx={({ palette: { light }, borders: { borderWidth } }) => ({
-                              borderBottom: `${borderWidth[1]} solid ${light.main}`,
-                              borderTop: `${borderWidth[2]} solid ${light.main}`,
-                            })}
-                          >
-                            Specifications
-                          </MDBox>
-                          <MDBox
-                            component="th"
-                            width="auto"
-                            py={1.5}
-                            px={3}
-                            sx={({ palette: { light }, borders: { borderWidth } }) => ({
-                              borderBottom: `${borderWidth[1]} solid ${light.main}`,
-                              borderTop: `${borderWidth[2]} solid ${light.main}`,
-                            })}
-                          >
-                            Description
-                          </MDBox>
-                        </TableRow>
-                      </MDBox>
-                      <TableBody>
-                        {specs.map((specification, index) => (
-                          <TableRow
-                            key={index}
-                            sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                          >
-                            <TableCell component="th" scope="row">
-                              {specification.name}
-                            </TableCell>
-                            <TableCell align="right">
-                              <input
-                                type="text"
-                                value={specification.description}
-                                onChange={(e) => handleEdit(index, e.target.value)}
-                                style={{
-                                  width: "100%",
-                                  border: "1px solid lightgray",
-                                  background: "transparent",
-                                  outline: "none",
-                                  padding: "5px",
-                                  borderRadius: "4px",
-                                  cursor: "text",
-                                }}
-                              />
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Grid>
-              )}
-              <Grid item xs={6}>
-                {histories && histories.length > 0 && (
-                  <>
-                    <h3 style={{ padding: "50px 0px 15px 0px" }}>Purchase History</h3>
-                    <TableContainer component={Paper}>
-                      <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
-                        <MDBox component="thead">
-                          <TableRow>
-                            <MDBox
-                              component="th"
-                              width="auto"
-                              py={1.5}
-                              px={3}
-                              sx={({ palette: { light }, borders: { borderWidth } }) => ({
-                                borderBottom: `${borderWidth[1]} solid ${light.main}`,
-                                borderTop: `${borderWidth[2]} solid ${light.main}`,
-                              })}
-                            >
-                              Date
-                            </MDBox>
-                            <MDBox
-                              component="th"
-                              width="auto"
-                              py={1.5}
-                              px={3}
-                              sx={({ palette: { light }, borders: { borderWidth } }) => ({
-                                borderBottom: `${borderWidth[1]} solid ${light.main}`,
-                                borderTop: `${borderWidth[2]} solid ${light.main}`,
-                              })}
-                            >
-                              Vendor
-                            </MDBox>
-                            <MDBox
-                              component="th"
-                              width="auto"
-                              py={1.5}
-                              px={3}
-                              sx={({ palette: { light }, borders: { borderWidth } }) => ({
-                                borderBottom: `${borderWidth[1]} solid ${light.main}`,
-                                borderTop: `${borderWidth[2]} solid ${light.main}`,
-                              })}
-                            >
-                              Price
-                            </MDBox>
-                            <MDBox
-                              component="th"
-                              width="auto"
-                              py={1.5}
-                              px={3}
-                              sx={({ palette: { light }, borders: { borderWidth } }) => ({
-                                borderBottom: `${borderWidth[1]} solid ${light.main}`,
-                                borderTop: `${borderWidth[2]} solid ${light.main}`,
-                                textAlign: "center",
-                              })}
-                            >
-                              Chat
-                            </MDBox>
-                          </TableRow>
+            {specs && specs.length > 0 && (
+              <>
+                <h3 style={{ padding: "50px 0px 15px 0px" }}>Specifications</h3>
+                <TableContainer component={Paper}>
+                  <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+                    <MDBox component="thead">
+                      <TableRow>
+                        <MDBox
+                          component="th"
+                          width="auto"
+                          py={1.5}
+                          px={3}
+                          sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                            borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                            borderTop: `${borderWidth[2]} solid ${light.main}`,
+                          })}
+                        >
+                          Specifications
                         </MDBox>
-                        <TableBody>
-                          {histories.map((history, index) => (
-                            <TableRow
-                              key={index}
-                              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                        <MDBox
+                          component="th"
+                          width="auto"
+                          py={1.5}
+                          px={3}
+                          sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                            borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                            borderTop: `${borderWidth[2]} solid ${light.main}`,
+                          })}
+                        >
+                          Description
+                        </MDBox>
+                      </TableRow>
+                    </MDBox>
+                    <TableBody>
+                      {specs.map((specification, index) => (
+                        <TableRow
+                          key={index}
+                          sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                        >
+                          <TableCell component="th" scope="row">
+                            {specification.name}
+                          </TableCell>
+                          <TableCell align="right">
+                            <input
+                              type="text"
+                              value={specification.description}
+                              onChange={(e) => handleEdit(index, e.target.value)}
+                              style={{
+                                width: "100%",
+                                border: "1px solid lightgray",
+                                background: "transparent",
+                                outline: "none",
+                                padding: "5px",
+                                borderRadius: "4px",
+                                cursor: "text",
+                              }}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </>
+            )}
+            {histories && histories.length > 0 && (
+              <>
+                <h3 style={{ padding: "50px 0px 15px 0px" }}>Top 3 Purchase History</h3>
+                <TableContainer component={Paper}>
+                  <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+                    <MDBox component="thead">
+                      <TableRow>
+                        <MDBox
+                          component="th"
+                          width="auto"
+                          py={1.5}
+                          px={3}
+                          sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                            borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                            borderTop: `${borderWidth[2]} solid ${light.main}`,
+                          })}
+                        >
+                          Date
+                        </MDBox>
+                        <MDBox
+                          component="th"
+                          width="auto"
+                          py={1.5}
+                          px={3}
+                          sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                            borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                            borderTop: `${borderWidth[2]} solid ${light.main}`,
+                          })}
+                        >
+                          Vendor
+                        </MDBox>
+                        <MDBox
+                          component="th"
+                          width="auto"
+                          py={1.5}
+                          px={3}
+                          sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                            borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                            borderTop: `${borderWidth[2]} solid ${light.main}`,
+                          })}
+                        >
+                          Price
+                        </MDBox>
+                        <MDBox
+                          component="th"
+                          width="auto"
+                          py={1.5}
+                          px={3}
+                          sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                            borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                            borderTop: `${borderWidth[2]} solid ${light.main}`,
+                            textAlign: "center",
+                          })}
+                        >
+                          Chat
+                        </MDBox>
+                      </TableRow>
+                    </MDBox>
+                    <TableBody>
+                      {histories.map((history, index) => (
+                        <TableRow
+                          key={index}
+                          sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                        >
+                          <TableCell component="th" scope="row">
+                            {history.date}
+                          </TableCell>
+                          <TableCell align="left">{history.vendor}</TableCell>
+                          <TableCell align="right">
+                            Rp{" "}
+                            {new Intl.NumberFormat("id-ID", {
+                              style: "decimal",
+                            }).format(history.price)}
+                          </TableCell>
+                          <TableCell align="center">
+                            <IconButton
+                              color="success"
+                              onClick={() => {
+                                const message = encodeURIComponent(
+                                  `Halo, saya ingin membeli produk ${name}, apakah tersedia?`
+                                );
+                                const whatsappUrl = `https://wa.me/${history.phone}?text=${message}`;
+                                window.open(whatsappUrl, "_blank"); // Open in a new tab
+                              }}
                             >
-                              <TableCell component="th" scope="row">
-                                {history.date}
-                              </TableCell>
-                              <TableCell align="left">{history.vendor}</TableCell>
-                              <TableCell align="right">
-                                Rp{" "}
-                                {new Intl.NumberFormat("id-ID", {
-                                  style: "decimal",
-                                }).format(history.price)}
-                              </TableCell>
-                              <TableCell align="center">
-                                <IconButton
-                                  color="success"
-                                  onClick={() => {
-                                    const message = encodeURIComponent(
-                                      `Halo, saya ingin membeli produk ${name}, apakah tersedia?`
-                                    );
-                                    const whatsappUrl = `https://wa.me/${history.phone}?text=${message}`;
-                                    window.open(whatsappUrl, "_blank"); // Open in a new tab
-                                  }}
-                                >
-                                  <WhatsAppIcon sx={{ color: "#007bff" }} />
-                                </IconButton>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  </>
-                )}
-              </Grid>
-            </Grid>
+                              <WhatsAppIcon sx={{ color: "#007bff" }} />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </>
+            )}
             <MDBox mt={4} mb={1}>
               <MDButton
                 variant="gradient"
