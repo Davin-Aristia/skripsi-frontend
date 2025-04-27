@@ -350,6 +350,7 @@ function POSPage() {
         customer_id: selectedCustomers.id,
         total: parseFloat(totalAmount),
         payment_method: paymentMethod,
+        pos: true,
         details: [
           {
             inventory_out_id: inventoryOut.id,
