@@ -507,7 +507,7 @@ export default function CreateInventoryInForm() {
                 // getOptionLabel={(option) => option?.name || ""}
                 getOptionLabel={(option) => {
                   if (!option) return "";
-                  return `${option.vendor?.name || "Unknown Vendor"} - ${option.name || ""}`;
+                  return `${option.vendor?.company || "Unknown Vendor"} - ${option.name || ""}`;
                 }}
                 sx={{
                   "& .MuiInputLabel-root": {

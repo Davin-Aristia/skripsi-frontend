@@ -37,6 +37,7 @@ export const InvoicePrint = React.forwardRef(({ invoice }, ref) => {
             <th style={tableHeaderStyle}>Product</th>
             <th style={tableHeaderStyle}>Quantity</th>
             <th style={tableHeaderStyle}>Unit Price</th>
+            <th style={tableHeaderStyle}>Tax</th>
             <th style={tableHeaderStyle}>Subtotal</th>
           </tr>
         </thead>
@@ -48,7 +49,10 @@ export const InvoicePrint = React.forwardRef(({ invoice }, ref) => {
               </td>
               <td style={tableCellStyle}>{item.quantity}</td>
               <td style={tableCellStyle}>Rp {item.price.toLocaleString("id-ID")}</td>
-              <td style={tableCellStyle}>Rp {item.subtotal.toLocaleString("id-ID")}</td>
+              <td style={tableCellStyle}>{item.tax ? item.tax : 0} %</td>
+              <td style={{ ...tableCellStyle, textAlign: "right" }}>
+                Rp {item.subtotal.toLocaleString("id-ID")}
+              </td>
             </tr>
           ))}
         </tbody>
