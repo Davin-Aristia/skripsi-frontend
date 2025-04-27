@@ -61,6 +61,7 @@ export default function CreateInventoryInForm() {
     product: {},
     quantity: null,
     price: null,
+    discount: null,
     tax: null,
     subtotal: 0,
   };
@@ -130,6 +131,7 @@ export default function CreateInventoryInForm() {
           billNumber: inventoryIn.bill_number,
           deliveryNumber: inventoryIn.delivery_number,
           selectedPurchase: inventoryIn.purchase_object,
+          vendor: inventoryIn.purchase_object.vendor,
           selectedVendor: inventoryIn.vendor,
           total: 0,
           consignment: inventoryIn.purchase_id ? false : true,
@@ -145,8 +147,16 @@ export default function CreateInventoryInForm() {
               detail.purchase_detail.receipt_quantity +
               detail.quantity || null,
           price: detail.price || null,
+          discount: detail.discount || null,
           tax: detail.tax || null,
-          subtotal: detail.subtotal || 0,
+          subtotal: calculateSubtotal(
+            detail.purchase_detail.quantity -
+              detail.purchase_detail.receipt_quantity +
+              detail.quantity,
+            detail.price,
+            detail.discount,
+            detail.tax
+          ),
         }));
 
         setDetails(transformedDetails);
@@ -207,6 +217,7 @@ export default function CreateInventoryInForm() {
         product_id: item.product.id,
         quantity: parseInt(item.quantity, 10),
         price: parseFloat(item.price),
+        discount: parseFloat(item.discount),
         tax: parseFloat(item.tax),
         subtotal: parseFloat(item.subtotal),
       }));
@@ -255,6 +266,12 @@ export default function CreateInventoryInForm() {
       flex: 1,
     },
     {
+      field: "discount",
+      headerName: "Unit Discount",
+      type: "number",
+      flex: 1,
+    },
+    {
       field: "tax",
       headerName: "PPN",
       type: "number",
@@ -274,13 +291,15 @@ export default function CreateInventoryInForm() {
     setDetailWizard(initialDetailWizard);
   };
 
-  const calculateSubtotal = (quantity, price, tax) => {
+  const calculateSubtotal = (quantity, price, discount, tax) => {
     const qty = parseFloat(quantity) || 0;
     const unitPrice = parseFloat(price) || 0;
+    const disc = parseFloat(discount) || 0;
     const taxPercentage = parseFloat(tax) || 0;
 
     // Calculate subtotal with tax as a percentage
-    return qty * unitPrice * (1 + taxPercentage / 100);
+    const subtotal = qty * (unitPrice - disc) * (1 + taxPercentage / 100);
+    return parseFloat(subtotal.toFixed(2));
   };
 
   // const handleSelect = () => {
@@ -300,6 +319,13 @@ export default function CreateInventoryInForm() {
       const deletedItem = {
         ...prevDetails[index],
         product_name: prevDetails[index].product?.name || "Unknown Product",
+        subtotal: calculateSubtotal(
+          // (detail.quantity || 0) - (detail.receipt_quantity || 0),
+          prevDetails[index].receipt_quantity,
+          prevDetails[index].price,
+          prevDetails[index].discount,
+          prevDetails[index].tax
+        ),
       };
       const updatedDetails = prevDetails.filter((_, i) => i !== index);
 
@@ -320,6 +346,7 @@ export default function CreateInventoryInForm() {
         updatedDetail.subtotal = calculateSubtotal(
           updatedDetail.quantity,
           updatedDetail.price,
+          updatedDetail.discount,
           updatedDetail.tax
         );
 
@@ -391,6 +418,12 @@ export default function CreateInventoryInForm() {
               ...detail,
               product_name: detail.product?.name || "Unknown Product",
               receipt_quantity: detail.quantity - detail.receipt_quantity,
+              subtotal: calculateSubtotal(
+                detail.quantity - detail.receipt_quantity,
+                detail.price,
+                detail.discount,
+                detail.tax
+              ),
             }))
         : [];
 
@@ -455,7 +488,12 @@ export default function CreateInventoryInForm() {
   };
 
   const handleCreate = () => {
-    const subtotal = calculateSubtotal(detailWizard.quantity, detailWizard.price, detailWizard.tax);
+    const subtotal = calculateSubtotal(
+      detailWizard.quantity,
+      detailWizard.price,
+      detailWizard.discount,
+      detailWizard.tax
+    );
     const newDetail = { ...detailWizard, subtotal };
     setDetails([...details, newDetail]);
     handleCloseWizard();
@@ -514,6 +552,15 @@ export default function CreateInventoryInForm() {
                   fullWidth
                   value={detailWizard.price}
                   onChange={(e) => setDetailWizard({ ...detailWizard, price: e.target.value })}
+                />
+              </MDBox>
+              <MDBox mb={2} mt={2}>
+                <MDInput
+                  type="number"
+                  label="Discount"
+                  fullWidth
+                  value={detailWizard.discount}
+                  onChange={(e) => setDetailWizard({ ...detailWizard, discount: e.target.value })}
                 />
               </MDBox>
               <MDBox mb={2} mt={2}>
@@ -688,7 +735,10 @@ export default function CreateInventoryInForm() {
                   }}
                   value={inventoryIn.selectedPurchase}
                   options={purchases}
-                  getOptionLabel={(option) => option?.name || ""}
+                  getOptionLabel={(option) => {
+                    if (!option) return "";
+                    return `${option.vendor?.name || "Unknown Vendor"} - ${option.name || ""}`;
+                  }}
                   sx={{
                     "& .MuiInputLabel-root": {
                       lineHeight: "1.5", // Adjust the line height for proper vertical alignment
@@ -804,7 +854,7 @@ export default function CreateInventoryInForm() {
                   <TableRow>
                     <MDBox
                       component="th"
-                      width="auto"
+                      width="30%"
                       py={1.5}
                       px={3}
                       sx={({ palette: { light }, borders: { borderWidth } }) => ({
@@ -848,6 +898,18 @@ export default function CreateInventoryInForm() {
                         borderTop: `${borderWidth[2]} solid ${light.main}`,
                       })}
                     >
+                      Discount
+                    </MDBox>
+                    <MDBox
+                      component="th"
+                      width="auto"
+                      py={1.5}
+                      px={3}
+                      sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                        borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                        borderTop: `${borderWidth[2]} solid ${light.main}`,
+                      })}
+                    >
                       PPN
                     </MDBox>
                     <MDBox
@@ -860,7 +922,7 @@ export default function CreateInventoryInForm() {
                         borderTop: `${borderWidth[2]} solid ${light.main}`,
                       })}
                     >
-                      Subtotal
+                      Subtotal (Rp)
                     </MDBox>
                     <MDBox
                       component="th"
@@ -940,6 +1002,26 @@ export default function CreateInventoryInForm() {
                       <TableCell component="th" scope="row">
                         {inventoryIn.consignment ? (
                           <input
+                            type="number"
+                            value={detail.discount}
+                            onChange={(e) => handleEdit(index, "discount", e.target.value)}
+                            style={{
+                              width: "100%",
+                              border: "1px solid lightgray",
+                              background: "transparent",
+                              outline: "none",
+                              padding: "5px",
+                              borderRadius: "4px",
+                              cursor: "text",
+                            }}
+                          />
+                        ) : (
+                          detail.discount
+                        )}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {inventoryIn.consignment ? (
+                          <input
                             type="text" // Use text type to handle proper decimal formatting
                             value={detail.tax}
                             onChange={(e) => {
@@ -969,8 +1051,12 @@ export default function CreateInventoryInForm() {
                           `${detail.tax} %`
                         )}
                       </TableCell>
-                      <TableCell component="th" scope="row">
-                        <h5>{detail.subtotal}</h5>
+                      <TableCell component="th" scope="row" align="right">
+                        <h5>
+                          {new Intl.NumberFormat("id-ID", {
+                            style: "decimal",
+                          }).format(detail.subtotal)}
+                        </h5>
                       </TableCell>
                       <TableCell align="center">
                         <MDButton

@@ -51,6 +51,7 @@ export default function CreatePurchaseForm() {
   const initialDetailWizard = {
     selectedProduct: {},
     quantity: null,
+    discount: null,
     price: null,
     tax: null,
     subtotal: 0,
@@ -108,6 +109,7 @@ export default function CreatePurchaseForm() {
         product_id: item.selectedProduct.id,
         quantity: parseInt(item.quantity, 10),
         price: parseFloat(item.price),
+        discount: parseFloat(item.discount),
         tax: parseFloat(item.tax),
         subtotal: parseFloat(item.subtotal),
       }));
@@ -147,17 +149,24 @@ export default function CreatePurchaseForm() {
     setDetailWizard(initialDetailWizard);
   };
 
-  const calculateSubtotal = (quantity, price, tax) => {
+  const calculateSubtotal = (quantity, price, discount, tax) => {
     const qty = parseFloat(quantity) || 0;
+    const disc = parseFloat(discount) || 0;
     const unitPrice = parseFloat(price) || 0;
     const taxPercentage = parseFloat(tax) || 0;
 
     // Calculate subtotal with tax as a percentage
-    return qty * unitPrice * (1 + taxPercentage / 100);
+    const subtotal = qty * (unitPrice - disc) * (1 + taxPercentage / 100);
+    return parseFloat(subtotal.toFixed(2));
   };
 
   const handleCreate = () => {
-    const subtotal = calculateSubtotal(detailWizard.quantity, detailWizard.price, detailWizard.tax);
+    const subtotal = calculateSubtotal(
+      detailWizard.quantity,
+      detailWizard.price,
+      detailWizard.discount,
+      detailWizard.tax
+    );
     const newDetail = { ...detailWizard, subtotal };
     setDetails([...details, newDetail]);
     handleCloseWizard();
@@ -195,6 +204,7 @@ export default function CreatePurchaseForm() {
         updatedDetail.subtotal = calculateSubtotal(
           updatedDetail.quantity,
           updatedDetail.price,
+          updatedDetail.discount,
           updatedDetail.tax
         );
 
@@ -275,6 +285,15 @@ export default function CreatePurchaseForm() {
                 fullWidth
                 value={detailWizard.price}
                 onChange={(e) => setDetailWizard({ ...detailWizard, price: e.target.value })}
+              />
+            </MDBox>
+            <MDBox mb={2} mt={2}>
+              <MDInput
+                type="number"
+                label="Discount"
+                fullWidth
+                value={detailWizard.discount}
+                onChange={(e) => setDetailWizard({ ...detailWizard, discount: e.target.value })}
               />
             </MDBox>
             <MDBox mb={2} mt={2}>
@@ -386,7 +405,7 @@ export default function CreatePurchaseForm() {
                   <TableRow>
                     <MDBox
                       component="th"
-                      width="auto"
+                      width="30%"
                       py={1.5}
                       px={3}
                       sx={({ palette: { light }, borders: { borderWidth } }) => ({
@@ -398,7 +417,7 @@ export default function CreatePurchaseForm() {
                     </MDBox>
                     <MDBox
                       component="th"
-                      width="auto"
+                      width="10%"
                       py={1.5}
                       px={3}
                       sx={({ palette: { light }, borders: { borderWidth } }) => ({
@@ -410,7 +429,7 @@ export default function CreatePurchaseForm() {
                     </MDBox>
                     <MDBox
                       component="th"
-                      width="auto"
+                      width="13%"
                       py={1.5}
                       px={3}
                       sx={({ palette: { light }, borders: { borderWidth } }) => ({
@@ -422,7 +441,19 @@ export default function CreatePurchaseForm() {
                     </MDBox>
                     <MDBox
                       component="th"
-                      width="auto"
+                      width="13%"
+                      py={1.5}
+                      px={3}
+                      sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                        borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                        borderTop: `${borderWidth[2]} solid ${light.main}`,
+                      })}
+                    >
+                      Discount
+                    </MDBox>
+                    <MDBox
+                      component="th"
+                      width="9%"
                       py={1.5}
                       px={3}
                       sx={({ palette: { light }, borders: { borderWidth } }) => ({
@@ -434,7 +465,7 @@ export default function CreatePurchaseForm() {
                     </MDBox>
                     <MDBox
                       component="th"
-                      width="auto"
+                      width="15%"
                       py={1.5}
                       px={3}
                       sx={({ palette: { light }, borders: { borderWidth } }) => ({
@@ -442,11 +473,11 @@ export default function CreatePurchaseForm() {
                         borderTop: `${borderWidth[2]} solid ${light.main}`,
                       })}
                     >
-                      Subtotal
+                      Subtotal (Rp)
                     </MDBox>
                     <MDBox
                       component="th"
-                      width="auto"
+                      width="10%"
                       py={1.5}
                       px={3}
                       sx={({ palette: { light }, borders: { borderWidth } }) => ({
@@ -516,6 +547,23 @@ export default function CreatePurchaseForm() {
                         />
                       </TableCell>
                       <TableCell component="th" scope="row">
+                        <input
+                          type="number"
+                          value={detail.discount}
+                          onChange={(e) => handleEdit(index, "discount", e.target.value)}
+                          required
+                          style={{
+                            width: "100%",
+                            border: "1px solid lightgray",
+                            background: "transparent",
+                            outline: "none",
+                            padding: "5px",
+                            borderRadius: "4px",
+                            cursor: "text",
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell component="th" scope="row">
                         <div
                           style={{ position: "relative", display: "inline-block", width: "100%" }}
                         >
@@ -558,9 +606,8 @@ export default function CreatePurchaseForm() {
                           </span>
                         </div>
                       </TableCell>
-                      <TableCell component="th" scope="row">
+                      <TableCell component="th" scope="row" align="right">
                         <h5>
-                          Rp{" "}
                           {new Intl.NumberFormat("id-ID", {
                             style: "decimal",
                           }).format(detail.subtotal)}

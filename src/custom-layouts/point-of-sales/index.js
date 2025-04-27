@@ -433,7 +433,7 @@ function POSPage() {
                     }}
                   >
                     <MenuItem value="cash">Cash</MenuItem>
-                    <MenuItem value="credit">Credit</MenuItem>
+                    <MenuItem value="credit">Credit Card</MenuItem>
                     <MenuItem value="debit">Debit</MenuItem>
                   </Select>
                 </FormControl>
@@ -458,31 +458,33 @@ function POSPage() {
             </Box> */}
 
             {/* Pay Amount */}
-            <Grid container alignItems="center" spacing={2} mb={2}>
-              <Grid item xs={7}>
-                <Typography variant="body1">Pay Amount</Typography>
-              </Grid>
-              <Grid item xs={5}>
-                <TextField
-                  fullWidth
-                  type="number"
-                  value={payAmount}
-                  sx={{
-                    "& input": {
-                      textAlign: "right",
-                      paddingRight: "10px",
-                      fontSize: "1.1rem",
-                    },
-                    "& input[type=number]::-webkit-inner-spin-button, & input[type=number]::-webkit-outer-spin-button":
-                      {
-                        WebkitAppearance: "none", // Hide default spinner
-                        margin: 0,
+            {paymentMethod === "cash" && (
+              <Grid container alignItems="center" spacing={2} mb={2}>
+                <Grid item xs={7}>
+                  <Typography variant="body1">Pay Amount</Typography>
+                </Grid>
+                <Grid item xs={5}>
+                  <TextField
+                    fullWidth
+                    type="number"
+                    value={payAmount}
+                    sx={{
+                      "& input": {
+                        textAlign: "right",
+                        paddingRight: "10px",
+                        fontSize: "1.1rem",
                       },
-                  }}
-                  onChange={(e) => setPayAmount(Math.max(1, parseInt(e.target.value) || 1))}
-                />
+                      "& input[type=number]::-webkit-inner-spin-button, & input[type=number]::-webkit-outer-spin-button":
+                        {
+                          WebkitAppearance: "none", // Hide default spinner
+                          margin: 0,
+                        },
+                    }}
+                    onChange={(e) => setPayAmount(Math.max(1, parseInt(e.target.value) || 1))}
+                  />
+                </Grid>
               </Grid>
-            </Grid>
+            )}
 
             <Box mb={2}>
               <Box display="flex" justifyContent="space-between">
@@ -500,12 +502,14 @@ function POSPage() {
             </Box>
 
             {/* Change */}
-            <Box>
-              <Typography variant="body1">Change</Typography>
-              <Typography color="error" fontWeight="bold">
-                Rp. {(payAmount - totalAmount).toLocaleString("id-ID")}
-              </Typography>
-            </Box>
+            {paymentMethod === "cash" && (
+              <Box textAlign="right">
+                <Typography variant="body1">Change</Typography>
+                <Typography color="error" fontWeight="bold">
+                  Rp. {(payAmount - totalAmount).toLocaleString("id-ID")}
+                </Typography>
+              </Box>
+            )}
           </DialogContent>
 
           {/* Action Buttons */}

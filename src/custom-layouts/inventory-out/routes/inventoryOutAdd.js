@@ -15,6 +15,7 @@ import {
   Button,
   Card,
   Icon,
+  InputAdornment,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -52,6 +53,7 @@ export default function CreateInventoryOutForm() {
     selectedProduct: {},
     quantity: null,
     price: null,
+    tax: null,
     subtotal: 0,
   };
   const [inventoryOut, setInventoryOut] = useState(initialInventoryOutState);
@@ -108,6 +110,7 @@ export default function CreateInventoryOutForm() {
         product_id: item.selectedProduct.id,
         quantity: parseInt(item.quantity, 10),
         price: parseFloat(item.price),
+        tax: parseFloat(item.tax),
         subtotal: parseFloat(item.subtotal),
       }));
     } else {
@@ -146,12 +149,14 @@ export default function CreateInventoryOutForm() {
     setDetailWizard(initialDetailWizard);
   };
 
-  const calculateSubtotal = (quantity, price) => {
-    return (parseFloat(quantity) || 0) * (parseFloat(price) || 0);
+  const calculateSubtotal = (quantity, price, tax) => {
+    const subtotal =
+      (parseFloat(quantity) || 0) * (parseFloat(price) || 0) * (1 + (parseFloat(tax) || 0) / 100);
+    return parseFloat(subtotal.toFixed(2));
   };
 
   const handleCreate = () => {
-    const subtotal = calculateSubtotal(detailWizard.quantity, detailWizard.price);
+    const subtotal = calculateSubtotal(detailWizard.quantity, detailWizard.price, detailWizard.tax);
     const newDetail = { ...detailWizard, subtotal };
     setDetails([...details, newDetail]);
     handleCloseWizard();
@@ -186,7 +191,11 @@ export default function CreateInventoryOutForm() {
           [fieldName]: newValue,
         };
 
-        updatedDetail.subtotal = calculateSubtotal(updatedDetail.quantity, updatedDetail.price);
+        updatedDetail.subtotal = calculateSubtotal(
+          updatedDetail.quantity,
+          updatedDetail.price,
+          updatedDetail.tax
+        );
 
         return updatedDetail;
       }
@@ -267,6 +276,28 @@ export default function CreateInventoryOutForm() {
                 onChange={(e) => setDetailWizard({ ...detailWizard, price: e.target.value })}
               />
             </MDBox>
+            <MDBox mb={2} mt={2}>
+              <MDInput
+                type="text"
+                label="Tax (%)"
+                fullWidth
+                value={detailWizard.tax}
+                onChange={(e) => {
+                  let value = e.target.value;
+
+                  // Allow only numbers and one decimal point
+                  if (!/^\d{0,2}(\.\d{0,2})?$/.test(value)) return;
+
+                  // Ensure it does not exceed 99.99
+                  if (parseFloat(value) > 99.99) return;
+
+                  setDetailWizard({ ...detailWizard, tax: value });
+                }}
+                InputProps={{
+                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                }}
+              />
+            </MDBox>
           </MDBox>
         </DialogContent>
         <DialogActions>
@@ -338,7 +369,7 @@ export default function CreateInventoryOutForm() {
                   <TableRow>
                     <MDBox
                       component="th"
-                      width="auto"
+                      width="35%"
                       py={1.5}
                       px={3}
                       sx={({ palette: { light }, borders: { borderWidth } }) => ({
@@ -382,7 +413,7 @@ export default function CreateInventoryOutForm() {
                         borderTop: `${borderWidth[2]} solid ${light.main}`,
                       })}
                     >
-                      Subtotal
+                      Subtotal (Rp)
                     </MDBox>
                     <MDBox
                       component="th"
@@ -454,7 +485,54 @@ export default function CreateInventoryOutForm() {
                         />
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        <h5>{detail.subtotal}</h5>
+                        <div
+                          style={{ position: "relative", display: "inline-block", width: "100%" }}
+                        >
+                          <input
+                            type="text" // Use text type to handle proper decimal formatting
+                            value={detail.tax}
+                            onChange={(e) => {
+                              let value = e.target.value;
+
+                              // Allow only numbers and one decimal point
+                              if (!/^\d{0,2}(\.\d{0,2})?$/.test(value)) return;
+
+                              // Ensure it does not exceed 99.99
+                              if (parseFloat(value) > 99.99) return;
+
+                              handleEdit(index, "tax", value);
+                            }}
+                            required
+                            style={{
+                              width: "100%",
+                              border: "1px solid lightgray",
+                              background: "transparent",
+                              outline: "none",
+                              padding: "5px",
+                              borderRadius: "4px",
+                              cursor: "text",
+                              paddingRight: "20px", // Add space for % symbol
+                            }}
+                          />
+                          <span
+                            style={{
+                              position: "absolute",
+                              right: "10px",
+                              top: "50%",
+                              transform: "translateY(-50%)",
+                              color: "gray",
+                            }}
+                          >
+                            %
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell component="th" scope="row" align="right">
+                        <h5>
+                          {new Intl.NumberFormat("id-ID", {
+                            style: "decimal",
+                          }).format(detail.subtotal)}
+                        </h5>
                       </TableCell>
                       <TableCell align="center">
                         <MDButton
