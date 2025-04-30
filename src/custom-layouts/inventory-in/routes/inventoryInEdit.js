@@ -650,7 +650,7 @@ export default function CreateInventoryInForm() {
       <Card sx={{ mt: 4 }}>
         <MDBox
           variant="gradient"
-          bgColor="info"
+          bgColor="dark"
           borderRadius="lg"
           coloredShadow="info"
           mx="auto"
@@ -886,6 +886,18 @@ export default function CreateInventoryInForm() {
                         borderTop: `${borderWidth[2]} solid ${light.main}`,
                       })}
                     >
+                      Max Qty
+                    </MDBox>
+                    <MDBox
+                      component="th"
+                      width="auto"
+                      py={1.5}
+                      px={3}
+                      sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                        borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                        borderTop: `${borderWidth[2]} solid ${light.main}`,
+                      })}
+                    >
                       Unit Price
                     </MDBox>
                     <MDBox
@@ -978,6 +990,9 @@ export default function CreateInventoryInForm() {
                             cursor: "text",
                           }}
                         />
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {detail.receipt_quantity}
                       </TableCell>
                       <TableCell component="th" scope="row">
                         {inventoryIn.consignment ? (

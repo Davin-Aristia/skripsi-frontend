@@ -285,7 +285,7 @@ export default function CreatePaymentVendorForm() {
       <Card sx={{ mt: 4 }}>
         <MDBox
           variant="gradient"
-          bgColor="info"
+          bgColor="dark"
           borderRadius="lg"
           coloredShadow="info"
           mx="auto"
