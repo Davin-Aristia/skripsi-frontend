@@ -47,6 +47,7 @@ import InventoryIn from "custom-layouts/inventory-in";
 import PaymentVendor from "custom-layouts/payment-vendor";
 import InventoryOut from "custom-layouts/inventory-out";
 import PaymentCustomer from "custom-layouts/payment-customer";
+import InventoryAdjustment from "custom-layouts/inventory-adjustment";
 import PurchaseReport from "custom-layouts/report/purchase";
 import SalesReport from "custom-layouts/report/sales";
 import InventoryReport from "custom-layouts/report/inventory";
@@ -69,6 +70,7 @@ import inventoryInRoutes from "custom-layouts/inventory-in/routes";
 import paymentVendorRoutes from "custom-layouts/payment-vendor/routes";
 import inventoryOutRoutes from "custom-layouts/inventory-out/routes";
 import paymentCustomerRoutes from "custom-layouts/payment-customer/routes";
+import inventoryAdjustmentRoutes from "custom-layouts/inventory-adjustment/routes";
 import SignInCustom from "custom-layouts/authentication/sign-in";
 import PreviewReport from "custom-layouts/report";
 
@@ -84,6 +86,7 @@ const routes = [
   ...inventoryInRoutes,
   ...paymentVendorRoutes,
   ...inventoryOutRoutes,
+  ...inventoryAdjustmentRoutes,
   ...paymentCustomerRoutes,
   ...PreviewReport,
   // {
@@ -349,6 +352,15 @@ const routes = [
   //   route: "/authentication/sign-up",
   //   component: <SignUp />,
   // },
+  {
+    type: "collapse",
+    name: "Inventory Adjustment",
+    key: "inventory-adjustment",
+    icon: <Icon fontSize="small">iso</Icon>,
+    route: "/inventory-adjustment",
+    component: <InventoryAdjustment />,
+    roles: ["owner"],
+  },
   {
     type: "collapse",
     name: "Point of Sales",
