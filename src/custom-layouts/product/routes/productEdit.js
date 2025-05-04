@@ -177,6 +177,7 @@ export default function CreateBookForm() {
         const transformedSpecs = (response.data.response.specifications || []).map((spec) => ({
           ...spec,
           description: "", // Add the empty description key
+          category_spec_id: spec.id,
         }));
 
         setSpecs(transformedSpecs);
