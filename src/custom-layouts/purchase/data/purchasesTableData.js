@@ -21,6 +21,7 @@ import Icon from "@mui/material/Icon";
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDButton from "components/MDButton";
+import MDBadge from "components/MDBadge";
 import { toast } from "react-toastify";
 
 import { useAuth } from "custom-layouts/authentication";
@@ -187,6 +188,7 @@ export default function data({ query }) {
     { Header: "date", accessor: "date", align: "left" },
     { Header: "vendor", accessor: "vendor", align: "center" },
     { Header: "total", accessor: "total", align: "center" },
+    { Header: "status", accessor: "status", align: "center" },
     { Header: "action", accessor: "action", align: "center" },
   ];
 
@@ -206,6 +208,22 @@ export default function data({ query }) {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(purchase.total)}`,
+    status: (
+      <MDBox ml={-1}>
+        <MDBadge
+          badgeContent={purchase.status}
+          color={
+            purchase.status === "open"
+              ? "light" // greyish-white
+              : purchase.status === "partial"
+              ? "warning" // yellow
+              : "success" // green for "done" or others
+          }
+          variant="gradient"
+          size="sm"
+        />
+      </MDBox>
+    ),
     action: (
       <MDBox display="flex" alignItems="center" mt={{ xs: 2, sm: 0 }} ml={{ xs: -1.5, sm: 0 }}>
         <NavLink to={`/purchase/${purchase.id}/edit`} style={{ textDecoration: "none" }}>

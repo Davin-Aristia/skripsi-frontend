@@ -100,7 +100,9 @@ export default function CreateInventoryInForm() {
         ]);
 
         // Extract the data from the responses
-        const purchases = purchasesResponse.data.response;
+        const purchases = purchasesResponse.data.response.filter(
+          (purchase) => purchase.status !== "done"
+        );
         const products = productsResponse.data.response;
         const vendors = vendorsResponse.data.response;
 
@@ -158,6 +160,14 @@ export default function CreateInventoryInForm() {
             detail.tax
           ),
         }));
+
+        setPurchases((prevPurchases) => {
+          const exists = prevPurchases.some((p) => p.id === inventoryIn.purchase_object.id);
+          if (!exists) {
+            return [...prevPurchases, inventoryIn.purchase_object];
+          }
+          return prevPurchases;
+        });
 
         setDetails(transformedDetails);
 

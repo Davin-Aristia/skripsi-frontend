@@ -90,7 +90,11 @@ export default function CreateInventoryInForm() {
         ]);
 
         // Extract the data from the responses
-        const purchases = purchasesResponse.data.response;
+        const purchases = purchasesResponse.data.response.filter(
+          (purchase) => purchase.status !== "done"
+        );
+        console.log("purchasesss", purchases);
+
         const products = productsResponse.data.response;
 
         // Set the state with fetched data

@@ -30,6 +30,7 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
+import MDBadge from "components/MDBadge";
 
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -49,6 +50,7 @@ export default function CreatePurchaseForm() {
     date: "",
     selectedVendor: {},
     total: 0,
+    status: "",
   };
   const initialDetailWizard = {
     selectedProduct: {},
@@ -110,12 +112,14 @@ export default function CreatePurchaseForm() {
           date: convertToLocalDate(purchase.date),
           selectedVendor: purchase.vendor,
           total: purchase.total,
+          status: purchase.status,
           createdAt: convertToLocalDate(purchase.created_at),
           updatedAt: convertToLocalDate(purchase.updated_at),
         });
         const transformedDetails = purchase.details.map((detail) => ({
           selectedProduct: detail.product,
           quantity: detail.quantity || null,
+          receipt_quantity: detail.receipt_quantity || null,
           price: detail.price || null,
           discount: detail.discount || null,
           tax: detail.tax || null,
@@ -275,6 +279,56 @@ export default function CreatePurchaseForm() {
     return date; // If it's already in datetime format (e.g., 2025-01-07T12:30)
   };
 
+  // const handleMarkAsDone = () => {
+  //   setPurchase((prev) => ({
+  //     ...prev,
+  //     status: "done",
+  //   }));
+  // };
+
+  // const handleMarkAsPartial = () => {
+  //   setPurchase((prev) => ({
+  //     ...prev,
+  //     status: "partial",
+  //   }));
+  // };
+
+  const handleUpdateStatus = async (newStatus) => {
+    try {
+      await API.put(
+        `/purchases/${id}/status`,
+        { status: newStatus },
+        {
+          headers: { Authorization: `Bearer ${authToken}` },
+        }
+      );
+
+      setPurchase((prev) => ({
+        ...prev,
+        status: newStatus,
+      }));
+    } catch (error) {
+      console.error(`Failed to update status to ${newStatus}:`, error);
+    }
+  };
+
+  const handleMarkAsDone = () => handleUpdateStatus("done");
+
+  const handleMarkAsPartial = () => handleUpdateStatus("partial");
+
+  const hasUnreceivedItems = (details = []) => {
+    console.log("Checking details for unreceived items:", details);
+    details.forEach((d, index) => {
+      console.log(`Item ${index + 1}:`, {
+        receipt_quantity: d.receipt_quantity,
+        quantity: d.quantity,
+        unreceived: d.receipt_quantity < d.quantity,
+      });
+    });
+
+    return details.some((d) => d.receipt_quantity < d.quantity);
+  };
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -399,6 +453,44 @@ export default function CreatePurchaseForm() {
           <MDTypography variant="body2" fontWeight="medium" sx={{ color: "grey.600" }}>
             Last Edit: {purchase.updatedAt || "-"}
           </MDTypography>
+        </MDBox>
+        <MDBox
+          sx={{
+            position: "absolute",
+            top: 15,
+            left: 10,
+            display: "flex",
+            alignItems: "center",
+            gap: 2, // spacing between badge and button
+          }}
+        >
+          <MDTypography variant="body2" color="text">
+            Status:
+          </MDTypography>
+          <MDBadge
+            badgeContent={purchase.status}
+            color={
+              purchase.status === "open"
+                ? "light"
+                : purchase.status === "partial"
+                ? "warning"
+                : "success"
+            }
+            variant="gradient"
+            size="md"
+          />
+
+          {purchase.status === "partial" && (
+            <MDButton size="small" color="info" variant="gradient" onClick={handleMarkAsDone}>
+              Mark as Done
+            </MDButton>
+          )}
+
+          {purchase.status === "done" && hasUnreceivedItems(details) && (
+            <MDButton size="small" color="info" variant="gradient" onClick={handleMarkAsPartial}>
+              Mark as Undone
+            </MDButton>
+          )}
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit}>

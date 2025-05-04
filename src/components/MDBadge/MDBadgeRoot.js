@@ -102,7 +102,7 @@ export default styled(Badge)(({ theme, ownerState }) => {
     position: "static",
     marginLeft: pxToRem(8),
     transform: "none",
-    fontSize: pxToRem(9),
+    fontSize: pxToRem(12),
   });
 
   // styles for the badge with container={true}
