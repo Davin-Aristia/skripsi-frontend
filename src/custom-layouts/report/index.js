@@ -1,6 +1,7 @@
 import PreviewPurchase from "./preview/previewPurchase";
 import PreviewSales from "./preview/previewSales";
 import PreviewInventory from "./preview/previewInventory";
+import PreviewInventoryIn from "./preview/previewInventoryIn";
 // import CustomerEdit from "./customerEdit";
 
 const routes = [
@@ -15,6 +16,12 @@ const routes = [
     key: "preview-sales",
     route: "/preview-sales",
     component: <PreviewSales />,
+  },
+  {
+    type: "sub-route",
+    key: "preview-inventory-in",
+    route: "/preview-inventory-in",
+    component: <PreviewInventoryIn />,
   },
   {
     type: "sub-route",

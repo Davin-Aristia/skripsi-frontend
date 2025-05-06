@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import BasicLayout from "examples/LayoutContainers/PageLayout";
 
@@ -12,6 +13,14 @@ const PreviewReport = () => {
   const formatDate = (dateStr) => {
     const options = { day: "2-digit", month: "long", year: "numeric" };
     return new Date(dateStr).toLocaleDateString("en-GB", options);
+  };
+
+  const [expandedIndexes, setExpandedIndexes] = useState([]);
+
+  const toggleRow = (index) => {
+    setExpandedIndexes((prev) =>
+      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+    );
   };
 
   return (
@@ -50,15 +59,58 @@ const PreviewReport = () => {
           </thead>
           <tbody>
             {reportData.map((item, index) => (
-              <tr key={index}>
-                <td style={{ textAlign: "center" }}>{index + 1}</td>
-                <td>{item.name}</td>
-                <td style={{ textAlign: "center" }}>{formatDate(item.date)}</td>
-                <td>{item.customer}</td>
-                <td style={{ textAlign: "right" }}>
-                  Rp {new Intl.NumberFormat("id-ID").format(item.total)}
-                </td>
-              </tr>
+              <React.Fragment key={index}>
+                {/* Main Row */}
+                <tr
+                  onClick={() => toggleRow(index)}
+                  style={{ cursor: "pointer", fontWeight: "bold" }}
+                >
+                  <td style={{ textAlign: "center" }}>{index + 1}</td>
+                  <td>{item.name}</td>
+                  <td style={{ textAlign: "center" }}>{formatDate(item.date)}</td>
+                  <td>{item.customer}</td>
+                  <td style={{ textAlign: "right" }}>
+                    Rp {new Intl.NumberFormat("id-ID").format(item.total)}
+                  </td>
+                </tr>
+
+                {/* Detail Row */}
+                {expandedIndexes.includes(index) && (
+                  <>
+                    <tr>
+                      <td colSpan="5">
+                        <table width="100%" style={{ marginTop: "10px", fontSize: "13px" }}>
+                          <thead>
+                            <tr style={{ backgroundColor: "#e0e0e0" }}>
+                              <th>Product</th>
+                              <th>Quantity</th>
+                              <th>Price</th>
+                              <th>Tax</th>
+                              <th>Subtotal</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {item.details.map((detail, idx) => (
+                              <tr key={idx}>
+                                <td>{detail.product}</td>
+                                <td>{detail.quantity}</td>
+                                <td>Rp {detail.price.toLocaleString("id-ID")}</td>
+                                <td>{detail.tax.toLocaleString("id-ID")} %</td>
+                                <td>Rp {detail.subtotal.toLocaleString("id-ID")}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </td>
+                    </tr>
+
+                    {/* Spacer Row */}
+                    <tr>
+                      <td colSpan="5" style={{ height: "10px", borderTop: "1px solid #ccc" }}></td>
+                    </tr>
+                  </>
+                )}
+              </React.Fragment>
             ))}
           </tbody>
           <tfoot>

@@ -51,6 +51,7 @@ import InventoryAdjustment from "custom-layouts/inventory-adjustment";
 import PurchaseReport from "custom-layouts/report/purchase";
 import SalesReport from "custom-layouts/report/sales";
 import InventoryReport from "custom-layouts/report/inventory";
+import InventoryInReport from "custom-layouts/report/inventoryIn";
 // import PreviewReport from "custom-layouts/report/previewReport";
 import Billing from "layouts/billing";
 // import RTL from "layouts/rtl";
@@ -278,6 +279,19 @@ const routes = [
         ),
         route: "/sales-report",
         component: <SalesReport />,
+        roles: ["owner"],
+      },
+      {
+        type: "collapse",
+        name: "Inventory In",
+        key: "inventory-in-report",
+        icon: (
+          <Icon fontSize="small" style={{ marginLeft: "30px" }}>
+            auto_stories
+          </Icon>
+        ),
+        route: "/inventory-in-report",
+        component: <InventoryInReport />,
         roles: ["owner"],
       },
       {
