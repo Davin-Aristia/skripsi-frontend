@@ -52,6 +52,8 @@ import PurchaseReport from "custom-layouts/report/purchase";
 import SalesReport from "custom-layouts/report/sales";
 import InventoryReport from "custom-layouts/report/inventory";
 import InventoryInReport from "custom-layouts/report/inventoryIn";
+import PaymentCustomerReport from "custom-layouts/report/paymentCustomer";
+import PaymentVendorReport from "custom-layouts/report/paymentVendor";
 // import PreviewReport from "custom-layouts/report/previewReport";
 import Billing from "layouts/billing";
 // import RTL from "layouts/rtl";
@@ -292,6 +294,32 @@ const routes = [
         ),
         route: "/inventory-in-report",
         component: <InventoryInReport />,
+        roles: ["owner"],
+      },
+      {
+        type: "collapse",
+        name: "Payment Customer",
+        key: "payment-customer-report",
+        icon: (
+          <Icon fontSize="small" style={{ marginLeft: "30px" }}>
+            auto_stories
+          </Icon>
+        ),
+        route: "/payment-customer-report",
+        component: <PaymentCustomerReport />,
+        roles: ["owner"],
+      },
+      {
+        type: "collapse",
+        name: "Payment Vendor",
+        key: "payment-vendor-report",
+        icon: (
+          <Icon fontSize="small" style={{ marginLeft: "30px" }}>
+            auto_stories
+          </Icon>
+        ),
+        route: "/payment-vendor-report",
+        component: <PaymentVendorReport />,
         roles: ["owner"],
       },
       {
