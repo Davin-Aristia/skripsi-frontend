@@ -27,7 +27,7 @@ import { useAuth } from "custom-layouts/authentication";
 import API from "custom-layouts/authentication/axiosConfig";
 
 // Material Dashboard 2 React context
-import { useMaterialUIController } from "context";
+// import { useMaterialUIController } from "context";
 import { NavLink } from "react-router-dom";
 
 import DataTable from "examples/Tables/DataTable";
@@ -41,8 +41,8 @@ export default function data({ query }) {
   const [pageSize, setPageSize] = useState(10);
   const { authToken } = useAuth();
 
-  const [controller] = useMaterialUIController();
-  const { darkMode } = controller;
+  // const [controller] = useMaterialUIController();
+  // const { darkMode } = controller;
 
   const fetchData = async () => {
     let link = `/payments?payment_type=customer`;
@@ -138,7 +138,7 @@ export default function data({ query }) {
           to={`/customer-payment/${paymentCustomer.id}/edit`}
           style={{ textDecoration: "none" }}
         >
-          <MDButton variant="text" color={darkMode ? "white" : "dark"} iconOnly>
+          <MDButton variant="text" color="dark" iconOnly>
             <Icon>edit</Icon>
           </MDButton>
         </NavLink>
@@ -163,7 +163,7 @@ export default function data({ query }) {
       canSearch={true}
       noEndBorder
       currentPage={currentPage}
-      onPageChange={handlePageChange}
+      // onPageChange={handlePageChange}
       onPageSizeChange={handlePageSizeChange}
     />
   );

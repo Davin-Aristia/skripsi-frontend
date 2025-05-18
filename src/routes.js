@@ -276,7 +276,7 @@ const routes = [
         key: "sales-report",
         icon: (
           <Icon fontSize="small" style={{ marginLeft: "30px" }}>
-            auto_stories
+            unarchive
           </Icon>
         ),
         route: "/sales-report",
@@ -289,7 +289,7 @@ const routes = [
         key: "inventory-in-report",
         icon: (
           <Icon fontSize="small" style={{ marginLeft: "30px" }}>
-            auto_stories
+            archive
           </Icon>
         ),
         route: "/inventory-in-report",
@@ -302,7 +302,7 @@ const routes = [
         key: "payment-customer-report",
         icon: (
           <Icon fontSize="small" style={{ marginLeft: "30px" }}>
-            auto_stories
+            move_to_inbox_outlined
           </Icon>
         ),
         route: "/payment-customer-report",
@@ -315,7 +315,7 @@ const routes = [
         key: "payment-vendor-report",
         icon: (
           <Icon fontSize="small" style={{ marginLeft: "30px" }}>
-            auto_stories
+            outbox_outlined
           </Icon>
         ),
         route: "/payment-vendor-report",

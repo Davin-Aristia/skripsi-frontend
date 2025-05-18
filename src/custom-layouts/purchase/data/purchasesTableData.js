@@ -28,7 +28,7 @@ import { useAuth } from "custom-layouts/authentication";
 import API from "custom-layouts/authentication/axiosConfig";
 
 // Material Dashboard 2 React context
-import { useMaterialUIController } from "context";
+// import { useMaterialUIController } from "context";
 import { NavLink } from "react-router-dom";
 import {
   Dialog,
@@ -57,8 +57,8 @@ export default function data({ query }) {
   const [openDialog, setOpenDialog] = useState(false);
   const printRef = useRef(null);
 
-  const [controller] = useMaterialUIController();
-  const { darkMode } = controller;
+  // const [controller] = useMaterialUIController();
+  // const { darkMode } = controller;
 
   const fetchData = async () => {
     let link = `/purchases`;
@@ -227,7 +227,7 @@ export default function data({ query }) {
     action: (
       <MDBox display="flex" alignItems="center" mt={{ xs: 2, sm: 0 }} ml={{ xs: -1.5, sm: 0 }}>
         <NavLink to={`/purchase/${purchase.id}/edit`} style={{ textDecoration: "none" }}>
-          <MDButton variant="text" color={darkMode ? "white" : "dark"} iconOnly>
+          <MDButton variant="text" color="dark" iconOnly>
             <Icon>edit</Icon>
           </MDButton>
         </NavLink>
@@ -289,7 +289,7 @@ export default function data({ query }) {
         canSearch={true}
         noEndBorder
         currentPage={currentPage}
-        onPageChange={handlePageChange}
+        // onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
       />
     </>

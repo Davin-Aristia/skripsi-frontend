@@ -28,7 +28,7 @@ import MDButton from "components/MDButton";
 import { useAuth } from "custom-layouts/authentication";
 
 // Material Dashboard 2 React context
-import { useMaterialUIController } from "context";
+// import { useMaterialUIController } from "context";
 import { NavLink } from "react-router-dom";
 
 // Images
@@ -48,8 +48,8 @@ export default function data({ setAlert, query }) {
   const [loading, setLoading] = useState(true);
   const { authToken } = useAuth();
 
-  const [controller] = useMaterialUIController();
-  const { darkMode } = controller;
+  // const [controller] = useMaterialUIController();
+  // const { darkMode } = controller;
 
   const fetchData = async () => {
     console.log("query", query);
@@ -159,7 +159,7 @@ export default function data({ setAlert, query }) {
   //       }).format(book.price)}`,
   //       action: (
   //         <MDBox display="flex" alignItems="center" mt={{ xs: 2, sm: 0 }} ml={{ xs: -1.5, sm: 0 }}>
-  //           <MDButton variant="text" color={darkMode ? "white" : "dark"} iconOnly="true">
+  //           <MDButton variant="text" color="dark" iconOnly="true">
   //             <Icon>edit</Icon>
   //           </MDButton>
   //           <MDButton variant="text" color="error" iconOnly="true">
@@ -188,7 +188,7 @@ export default function data({ setAlert, query }) {
   //     //       //   Edit
   //     //       // </MDTypography>
   //     //       <MDBox display="flex" alignItems="center" mt={{ xs: 2, sm: 0 }} ml={{ xs: -1.5, sm: 0 }}>
-  //     //         <MDButton variant="text" color={darkMode ? "white" : "dark"} iconOnly="true">
+  //     //         <MDButton variant="text" color="dark" iconOnly="true">
   //     //           <Icon>edit</Icon>
   //     //         </MDButton>
   //     //         <MDButton variant="text" color="error" iconOnly="true">
@@ -316,7 +316,7 @@ export default function data({ setAlert, query }) {
     action: (
       <MDBox display="flex" alignItems="center" mt={{ xs: 2, sm: 0 }} ml={{ xs: -1.5, sm: 0 }}>
         <NavLink to={`/product/${book.id}/edit`} style={{ textDecoration: "none" }}>
-          <MDButton variant="text" color={darkMode ? "white" : "dark"} iconOnly>
+          <MDButton variant="text" color="dark" iconOnly>
             <Icon>edit</Icon>
           </MDButton>
         </NavLink>
@@ -337,7 +337,7 @@ export default function data({ setAlert, query }) {
       canSearch={true}
       noEndBorder
       currentPage={currentPage}
-      onPageChange={handlePageChange}
+      // onPageChange={handlePageChange}
       onPageSizeChange={handlePageSizeChange}
     />
   );
