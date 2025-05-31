@@ -17,6 +17,7 @@ Coded by www.creative-tim.com
 
 // @mui material components
 import Icon from "@mui/material/Icon";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -40,6 +41,8 @@ export default function data({ query }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const { authToken } = useAuth();
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [customerToDelete, setCustomerToDelete] = useState(null);
 
   // const [controller] = useMaterialUIController();
   // const { darkMode } = controller;
@@ -73,19 +76,29 @@ export default function data({ query }) {
     setCurrentPage(1);
   };
 
-  const deleteCustomer = async (customerId) => {
+  const handleDeleteClick = (customerId) => {
+    setCustomerToDelete(customerId);
+    setOpenConfirm(true);
+  };
+
+  const handleCancelDelete = () => {
+    setOpenConfirm(false);
+    setCustomerToDelete(null);
+  };
+
+  const handleConfirmDelete = async () => {
     try {
-      await API.delete(`/customers/${customerId}`, {
+      await API.delete(`/customers/${customerToDelete}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
       });
       // Refresh the customer list after deletion
-      // setCustomers((prevCustomers) => prevCustomers.filter((customer) => customer.id !== customerId));
+      // setCustomers((prevCustomers) => prevCustomers.filter((customer) => customer.id !== customerToDelete));
       fetchData();
 
       // Check if the current page is empty after deletion
-      const updatedCustomers = customers.filter((customer) => customer.id !== customerId);
+      const updatedCustomers = customers.filter((customer) => customer.id !== customerToDelete);
       const startIndex = (currentPage - 1) * pageSize;
       const currentPageCustomers = updatedCustomers.slice(startIndex, startIndex + pageSize);
       if (currentPageCustomers.length === 0 && currentPage > 1) {
@@ -100,6 +113,9 @@ export default function data({ query }) {
         toast.error("Something went wrong with the server");
       }
       console.log("error:", error);
+    } finally {
+      setOpenConfirm(false);
+      setCustomerToDelete(null);
     }
   };
 
@@ -121,7 +137,12 @@ export default function data({ query }) {
             <Icon>edit</Icon>
           </MDButton>
         </NavLink>
-        <MDButton variant="text" color="error" iconOnly onClick={() => deleteCustomer(customer.id)}>
+        <MDButton
+          variant="text"
+          color="error"
+          iconOnly
+          onClick={() => handleDeleteClick(customer.id)}
+        >
           <Icon>delete</Icon>
         </MDButton>
       </MDBox>
@@ -129,16 +150,30 @@ export default function data({ query }) {
   }));
 
   return (
-    <DataTable
-      table={{ columns, rows }}
-      isSorted={true}
-      entriesPerPage={false}
-      showTotalEntries={true}
-      canSearch={true}
-      noEndBorder
-      currentPage={currentPage}
-      // onPageChange={handlePageChange}
-      onPageSizeChange={handlePageSizeChange}
-    />
+    <>
+      <Dialog open={openConfirm} onClose={handleCancelDelete}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent dividers>Are you sure you want to delete this customer?</DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete} color="primary">
+            Cancel
+          </Button>
+          <MDButton onClick={handleConfirmDelete} color="error">
+            Delete
+          </MDButton>
+        </DialogActions>
+      </Dialog>
+      <DataTable
+        table={{ columns, rows }}
+        isSorted={true}
+        entriesPerPage={false}
+        showTotalEntries={true}
+        canSearch={true}
+        noEndBorder
+        currentPage={currentPage}
+        // onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
+      />
+    </>
   );
 }

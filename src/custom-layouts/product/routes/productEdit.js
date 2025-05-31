@@ -29,6 +29,8 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
 
 import { IconButton } from "@mui/material";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
@@ -56,6 +58,24 @@ export default function CreateBookForm() {
   const [imagePreview, setImagePreview] = useState(null);
 
   const [loading, setLoading] = useState(null);
+
+  const [openPreview, setOpenPreview] = useState(false);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setSelectedFile(file);
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleOpenPreview = () => setOpenPreview(true);
+  const handleClosePreview = () => setOpenPreview(false);
 
   // Fetch data when the component mounts
   useEffect(() => {
@@ -250,10 +270,21 @@ export default function CreateBookForm() {
                           height: "100px",
                           objectFit: "cover",
                           borderRadius: "8px",
+                          cursor: "pointer",
                         }}
+                        onClick={handleOpenPreview}
                       />
                     </MDBox>
                   )}
+                  <Dialog open={openPreview} onClose={handleClosePreview} maxWidth="md" fullWidth>
+                    <DialogContent>
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        style={{ width: "100%", maxHeight: "80vh", objectFit: "contain" }}
+                      />
+                    </DialogContent>
+                  </Dialog>
                   <MDInput type="file" onChange={(e) => setSelectedFile(e.target.files[0])} />
                 </MDBox>
                 <MDBox mb={2}>

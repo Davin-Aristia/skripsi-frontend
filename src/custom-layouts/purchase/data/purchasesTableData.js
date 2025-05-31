@@ -56,6 +56,8 @@ export default function data({ query }) {
   const [selectedData, setSelectedData] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const printRef = useRef(null);
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [purchaseToDelete, setPurchaseToDelete] = useState(null);
 
   // const [controller] = useMaterialUIController();
   // const { darkMode } = controller;
@@ -153,19 +155,29 @@ export default function data({ query }) {
     setCurrentPage(1);
   };
 
-  const deletePurchase = async (purchaseId) => {
+  const handleDeleteClick = (purchaseId) => {
+    setPurchaseToDelete(purchaseId);
+    setOpenConfirm(true);
+  };
+
+  const handleCancelDelete = () => {
+    setOpenConfirm(false);
+    setPurchaseToDelete(null);
+  };
+
+  const handleConfirmDelete = async () => {
     try {
-      await API.delete(`/purchases/${purchaseId}`, {
+      await API.delete(`/purchases/${purchaseToDelete}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
       });
       // Refresh the purchase list after deletion
-      // setPurchases((prevPurchases) => prevPurchases.filter((purchase) => purchase.id !== purchaseId));
+      // setPurchases((prevPurchases) => prevPurchases.filter((purchase) => purchase.id !== purchaseToDelete));
       fetchData();
 
       // Check if the current page is empty after deletion
-      const updatedPurchases = purchases.filter((purchase) => purchase.id !== purchaseId);
+      const updatedPurchases = purchases.filter((purchase) => purchase.id !== purchaseToDelete);
       const startIndex = (currentPage - 1) * pageSize;
       const currentPagePurchases = updatedPurchases.slice(startIndex, startIndex + pageSize);
       if (currentPagePurchases.length === 0 && currentPage > 1) {
@@ -180,6 +192,9 @@ export default function data({ query }) {
         toast.error("Something went wrong with the server");
       }
       console.log("error:", error);
+    } finally {
+      setOpenConfirm(false);
+      setPurchaseToDelete(null);
     }
   };
 
@@ -212,6 +227,7 @@ export default function data({ query }) {
       <MDBox ml={-1}>
         <MDBadge
           badgeContent={purchase.status}
+          circular={true}
           color={
             purchase.status === "open"
               ? "light" // greyish-white
@@ -231,7 +247,12 @@ export default function data({ query }) {
             <Icon>edit</Icon>
           </MDButton>
         </NavLink>
-        <MDButton variant="text" color="error" iconOnly onClick={() => deletePurchase(purchase.id)}>
+        <MDButton
+          variant="text"
+          color="error"
+          iconOnly
+          onClick={() => handleDeleteClick(purchase.id)}
+        >
           <Icon>delete</Icon>
         </MDButton>
         <MDButton
@@ -257,6 +278,18 @@ export default function data({ query }) {
           <p>Loading purchase data...</p>
         )}
       </div>
+      <Dialog open={openConfirm} onClose={handleCancelDelete}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent dividers>Are you sure you want to delete this purchase?</DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete} color="primary">
+            Cancel
+          </Button>
+          <MDButton onClick={handleConfirmDelete} color="error">
+            Delete
+          </MDButton>
+        </DialogActions>
+      </Dialog>
       <Dialog open={openDialog} onClose={handleClose}>
         <DialogTitle>
           <Box display="flex" justifyContent="space-between" alignItems="center">

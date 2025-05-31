@@ -900,7 +900,7 @@ export default function CreateInventoryInForm() {
                     </MDBox>
                     <MDBox
                       component="th"
-                      width="auto"
+                      width="13%"
                       py={1.5}
                       px={3}
                       sx={({ palette: { light }, borders: { borderWidth } }) => ({

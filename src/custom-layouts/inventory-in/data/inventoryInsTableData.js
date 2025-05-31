@@ -17,6 +17,7 @@ Coded by www.creative-tim.com
 
 // @mui material components
 import Icon from "@mui/material/Icon";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -40,6 +41,8 @@ export default function data({ query }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const { authToken } = useAuth();
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [inventoryInToDelete, setInventoryInToDelete] = useState(null);
 
   // const [controller] = useMaterialUIController();
   // const { darkMode } = controller;
@@ -73,20 +76,30 @@ export default function data({ query }) {
     setCurrentPage(1);
   };
 
-  const deleteInventoryIn = async (inventoryInId) => {
+  const handleDeleteClick = (inventoryInId) => {
+    setInventoryInToDelete(inventoryInId);
+    setOpenConfirm(true);
+  };
+
+  const handleCancelDelete = () => {
+    setOpenConfirm(false);
+    setInventoryInToDelete(null);
+  };
+
+  const handleConfirmDelete = async () => {
     try {
-      await API.delete(`/inventory-ins/${inventoryInId}`, {
+      await API.delete(`/inventory-ins/${inventoryInToDelete}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
       });
       // Refresh the inventoryIn list after deletion
-      // setInventoryIns((prevInventoryIns) => prevInventoryIns.filter((inventoryIn) => inventoryIn.id !== inventoryInId));
+      // setInventoryIns((prevInventoryIns) => prevInventoryIns.filter((inventoryIn) => inventoryIn.id !== inventoryInToDelete));
       fetchData();
 
       // Check if the current page is empty after deletion
       const updatedInventoryIns = inventoryIns.filter(
-        (inventoryIn) => inventoryIn.id !== inventoryInId
+        (inventoryIn) => inventoryIn.id !== inventoryInToDelete
       );
       const startIndex = (currentPage - 1) * pageSize;
       const currentPageInventoryIns = updatedInventoryIns.slice(startIndex, startIndex + pageSize);
@@ -102,6 +115,9 @@ export default function data({ query }) {
         toast.error("Something went wrong with the server");
       }
       console.log("error:", error);
+    } finally {
+      setOpenConfirm(false);
+      setInventoryInToDelete(null);
     }
   };
 
@@ -140,7 +156,7 @@ export default function data({ query }) {
           variant="text"
           color="error"
           iconOnly
-          onClick={() => deleteInventoryIn(inventoryIn.id)}
+          onClick={() => handleDeleteClick(inventoryIn.id)}
         >
           <Icon>delete</Icon>
         </MDButton>
@@ -149,16 +165,30 @@ export default function data({ query }) {
   }));
 
   return (
-    <DataTable
-      table={{ columns, rows }}
-      isSorted={true}
-      entriesPerPage={false}
-      showTotalEntries={true}
-      canSearch={true}
-      noEndBorder
-      currentPage={currentPage}
-      // onPageChange={handlePageChange}
-      onPageSizeChange={handlePageSizeChange}
-    />
+    <>
+      <Dialog open={openConfirm} onClose={handleCancelDelete}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent dividers>Are you sure you want to delete this inventory in?</DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete} color="primary">
+            Cancel
+          </Button>
+          <MDButton onClick={handleConfirmDelete} color="error">
+            Delete
+          </MDButton>
+        </DialogActions>
+      </Dialog>
+      <DataTable
+        table={{ columns, rows }}
+        isSorted={true}
+        entriesPerPage={false}
+        showTotalEntries={true}
+        canSearch={true}
+        noEndBorder
+        currentPage={currentPage}
+        // onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
+      />
+    </>
   );
 }

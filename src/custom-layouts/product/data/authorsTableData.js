@@ -17,6 +17,7 @@ Coded by www.creative-tim.com
 
 // @mui material components
 import Icon from "@mui/material/Icon";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -46,6 +47,8 @@ export default function data({ query }) {
   const [pageSize, setPageSize] = useState(10);
   const [loading, setLoading] = useState(true);
   const { authToken } = useAuth();
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
 
   // // const [controller] = useMaterialUIController();
   // // const { darkMode } = controller;
@@ -80,19 +83,29 @@ export default function data({ query }) {
     setCurrentPage(1);
   };
 
-  const deleteProduct = async (productId) => {
+  const handleDeleteClick = (productId) => {
+    setProductToDelete(productId);
+    setOpenConfirm(true);
+  };
+
+  const handleCancelDelete = () => {
+    setOpenConfirm(false);
+    setProductToDelete(null);
+  };
+
+  const handleConfirmDelete = async () => {
     try {
-      await API.delete(`/products/${productId}`, {
+      await API.delete(`/products/${productToDelete}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
       });
       // Refresh the product list after deletion
-      // setProducts((prevProducts) => prevProducts.filter((product) => product.id !== productId));
+      // setProducts((prevProducts) => prevProducts.filter((product) => product.id !== productToDelete));
       fetchData();
 
       // Check if the current page is empty after deletion
-      const updatedProducts = products.filter((product) => product.id !== productId);
+      const updatedProducts = products.filter((product) => product.id !== productToDelete);
       const startIndex = (currentPage - 1) * pageSize;
       const currentPageProducts = updatedProducts.slice(startIndex, startIndex + pageSize);
       if (currentPageProducts.length === 0 && currentPage > 1) {
@@ -107,6 +120,9 @@ export default function data({ query }) {
         toast.error("Something went wrong with the server");
       }
       console.log("error:", error);
+    } finally {
+      setOpenConfirm(false);
+      setProductToDelete(null);
     }
   };
 
@@ -143,7 +159,12 @@ export default function data({ query }) {
             <Icon>edit</Icon>
           </MDButton>
         </NavLink>
-        <MDButton variant="text" color="error" iconOnly onClick={() => deleteProduct(product.id)}>
+        <MDButton
+          variant="text"
+          color="error"
+          iconOnly
+          onClick={() => handleDeleteClick(product.id)}
+        >
           <Icon>delete</Icon>
         </MDButton>
       </MDBox>
@@ -151,17 +172,31 @@ export default function data({ query }) {
   }));
 
   return (
-    <DataTable
-      table={{ columns, rows }}
-      isSorted={true}
-      // entriesPerPage={{ defaultValue: pageSize }}
-      entriesPerPage={false}
-      showTotalEntries={true}
-      canSearch={true}
-      noEndBorder
-      currentPage={currentPage}
-      // // onPageChange={handlePageChange}
-      onPageSizeChange={handlePageSizeChange}
-    />
+    <>
+      <Dialog open={openConfirm} onClose={handleCancelDelete}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent dividers>Are you sure you want to delete this product?</DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete} color="primary">
+            Cancel
+          </Button>
+          <MDButton onClick={handleConfirmDelete} color="error">
+            Delete
+          </MDButton>
+        </DialogActions>
+      </Dialog>
+      <DataTable
+        table={{ columns, rows }}
+        isSorted={true}
+        // entriesPerPage={{ defaultValue: pageSize }}
+        entriesPerPage={false}
+        showTotalEntries={true}
+        canSearch={true}
+        noEndBorder
+        currentPage={currentPage}
+        // // onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
+      />
+    </>
   );
 }

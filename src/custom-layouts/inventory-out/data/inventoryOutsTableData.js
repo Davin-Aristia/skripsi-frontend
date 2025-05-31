@@ -55,6 +55,8 @@ export default function data({ query }) {
   const [selectedData, setSelectedData] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const printRef = useRef(null);
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [inventoryOutToDelete, setInventoryOutToDelete] = useState(null);
 
   const handlePrintClick = async (id) => {
     try {
@@ -151,20 +153,30 @@ export default function data({ query }) {
     setCurrentPage(1);
   };
 
-  const deleteInventoryOut = async (inventoryOutId) => {
+  const handleDeleteClick = (inventoryOutId) => {
+    setInventoryOutToDelete(inventoryOutId);
+    setOpenConfirm(true);
+  };
+
+  const handleCancelDelete = () => {
+    setOpenConfirm(false);
+    setInventoryOutToDelete(null);
+  };
+
+  const handleConfirmDelete = async () => {
     try {
-      await API.delete(`/inventory-outs/${inventoryOutId}`, {
+      await API.delete(`/inventory-outs/${inventoryOutToDelete}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
       });
       // Refresh the inventoryOut list after deletion
-      // setInventoryOuts((prevInventoryOuts) => prevInventoryOuts.filter((inventoryOut) => inventoryOut.id !== inventoryOutId));
+      // setInventoryOuts((prevInventoryOuts) => prevInventoryOuts.filter((inventoryOut) => inventoryOut.id !== inventoryOutToDelete));
       fetchData();
 
       // Check if the current page is empty after deletion
       const updatedInventoryOuts = inventoryOuts.filter(
-        (inventoryOut) => inventoryOut.id !== inventoryOutId
+        (inventoryOut) => inventoryOut.id !== inventoryOutToDelete
       );
       const startIndex = (currentPage - 1) * pageSize;
       const currentPageInventoryOuts = updatedInventoryOuts.slice(
@@ -183,6 +195,9 @@ export default function data({ query }) {
         toast.error("Something went wrong with the server");
       }
       console.log("error:", error);
+    } finally {
+      setOpenConfirm(false);
+      setInventoryOutToDelete(null);
     }
   };
 
@@ -221,7 +236,7 @@ export default function data({ query }) {
           variant="text"
           color="error"
           iconOnly
-          onClick={() => deleteInventoryOut(inventoryOut.id)}
+          onClick={() => handleDeleteClick(inventoryOut.id)}
         >
           <Icon>delete</Icon>
         </MDButton>
@@ -248,6 +263,18 @@ export default function data({ query }) {
           <p>Loading invoice data...</p>
         )}
       </div>
+      <Dialog open={openConfirm} onClose={handleCancelDelete}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent dividers>Are you sure you want to delete this inventory out</DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete} color="primary">
+            Cancel
+          </Button>
+          <MDButton onClick={handleConfirmDelete} color="error">
+            Delete
+          </MDButton>
+        </DialogActions>
+      </Dialog>
       <Dialog open={openDialog} onClose={handleClose}>
         <DialogTitle>
           <Box display="flex" justifyContent="space-between" alignItems="center">

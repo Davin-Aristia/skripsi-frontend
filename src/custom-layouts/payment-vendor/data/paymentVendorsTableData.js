@@ -17,6 +17,7 @@ Coded by www.creative-tim.com
 
 // @mui material components
 import Icon from "@mui/material/Icon";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -40,6 +41,8 @@ export default function data({ query }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const { authToken } = useAuth();
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [paymentVendorToDelete, setPaymentVendorToDelete] = useState(null);
 
   // const [controller] = useMaterialUIController();
   // const { darkMode } = controller;
@@ -73,20 +76,30 @@ export default function data({ query }) {
     setCurrentPage(1);
   };
 
-  const deletePaymentVendor = async (paymentVendorId) => {
+  const handleDeleteClick = (paymentVendorId) => {
+    setPaymentVendorToDelete(paymentVendorId);
+    setOpenConfirm(true);
+  };
+
+  const handleCancelDelete = () => {
+    setOpenConfirm(false);
+    setPaymentVendorToDelete(null);
+  };
+
+  const handleConfirmDelete = async () => {
     try {
-      await API.delete(`/payments/${paymentVendorId}`, {
+      await API.delete(`/payments/${paymentVendorToDelete}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
       });
       // Refresh the paymentVendor list after deletion
-      // setPaymentVendors((prevPaymentVendors) => prevPaymentVendors.filter((paymentVendor) => paymentVendor.id !== paymentVendorId));
+      // setPaymentVendors((prevPaymentVendors) => prevPaymentVendors.filter((paymentVendor) => paymentVendor.id !== paymentVendorToDelete));
       fetchData();
 
       // Check if the current page is empty after deletion
       const updatedPaymentVendors = paymentVendors.filter(
-        (paymentVendor) => paymentVendor.id !== paymentVendorId
+        (paymentVendor) => paymentVendor.id !== paymentVendorToDelete
       );
       const startIndex = (currentPage - 1) * pageSize;
       const currentPagePaymentVendors = updatedPaymentVendors.slice(
@@ -105,6 +118,9 @@ export default function data({ query }) {
         toast.error("Something went wrong with the server");
       }
       console.log("error:", error);
+    } finally {
+      setOpenConfirm(false);
+      setPaymentVendorToDelete(null);
     }
   };
 
@@ -143,7 +159,7 @@ export default function data({ query }) {
           variant="text"
           color="error"
           iconOnly
-          onClick={() => deletePaymentVendor(paymentVendor.id)}
+          onClick={() => handleDeleteClick(paymentVendor.id)}
         >
           <Icon>delete</Icon>
         </MDButton>
@@ -152,16 +168,30 @@ export default function data({ query }) {
   }));
 
   return (
-    <DataTable
-      table={{ columns, rows }}
-      isSorted={true}
-      entriesPerPage={false}
-      showTotalEntries={true}
-      canSearch={true}
-      noEndBorder
-      currentPage={currentPage}
-      // onPageChange={handlePageChange}
-      onPageSizeChange={handlePageSizeChange}
-    />
+    <>
+      <Dialog open={openConfirm} onClose={handleCancelDelete}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent dividers>Are you sure you want to delete this payment vendor?</DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete} color="primary">
+            Cancel
+          </Button>
+          <MDButton onClick={handleConfirmDelete} color="error">
+            Delete
+          </MDButton>
+        </DialogActions>
+      </Dialog>
+      <DataTable
+        table={{ columns, rows }}
+        isSorted={true}
+        entriesPerPage={false}
+        showTotalEntries={true}
+        canSearch={true}
+        noEndBorder
+        currentPage={currentPage}
+        // onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
+      />
+    </>
   );
 }

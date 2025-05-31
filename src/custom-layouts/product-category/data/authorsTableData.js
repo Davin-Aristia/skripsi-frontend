@@ -17,6 +17,7 @@ Coded by www.creative-tim.com
 
 // @mui material components
 import Icon from "@mui/material/Icon";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -46,6 +47,8 @@ export default function data({ query }) {
   const [pageSize, setPageSize] = useState(10);
   const [loading, setLoading] = useState(true);
   const { authToken } = useAuth();
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState(null);
 
   // const [controller] = useMaterialUIController();
   // const { darkMode } = controller;
@@ -81,9 +84,19 @@ export default function data({ query }) {
     setCurrentPage(1);
   };
 
-  const deleteProductCategory = async (productCategoryId) => {
+  const handleDeleteClick = (categoryId) => {
+    setCategoryToDelete(categoryId);
+    setOpenConfirm(true);
+  };
+
+  const handleCancelDelete = () => {
+    setOpenConfirm(false);
+    setCategoryToDelete(null);
+  };
+
+  const handleConfirmDelete = async () => {
     try {
-      await API.delete(`/product-categories/${productCategoryId}`, {
+      await API.delete(`/product-categories/${categoryToDelete}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -94,7 +107,7 @@ export default function data({ query }) {
 
       // Check if the current page is empty after deletion
       const updatedProductCategories = productCategories.filter(
-        (productCategory) => productCategory.id !== productCategoryId
+        (productCategory) => productCategory.id !== categoryToDelete
       );
       const startIndex = (currentPage - 1) * pageSize;
       const currentPageProductCategories = updatedProductCategories.slice(
@@ -113,6 +126,9 @@ export default function data({ query }) {
         toast.error("Something went wrong with the server");
       }
       console.log("error:", error);
+    } finally {
+      setOpenConfirm(false);
+      setCategoryToDelete(null);
     }
   };
 
@@ -139,7 +155,7 @@ export default function data({ query }) {
           variant="text"
           color="error"
           iconOnly
-          onClick={() => deleteProductCategory(productCategory.id)}
+          onClick={() => handleDeleteClick(productCategory.id)}
         >
           <Icon>delete</Icon>
         </MDButton>
@@ -148,16 +164,30 @@ export default function data({ query }) {
   }));
 
   return (
-    <DataTable
-      table={{ columns, rows }}
-      isSorted={true}
-      entriesPerPage={false}
-      showTotalEntries={true}
-      canSearch={true}
-      noEndBorder
-      currentPage={currentPage}
-      // onPageChange={handlePageChange}
-      onPageSizeChange={handlePageSizeChange}
-    />
+    <>
+      <Dialog open={openConfirm} onClose={handleCancelDelete}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent dividers>Are you sure you want to delete this category?</DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete} color="primary">
+            Cancel
+          </Button>
+          <MDButton onClick={handleConfirmDelete} color="error">
+            Delete
+          </MDButton>
+        </DialogActions>
+      </Dialog>
+      <DataTable
+        table={{ columns, rows }}
+        isSorted={true}
+        entriesPerPage={false}
+        showTotalEntries={true}
+        canSearch={true}
+        noEndBorder
+        currentPage={currentPage}
+        // onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
+      />
+    </>
   );
 }

@@ -67,6 +67,7 @@ export default function CreatePurchaseForm() {
   const [products, setProducts] = useState([]);
 
   const [open, setOpen] = useState(false);
+  const [openConfirm, setOpenConfirm] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -312,7 +313,17 @@ export default function CreatePurchaseForm() {
     }
   };
 
-  const handleMarkAsDone = () => handleUpdateStatus("done");
+  // const handleMarkAsDone = () => handleUpdateStatus("done");
+  const handleMarkAsDone = () => setOpenConfirm(true);
+
+  const handleConfirm = () => {
+    handleUpdateStatus("done");
+    setOpenConfirm(false);
+  };
+
+  const handleCancel = () => {
+    setOpenConfirm(false);
+  };
 
   const handleMarkAsPartial = () => handleUpdateStatus("partial");
 
@@ -422,6 +433,19 @@ export default function CreatePurchaseForm() {
         </DialogActions>
       </Dialog>
 
+      <Dialog open={openConfirm} onClose={handleCancel}>
+        <DialogTitle>Confirm Action</DialogTitle>
+        <DialogContent dividers>Are you sure you want to mark this as done?</DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancel} color="primary">
+            Cancel
+          </Button>
+          <MDButton onClick={handleConfirm} color="info" variant="gradient">
+            Confirm
+          </MDButton>
+        </DialogActions>
+      </Dialog>
+
       <Card sx={{ mt: 4 }}>
         <MDBox
           variant="gradient"
@@ -469,6 +493,7 @@ export default function CreatePurchaseForm() {
           </MDTypography>
           <MDBadge
             badgeContent={purchase.status}
+            circular={true}
             color={
               purchase.status === "open"
                 ? "light"
