@@ -143,7 +143,8 @@ function POSPage() {
           ? {
               ...item,
               quantity: item.quantity + 1,
-              totalAmount: item.price * (item.quantity + 1),
+              totalAmount:
+                (item.price - item.discount) * (item.quantity + 1) * (1 + item.tax / 100),
             }
           : item
       );
@@ -154,7 +155,8 @@ function POSPage() {
       let newItem = {
         ...product,
         quantity: 1,
-        totalAmount: product.price,
+        tax: 11,
+        totalAmount: product.price * (1 + 11 / 100),
       };
       setList([...list, newItem]);
       toast.success(`Added ${product.name} to ${type}`, toastOptions);
@@ -274,15 +276,17 @@ function POSPage() {
     // Allow empty string temporarily to prevent "032" issue
     // let newValue = value === "" ? "" : parseFloat(value) || 0;
 
-    let newValue = parseFloat(value) || 1;
-    if (newValue < 1) newValue = 1;
+    let newValue = parseFloat(value) || 0;
+    if (newValue < 0) newValue = 0;
 
     updatedList[index] = {
       ...updatedList[index],
       [field]: newValue,
       totalAmount:
-        (field === "price" ? newValue : updatedList[index].price || 0) *
-        (field === "quantity" ? newValue : updatedList[index].quantity || 0),
+        ((field === "price" ? newValue : updatedList[index].price || 0) -
+          (field === "discount" ? newValue : updatedList[index].discount || 0)) *
+        (field === "quantity" ? newValue : updatedList[index].quantity || 0) *
+        (1 + (field === "tax" ? newValue : updatedList[index].tax || 0) / 100),
     };
 
     setList(updatedList);
@@ -303,6 +307,7 @@ function POSPage() {
         product_id: item.id,
         quantity: parseInt(item.quantity, 10),
         price: parseFloat(item.price),
+        tax: parseFloat(item.tax),
         subtotal: parseFloat(item.totalAmount),
       }));
     }
@@ -323,6 +328,8 @@ function POSPage() {
         product_id: item.id,
         quantity: parseInt(item.quantity, 10),
         price: parseFloat(item.price),
+        discount: parseFloat(item.discount),
+        tax: parseFloat(item.tax),
         subtotal: parseFloat(item.totalAmount),
       }));
     }
@@ -619,8 +626,10 @@ function POSPage() {
                       <tr>
                         <td>Name</td>
                         <td>Price</td>
+                        <td>Discount</td>
                         <td>Qty</td>
-                        <td>Total</td>
+                        <td>Tax (%)</td>
+                        <td>Total (Rp)</td>
                         <td style={{ textAlign: "center", verticalAlign: "middle" }}>Action</td>
                       </tr>
                     </thead>
@@ -644,6 +653,24 @@ function POSPage() {
                                     )
                                   }
                                   className="form-control"
+                                  style={{ width: "120px" }}
+                                />
+                              </td>
+                              <td>
+                                <input
+                                  type="number"
+                                  value={consignmentProduct.discount}
+                                  required
+                                  onChange={(e) =>
+                                    updateProduct(
+                                      consignment,
+                                      setConsignment,
+                                      key,
+                                      "discount",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="form-control"
                                   style={{ width: "100px" }}
                                 />
                               </td>
@@ -662,11 +689,28 @@ function POSPage() {
                                     )
                                   }
                                   className="form-control"
-                                  style={{ width: "100px" }}
+                                  style={{ width: "70px" }}
                                 />
                               </td>
                               <td>
-                                Rp{" "}
+                                <input
+                                  type="number"
+                                  value={consignmentProduct.tax}
+                                  required
+                                  onChange={(e) =>
+                                    updateProduct(
+                                      consignment,
+                                      setConsignment,
+                                      key,
+                                      "tax",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="form-control"
+                                  style={{ width: "70px" }}
+                                />
+                              </td>
+                              <td style={{ textAlign: "right" }}>
                                 {new Intl.NumberFormat("id-ID", {
                                   style: "decimal",
                                   minimumFractionDigits: 2,
@@ -688,7 +732,7 @@ function POSPage() {
                         : "No Item in Consignment"}
                     </tbody>
                   </table>
-                  <h2 className="px-2 text-white">
+                  <h2 className="px-2 text-white" style={{ textAlign: "right" }}>
                     Total: Rp{" "}
                     {new Intl.NumberFormat("id-ID", {
                       style: "decimal",
@@ -723,7 +767,8 @@ function POSPage() {
                     <td>Name</td>
                     <td>Price</td>
                     <td>Qty</td>
-                    <td>Total</td>
+                    <td>Tax (%)</td>
+                    <td>Total (Rp)</td>
                     <td style={{ textAlign: "center", verticalAlign: "middle" }}>Action</td>
                   </tr>
                 </thead>
@@ -741,7 +786,7 @@ function POSPage() {
                                 updateProduct(cart, setCart, key, "price", e.target.value)
                               }
                               className="form-control"
-                              style={{ width: "100px" }}
+                              style={{ width: "120px" }}
                             />
                           </td>
                           <td>
@@ -753,11 +798,22 @@ function POSPage() {
                                 updateProduct(cart, setCart, key, "quantity", e.target.value)
                               }
                               className="form-control"
-                              style={{ width: "100px" }}
+                              style={{ width: "70px" }}
                             />
                           </td>
                           <td>
-                            Rp{" "}
+                            <input
+                              type="number"
+                              value={cartProduct.tax}
+                              required
+                              onChange={(e) =>
+                                updateProduct(cart, setCart, key, "tax", e.target.value)
+                              }
+                              className="form-control"
+                              style={{ width: "70px" }}
+                            />
+                          </td>
+                          <td style={{ textAlign: "right" }}>
                             {new Intl.NumberFormat("id-ID", {
                               style: "decimal",
                               minimumFractionDigits: 2,
@@ -787,7 +843,7 @@ function POSPage() {
                     : "No Item in Cart"}
                 </tbody>
               </table>
-              <h2 className="px-2 text-white">
+              <h2 className="px-2 text-white" style={{ textAlign: "right" }}>
                 Total: Rp{" "}
                 {new Intl.NumberFormat("id-ID", {
                   style: "decimal",
