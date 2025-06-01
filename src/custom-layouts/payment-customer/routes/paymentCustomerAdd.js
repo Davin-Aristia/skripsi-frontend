@@ -480,6 +480,8 @@ export default function CreatePaymentCustomerForm() {
                 Total: Rp{" "}
                 {new Intl.NumberFormat("id-ID", {
                   style: "decimal",
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
                 }).format(paymentCustomer.total)}
               </MDBox>
             </MDBox>

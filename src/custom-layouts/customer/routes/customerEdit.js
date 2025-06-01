@@ -113,10 +113,24 @@ export default function CreateCustomerForm() {
           }}
         >
           <MDTypography variant="body2" fontWeight="medium" sx={{ color: "grey.600" }}>
-            Create Date: {customer.createdAt || "-"}
+            Create Date:{" "}
+            {customer.createdAt
+              ? new Date(customer.createdAt).toLocaleDateString("id-ID", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })
+              : "-"}
           </MDTypography>
           <MDTypography variant="body2" fontWeight="medium" sx={{ color: "grey.600" }}>
-            Last Edit: {customer.updatedAt || "-"}
+            Last Edit:{" "}
+            {customer.updatedAt
+              ? new Date(customer.updatedAt).toLocaleDateString("id-ID", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })
+              : "-"}
           </MDTypography>
         </MDBox>
         <MDBox pt={2} pb={3} px={3}>

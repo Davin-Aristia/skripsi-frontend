@@ -377,10 +377,24 @@ export default function CreatePaymentCustomerForm() {
           }}
         >
           <MDTypography variant="body2" fontWeight="medium" sx={{ color: "grey.600" }}>
-            Create Date: {paymentCustomer.createdAt || "-"}
+            Create Date:{" "}
+            {paymentCustomer.createdAt
+              ? new Date(paymentCustomer.createdAt).toLocaleDateString("id-ID", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })
+              : "-"}
           </MDTypography>
           <MDTypography variant="body2" fontWeight="medium" sx={{ color: "grey.600" }}>
-            Last Edit: {paymentCustomer.updatedAt || "-"}
+            Last Edit:{" "}
+            {paymentCustomer.updatedAt
+              ? new Date(paymentCustomer.updatedAt).toLocaleDateString("id-ID", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })
+              : "-"}
           </MDTypography>
         </MDBox>
 
@@ -559,6 +573,8 @@ export default function CreatePaymentCustomerForm() {
                 Total: Rp{" "}
                 {new Intl.NumberFormat("id-ID", {
                   style: "decimal",
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
                 }).format(paymentCustomer.total)}
               </MDBox>
             </MDBox>

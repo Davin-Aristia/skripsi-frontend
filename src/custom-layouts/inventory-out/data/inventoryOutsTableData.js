@@ -218,7 +218,13 @@ export default function data({ query }) {
 
   const rows = inventoryOuts.map((inventoryOut) => ({
     name: inventoryOut.name,
-    date: convertToLocalDate(inventoryOut.date),
+    date: inventoryOut.date
+      ? new Date(inventoryOut.date).toLocaleDateString("id-ID", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        })
+      : "-",
     customer: inventoryOut.customer.name,
     total: `Rp ${new Intl.NumberFormat("id-ID", {
       style: "decimal",

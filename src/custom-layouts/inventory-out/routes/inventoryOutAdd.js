@@ -531,6 +531,8 @@ export default function CreateInventoryOutForm() {
                         <h5>
                           {new Intl.NumberFormat("id-ID", {
                             style: "decimal",
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
                           }).format(detail.subtotal)}
                         </h5>
                       </TableCell>
@@ -581,6 +583,8 @@ export default function CreateInventoryOutForm() {
                 Total: Rp{" "}
                 {new Intl.NumberFormat("id-ID", {
                   style: "decimal",
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
                 }).format(inventoryOut.total)}
               </MDBox>
             </MDBox>

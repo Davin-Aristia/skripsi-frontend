@@ -141,7 +141,13 @@ export default function data({ query }) {
 
   const rows = paymentCustomers.map((paymentCustomer) => ({
     name: paymentCustomer.name,
-    date: convertToLocalDate(paymentCustomer.date),
+    date: paymentCustomer.date
+      ? new Date(paymentCustomer.date).toLocaleDateString("id-ID", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        })
+      : "-",
     customer: paymentCustomer.customer.name,
     total: `Rp ${new Intl.NumberFormat("id-ID", {
       style: "decimal",

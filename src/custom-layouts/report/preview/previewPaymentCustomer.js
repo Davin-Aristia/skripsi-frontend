@@ -70,7 +70,12 @@ const PreviewReport = () => {
                   <td style={{ textAlign: "center" }}>{formatDate(item.date)}</td>
                   <td>{item.customer}</td>
                   <td style={{ textAlign: "right" }}>
-                    Rp {new Intl.NumberFormat("id-ID").format(item.total)}
+                    Rp{" "}
+                    {new Intl.NumberFormat("id-ID", {
+                      style: "decimal",
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(item.total)}
                   </td>
                 </tr>
 
@@ -90,7 +95,13 @@ const PreviewReport = () => {
                             {item.details.map((detail, idx) => (
                               <tr key={idx}>
                                 <td>{detail.inventory_out}</td>
-                                <td>Rp {Number(detail.amount || 0).toLocaleString("id-ID")}</td>
+                                <td>
+                                  Rp{" "}
+                                  {Number(detail.amount || 0).toLocaleString("id-ID", {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  })}
+                                </td>
                               </tr>
                             ))}
                           </tbody>
@@ -114,9 +125,11 @@ const PreviewReport = () => {
               </td>
               <td style={{ textAlign: "right" }}>
                 Rp{" "}
-                {new Intl.NumberFormat("id-ID").format(
-                  reportData.reduce((sum, item) => sum + item.total, 0)
-                )}
+                {new Intl.NumberFormat("id-ID", {
+                  style: "decimal",
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }).format(reportData.reduce((sum, item) => sum + item.total, 0))}
               </td>
             </tr>
           </tfoot>

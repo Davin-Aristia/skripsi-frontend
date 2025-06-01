@@ -248,10 +248,24 @@ export default function CreateBookForm() {
           }}
         >
           <MDTypography variant="body2" fontWeight="medium" sx={{ color: "grey.600" }}>
-            Create Date: {createdAt || "-"}
+            Create Date:{" "}
+            {createdAt
+              ? new Date(createdAt).toLocaleDateString("id-ID", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })
+              : "-"}
           </MDTypography>
           <MDTypography variant="body2" fontWeight="medium" sx={{ color: "grey.600" }}>
-            Last Edit: {updatedAt || "-"}
+            Last Edit:{" "}
+            {updatedAt
+              ? new Date(updatedAt).toLocaleDateString("id-ID", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })
+              : "-"}
           </MDTypography>
         </MDBox>
         <MDBox pt={3} pb={3} px={3}>
@@ -499,6 +513,8 @@ export default function CreateBookForm() {
                             Rp{" "}
                             {new Intl.NumberFormat("id-ID", {
                               style: "decimal",
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
                             }).format(history.price)}
                           </TableCell>
                           <TableCell align="center">

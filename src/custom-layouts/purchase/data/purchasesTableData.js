@@ -216,7 +216,13 @@ export default function data({ query }) {
 
   const rows = purchases.map((purchase) => ({
     name: purchase.name,
-    date: convertToLocalDate(purchase.date),
+    date: purchase.date
+      ? new Date(purchase.date).toLocaleDateString("id-ID", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        })
+      : "-",
     vendor: purchase.vendor.company,
     total: `Rp ${new Intl.NumberFormat("id-ID", {
       style: "decimal",

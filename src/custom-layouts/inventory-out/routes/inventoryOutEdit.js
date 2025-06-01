@@ -372,10 +372,24 @@ export default function CreateInventoryOutForm() {
           }}
         >
           <MDTypography variant="body2" fontWeight="medium" sx={{ color: "grey.600" }}>
-            Create Date: {inventoryOut.createdAt || "-"}
+            Create Date:{" "}
+            {inventoryOut.createdAt
+              ? new Date(inventoryOut.createdAt).toLocaleDateString("id-ID", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })
+              : "-"}
           </MDTypography>
           <MDTypography variant="body2" fontWeight="medium" sx={{ color: "grey.600" }}>
-            Last Edit: {inventoryOut.updatedAt || "-"}
+            Last Edit:{" "}
+            {inventoryOut.updatedAt
+              ? new Date(inventoryOut.updatedAt).toLocaleDateString("id-ID", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })
+              : "-"}
           </MDTypography>
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
@@ -600,6 +614,8 @@ export default function CreateInventoryOutForm() {
                         <h5>
                           {new Intl.NumberFormat("id-ID", {
                             style: "decimal",
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
                           }).format(detail.subtotal)}
                         </h5>
                       </TableCell>
@@ -650,6 +666,8 @@ export default function CreateInventoryOutForm() {
                 Total: Rp{" "}
                 {new Intl.NumberFormat("id-ID", {
                   style: "decimal",
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
                 }).format(inventoryOut.total)}
               </MDBox>
             </MDBox>

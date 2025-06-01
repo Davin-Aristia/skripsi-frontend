@@ -46,18 +46,19 @@ function Customers() {
                 py={3}
                 px={2}
                 variant="gradient"
-                bgColor="info"
+                // bgColor="info"
                 borderRadius="lg"
                 coloredShadow="info"
                 display="flex"
                 justifyContent="space-between"
                 alignItems="center"
+                sx={{ backgroundColor: "#323232" }}
               >
                 <MDTypography variant="h6" color="white">
                   Customers Table
                 </MDTypography>
                 <NavLink to="/customer/add" style={{ textDecoration: "none" }}>
-                  <MDButton variant="gradient" color="dark">
+                  <MDButton variant="gradient" color="info">
                     <Icon sx={{ fontWeight: "bold" }}>add</Icon>
                     &nbsp;add new customer
                   </MDButton>

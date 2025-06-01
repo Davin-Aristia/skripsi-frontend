@@ -454,6 +454,8 @@ export default function CreatePaymentVendorForm() {
                 Total: Rp{" "}
                 {new Intl.NumberFormat("id-ID", {
                   style: "decimal",
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
                 }).format(paymentVendor.total)}
               </MDBox>
             </MDBox>

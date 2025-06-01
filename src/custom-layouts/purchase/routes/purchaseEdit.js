@@ -472,10 +472,24 @@ export default function CreatePurchaseForm() {
           }}
         >
           <MDTypography variant="body2" fontWeight="medium" sx={{ color: "grey.600" }}>
-            Create Date: {purchase.createdAt || "-"}
+            Create Date:{" "}
+            {purchase.createdAt
+              ? new Date(purchase.createdAt).toLocaleDateString("id-ID", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })
+              : "-"}
           </MDTypography>
           <MDTypography variant="body2" fontWeight="medium" sx={{ color: "grey.600" }}>
-            Last Edit: {purchase.updatedAt || "-"}
+            Last Edit:{" "}
+            {purchase.updatedAt
+              ? new Date(purchase.updatedAt).toLocaleDateString("id-ID", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })
+              : "-"}
           </MDTypography>
         </MDBox>
         <MDBox
@@ -789,6 +803,8 @@ export default function CreatePurchaseForm() {
                         <h5>
                           {new Intl.NumberFormat("id-ID", {
                             style: "decimal",
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
                           }).format(detail.subtotal)}
                         </h5>
                       </TableCell>
@@ -839,6 +855,8 @@ export default function CreatePurchaseForm() {
                 Total: Rp{" "}
                 {new Intl.NumberFormat("id-ID", {
                   style: "decimal",
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
                 }).format(purchase.total)}
               </MDBox>
             </MDBox>

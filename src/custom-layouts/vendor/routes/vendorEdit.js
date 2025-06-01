@@ -141,10 +141,24 @@ export default function CreateVendorForm() {
           }}
         >
           <MDTypography variant="body2" fontWeight="medium" sx={{ color: "grey.600" }}>
-            Create Date: {vendor.createdAt || "-"}
+            Create Date:{" "}
+            {vendor.createdAt
+              ? new Date(vendor.createdAt).toLocaleDateString("id-ID", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })
+              : "-"}
           </MDTypography>
           <MDTypography variant="body2" fontWeight="medium" sx={{ color: "grey.600" }}>
-            Last Edit: {vendor.updatedAt || "-"}
+            Last Edit:{" "}
+            {vendor.updatedAt
+              ? new Date(vendor.updatedAt).toLocaleDateString("id-ID", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })
+              : "-"}
           </MDTypography>
         </MDBox>
         <MDBox pt={2} pb={3} px={3}>

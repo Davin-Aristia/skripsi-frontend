@@ -138,7 +138,12 @@ const PreviewReport = () => {
                   <td style={{ textAlign: "center" }}>{formatDate(item.date)}</td>
                   <td>{item.vendor}</td>
                   <td style={{ textAlign: "right" }}>
-                    Rp {new Intl.NumberFormat("id-ID").format(item.total)}
+                    Rp{" "}
+                    {new Intl.NumberFormat("id-ID", {
+                      style: "decimal",
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(item.total)}
                   </td>
                 </tr>
 
@@ -163,10 +168,31 @@ const PreviewReport = () => {
                               <tr key={idx}>
                                 <td>{detail.product}</td>
                                 <td>{detail.quantity}</td>
-                                <td>Rp {detail.price.toLocaleString("id-ID")}</td>
-                                <td>Rp {detail.discount.toLocaleString("id-ID")}</td>
+                                <td>
+                                  Rp{" "}
+                                  {detail.price.toLocaleString("id-ID", {
+                                    style: "decimal",
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  })}
+                                </td>
+                                <td>
+                                  Rp{" "}
+                                  {detail.discount.toLocaleString("id-ID", {
+                                    style: "decimal",
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  })}
+                                </td>
                                 <td>{detail.tax.toLocaleString("id-ID")} %</td>
-                                <td>Rp {detail.subtotal.toLocaleString("id-ID")}</td>
+                                <td>
+                                  Rp{" "}
+                                  {detail.subtotal.toLocaleString("id-ID", {
+                                    style: "decimal",
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  })}
+                                </td>
                               </tr>
                             ))}
                           </tbody>
@@ -190,9 +216,11 @@ const PreviewReport = () => {
               </td>
               <td style={{ textAlign: "right" }}>
                 Rp{" "}
-                {new Intl.NumberFormat("id-ID").format(
-                  reportData.reduce((sum, item) => sum + item.total, 0)
-                )}
+                {new Intl.NumberFormat("id-ID", {
+                  style: "decimal",
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }).format(reportData.reduce((sum, item) => sum + item.total, 0))}
               </td>
             </tr>
           </tfoot>

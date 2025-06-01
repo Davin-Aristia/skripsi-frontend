@@ -180,18 +180,19 @@ function Products() {
                 py={3}
                 px={2}
                 variant="gradient"
-                bgColor="info"
+                bgColor="grey"
                 borderRadius="lg"
                 coloredShadow="info"
                 display="flex"
                 justifyContent="space-between"
                 alignItems="center"
+                sx={{ backgroundColor: "#323232" }}
               >
                 <MDTypography variant="h6" color="white">
                   Products Table
                 </MDTypography>
                 <NavLink to="/product/add" style={{ textDecoration: "none" }}>
-                  <MDButton variant="gradient" color="dark">
+                  <MDButton variant="gradient" color="info">
                     <Icon sx={{ fontWeight: "bold" }}>add</Icon>
                     &nbsp;add new product
                   </MDButton>

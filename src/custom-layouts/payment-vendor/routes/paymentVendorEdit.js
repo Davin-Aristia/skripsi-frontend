@@ -366,10 +366,24 @@ export default function CreatePaymentVendorForm() {
           }}
         >
           <MDTypography variant="body2" fontWeight="medium" sx={{ color: "grey.600" }}>
-            Create Date: {paymentVendor.createdAt || "-"}
+            Create Date:{" "}
+            {paymentVendor.createdAt
+              ? new Date(paymentVendor.createdAt).toLocaleDateString("id-ID", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })
+              : "-"}
           </MDTypography>
           <MDTypography variant="body2" fontWeight="medium" sx={{ color: "grey.600" }}>
-            Last Edit: {paymentVendor.updatedAt || "-"}
+            Last Edit:{" "}
+            {paymentVendor.updatedAt
+              ? new Date(paymentVendor.updatedAt).toLocaleDateString("id-ID", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })
+              : "-"}
           </MDTypography>
         </MDBox>
 
@@ -528,6 +542,8 @@ export default function CreatePaymentVendorForm() {
                 Total: Rp{" "}
                 {new Intl.NumberFormat("id-ID", {
                   style: "decimal",
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
                 }).format(paymentVendor.total)}
               </MDBox>
             </MDBox>
