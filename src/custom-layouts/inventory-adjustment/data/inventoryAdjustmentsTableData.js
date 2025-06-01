@@ -125,7 +125,13 @@ export default function data({ query }) {
 
   const rows = inventoryAdjustments.map((inventoryAdjustment) => ({
     product: inventoryAdjustment.product.name,
-    date: convertToLocalDate(inventoryAdjustment.date), // or another appropriate field
+    date: inventoryAdjustment.created_at
+      ? new Date(inventoryAdjustment.created_at).toLocaleDateString("id-ID", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        })
+      : "-",
     quantity: inventoryAdjustment.quantity,
     action: (
       <MDBox display="flex" alignItems="center" mt={{ xs: 2, sm: 0 }} ml={{ xs: -1.5, sm: 0 }}>
@@ -133,18 +139,18 @@ export default function data({ query }) {
           to={`/inventory-adjustment/${inventoryAdjustment.id}/edit`}
           style={{ textDecoration: "none" }}
         >
-          <MDButton variant="text" color="dark" iconOnly>
-            <Icon>edit</Icon>
+          <MDButton variant="text" color="info" iconOnly>
+            <Icon>visibility</Icon>
           </MDButton>
         </NavLink>
-        <MDButton
+        {/* <MDButton
           variant="text"
           color="error"
           iconOnly
           onClick={() => deleteInventoryAdjustment(inventoryAdjustment.id)}
         >
           <Icon>delete</Icon>
-        </MDButton>
+        </MDButton> */}
       </MDBox>
     ),
   }));

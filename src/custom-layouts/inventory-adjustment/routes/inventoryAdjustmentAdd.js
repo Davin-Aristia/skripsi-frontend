@@ -27,8 +27,9 @@ export default function CreateInventoryAdjustmentForm() {
 
   const initialInventoryAdjustmentState = {
     selectedProduct: null,
-    date: "",
+    // date: "",
     quantity: 0,
+    difference: 0,
     reason: "",
   };
 
@@ -68,8 +69,8 @@ export default function CreateInventoryAdjustmentForm() {
         "/inventory-adjustments",
         {
           product_id: inventoryAdjustment.selectedProduct.id,
-          date: ensureDateTimeFormat(inventoryAdjustment.date),
-          quantity: parseInt(inventoryAdjustment.quantity, 10),
+          // date: ensureDateTimeFormat(inventoryAdjustment.date),
+          quantity: parseInt(inventoryAdjustment.difference, 10),
           reason: inventoryAdjustment.reason,
         },
         {
@@ -128,13 +129,21 @@ export default function CreateInventoryAdjustmentForm() {
         </MDBox>
         <MDBox pt={2} pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit}>
-            <h3 style={{ paddingBottom: "10px" }}>InventoryAdjustment Information</h3>
             <MDBox mb={2}>
               <Autocomplete
                 disablePortal
-                onChange={(event, newValue) =>
-                  setInventoryAdjustment({ ...inventoryAdjustment, selectedProduct: newValue })
-                }
+                // onChange={(event, newValue) =>
+                //   setInventoryAdjustment({ ...inventoryAdjustment, selectedProduct: newValue })
+                // }
+                onChange={(event, newValue) => {
+                  const stock = newValue?.stock || 0;
+                  setInventoryAdjustment((prev) => ({
+                    ...prev,
+                    selectedProduct: newValue,
+                    // quantity: stock + (prev.difference ?? 0), // quantity adjusts with new stock
+                    difference: (prev.quantity ?? stock) - stock, // difference recalculated
+                  }));
+                }}
                 options={products}
                 getOptionLabel={(option) => option?.name || ""}
                 sx={{
@@ -144,8 +153,21 @@ export default function CreateInventoryAdjustmentForm() {
                 }}
                 renderInput={(params) => <MDInput {...params} label="Select Product" required />}
               />
+              {inventoryAdjustment.selectedProduct && (
+                <MDBox mt={1}>
+                  <MDTypography variant="subtitle2" fontWeight="bold">
+                    Stock Information
+                  </MDTypography>
+                  <MDTypography variant="body2">
+                    Stock: {inventoryAdjustment.selectedProduct.stock || "N/A"}
+                  </MDTypography>
+                  <MDTypography variant="body2">
+                    Min Stock: {inventoryAdjustment.selectedProduct.min_stock || "N/A"}
+                  </MDTypography>
+                </MDBox>
+              )}
             </MDBox>
-            <MDBox mb={2}>
+            {/* <MDBox mb={2}>
               <MDInput
                 type="date"
                 label="Date"
@@ -158,18 +180,53 @@ export default function CreateInventoryAdjustmentForm() {
                   shrink: true, // Ensures label stays on top even when the input is empty
                 }}
               />
-            </MDBox>
-            <MDBox mb={2}>
-              <MDInput
-                type="number"
-                label="Quantity"
-                fullWidth
-                value={inventoryAdjustment.quantity}
-                onChange={(e) =>
-                  setInventoryAdjustment({ ...inventoryAdjustment, quantity: e.target.value })
-                }
-              />
-            </MDBox>
+            </MDBox> */}
+            <Grid container spacing={5}>
+              <Grid item xs={6}>
+                <MDBox mb={2}>
+                  <MDInput
+                    type="number"
+                    label="Quantity"
+                    fullWidth
+                    value={inventoryAdjustment.quantity}
+                    // onChange={(e) =>
+                    //   setInventoryAdjustment({ ...inventoryAdjustment, quantity: e.target.value })
+                    // }
+                    onChange={(e) => {
+                      const newQuantity = parseInt(e.target.value) || 0;
+                      const stock = inventoryAdjustment.selectedProduct?.stock ?? 0;
+                      setInventoryAdjustment((prev) => ({
+                        ...prev,
+                        quantity: newQuantity,
+                        difference: newQuantity - stock, // auto-update difference
+                      }));
+                    }}
+                  />
+                </MDBox>
+              </Grid>
+              <Grid item xs={6}>
+                <MDBox mb={2}>
+                  <MDInput
+                    type="number"
+                    label="Difference"
+                    fullWidth
+                    value={inventoryAdjustment.difference}
+                    // onChange={(e) =>
+                    //   setInventoryAdjustment({ ...inventoryAdjustment, difference: e.target.value })
+                    // }
+                    onChange={(e) => {
+                      const newDifference = parseInt(e.target.value) || 0;
+                      const stock = inventoryAdjustment.selectedProduct?.stock ?? 0;
+                      setInventoryAdjustment((prev) => ({
+                        ...prev,
+                        difference: newDifference,
+                        quantity: stock + newDifference, // auto-update quantity
+                      }));
+                    }}
+                  />
+                </MDBox>
+              </Grid>
+            </Grid>
             <MDBox mb={2}>
               <MDInput
                 type="text"

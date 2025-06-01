@@ -192,10 +192,11 @@ export default function EditInventoryAdjustmentForm() {
         </MDBox>
         <MDBox pt={2} pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit}>
-            <h3 style={{ paddingBottom: "10px" }}>InventoryAdjustment Information</h3>
+            <h3 style={{ paddingBottom: "30px" }}>Inventory Adjustment Information</h3>
             <MDBox mb={2}>
               <Autocomplete
                 disablePortal
+                disabled
                 onChange={(event, newValue) =>
                   setInventoryAdjustment({ ...inventoryAdjustment, selectedProduct: newValue })
                 }
@@ -209,11 +210,28 @@ export default function EditInventoryAdjustmentForm() {
                 }}
                 renderInput={(params) => <MDInput {...params} label="Select Product" required />}
               />
+              {inventoryAdjustment.selectedProduct && (
+                <MDBox mt={1}>
+                  <MDTypography variant="subtitle2" fontWeight="bold">
+                    Stock Information
+                  </MDTypography>
+                  <MDTypography variant="body2">
+                    Stock: {inventoryAdjustment.selectedProduct.stock || "N/A"}
+                  </MDTypography>
+                  <MDTypography variant="body2">
+                    Min Stock: {inventoryAdjustment.selectedProduct.min_stock || "N/A"}
+                  </MDTypography>
+                </MDBox>
+              )}
             </MDBox>
-            <MDBox mb={2}>
+            {/* <MDBox mb={2}>
               <MDInput
                 type="date"
                 label="Date"
+                disabled
+                InputProps={{
+                  readOnly: true,
+                }}
                 fullWidth
                 value={inventoryAdjustment.date}
                 onChange={(e) =>
@@ -223,11 +241,15 @@ export default function EditInventoryAdjustmentForm() {
                   shrink: true, // Ensures label stays on top even when the input is empty
                 }}
               />
-            </MDBox>
+            </MDBox> */}
             <MDBox mb={2}>
               <MDInput
                 type="number"
                 label="Quantity"
+                disabled
+                InputProps={{
+                  readOnly: true,
+                }}
                 fullWidth
                 value={inventoryAdjustment.quantity}
                 onChange={(e) =>

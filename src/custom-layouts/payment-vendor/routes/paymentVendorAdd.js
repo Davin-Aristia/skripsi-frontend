@@ -46,7 +46,7 @@ export default function CreatePaymentVendorForm() {
 
   const initialPaymentVendorState = {
     date: "",
-    selectedVendor: {},
+    selectedVendor: null,
     total: 0,
   };
   // const initialDetailWizard = {
@@ -296,7 +296,7 @@ export default function CreatePaymentVendorForm() {
           width="30%"
         >
           <MDTypography variant="h5" fontWeight="medium" color="white" mt={1}>
-            Add New Payment
+            Add New Vendor Payment
           </MDTypography>
         </MDBox>
 
@@ -315,6 +315,22 @@ export default function CreatePaymentVendorForm() {
                 }}
                 renderInput={(params) => <MDInput {...params} label="Select Vendor" required />}
               />
+              {paymentVendor.selectedVendor && (
+                <MDBox mt={1}>
+                  <MDTypography variant="subtitle2" fontWeight="bold">
+                    Vendor Bank Information
+                  </MDTypography>
+                  <MDTypography variant="body2">
+                    Account Name: {paymentVendor.selectedVendor.account_name || "N/A"}
+                  </MDTypography>
+                  <MDTypography variant="body2">
+                    Account Number: {paymentVendor.selectedVendor.account_number || "N/A"}
+                  </MDTypography>
+                  <MDTypography variant="body2">
+                    Bank Account: {paymentVendor.selectedVendor.account_bank || "N/A"}
+                  </MDTypography>
+                </MDBox>
+              )}
             </MDBox>
             <MDBox mb={2}>
               <MDInput

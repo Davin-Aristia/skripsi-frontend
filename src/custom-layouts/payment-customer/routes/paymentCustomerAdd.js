@@ -302,7 +302,7 @@ export default function CreatePaymentCustomerForm() {
           width="30%"
         >
           <MDTypography variant="h5" fontWeight="medium" color="white" mt={1}>
-            Add New Payment
+            Add New Customer Payment
           </MDTypography>
         </MDBox>
 
