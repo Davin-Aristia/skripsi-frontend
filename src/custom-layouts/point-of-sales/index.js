@@ -31,6 +31,7 @@ import {
   Grid,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { v4 as uuidv4 } from "uuid";
 
 function POSPage() {
   const navigate = useNavigate();
@@ -137,7 +138,7 @@ function POSPage() {
   const updateList = (list, setList, product, type) => {
     let findProduct = list.find((i) => i.id === product.id);
 
-    if (findProduct) {
+    if (findProduct && type == "cart") {
       let newList = list.map((item) =>
         item.id === product.id
           ? {
@@ -154,7 +155,9 @@ function POSPage() {
     } else {
       let newItem = {
         ...product,
+        uniqueId: uuidv4(),
         quantity: 1,
+        discount: 0,
         tax: 11,
         totalAmount: product.price * (1 + 11 / 100),
       };
@@ -178,7 +181,7 @@ function POSPage() {
 
   const removeProductConsignment = async (product) => {
     const newConsignment = consignment.filter(
-      (consignmentItem) => consignmentItem.id !== product.id
+      (consignmentItem) => consignmentItem.uniqueId !== product.uniqueId
     );
     setConsignment(newConsignment);
   };
@@ -276,8 +279,16 @@ function POSPage() {
     // Allow empty string temporarily to prevent "032" issue
     // let newValue = value === "" ? "" : parseFloat(value) || 0;
 
-    let newValue = parseFloat(value) || 0;
-    if (newValue < 0) newValue = 0;
+    // let newValue = parseFloat(value) || 0;
+    // if (newValue < 0) newValue = 0;
+
+    let newValue;
+    if (field === "selectedVendor") {
+      newValue = value; // No parsing needed
+    } else {
+      newValue = parseFloat(value) || 0;
+      if (newValue < 0) newValue = 0;
+    }
 
     updatedList[index] = {
       ...updatedList[index],
@@ -312,36 +323,74 @@ function POSPage() {
       }));
     }
 
-    const newInventoryIn = {
-      date: new Date().toISOString(),
-      due_date: new Date().toISOString(),
-      vendor_id: selectedVendors.id,
-      // bill_date: ensureDateTimeFormat(inventoryIn.billDate),
-      // bill_number: inventoryIn.billNumber,
-      // delivery_number: inventoryIn.deliveryNumber,
-      // purchase_id: inventoryIn.selectedPurchase.id,
-      total: parseFloat(consignmentTotal),
-    };
+    // const newInventoryIn = {
+    //   date: new Date().toISOString(),
+    //   due_date: new Date().toISOString(),
+    //   vendor_id: selectedVendors.id,
+    //   // bill_date: ensureDateTimeFormat(inventoryIn.billDate),
+    //   // bill_number: inventoryIn.billNumber,
+    //   // delivery_number: inventoryIn.deliveryNumber,
+    //   // purchase_id: inventoryIn.selectedPurchase.id,
+    //   total: parseFloat(consignmentTotal),
+    // };
 
-    if (consignment.length > 0) {
-      newInventoryIn.stock_moves = consignment.map((item) => ({
-        product_id: item.id,
-        quantity: parseInt(item.quantity, 10),
-        price: parseFloat(item.price),
-        discount: parseFloat(item.discount),
-        tax: parseFloat(item.tax),
-        subtotal: parseFloat(item.totalAmount),
-      }));
-    }
+    // if (consignment.length > 0) {
+    //   newInventoryIn.stock_moves = consignment.map((item) => ({
+    //     product_id: item.id,
+    //     quantity: parseInt(item.quantity, 10),
+    //     price: parseFloat(item.price),
+    //     discount: parseFloat(item.discount),
+    //     tax: parseFloat(item.tax),
+    //     subtotal: parseFloat(item.totalAmount),
+    //   }));
+    // }
 
     try {
       // Send POST request to the API
+      // if (consignment.length > 0) {
+      //   const consignmentResponse = await API.post("/inventory-ins", newInventoryIn, {
+      //     headers: {
+      //       Authorization: `Bearer ${authToken}`,
+      //     },
+      //   });
+      // }
+
       if (consignment.length > 0) {
-        const consignmentResponse = await API.post("/inventory-ins", newInventoryIn, {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        });
+        // Group consignment items by vendor
+        const groupedByVendor = consignment.reduce((groups, item) => {
+          console.log("item.selectedVendor", item.selectedVendor.id);
+          const vendorId = item.selectedVendor.id;
+          if (!groups[vendorId]) {
+            groups[vendorId] = [];
+          }
+          groups[vendorId].push(item);
+          return groups;
+        }, {});
+
+        // Loop through each vendor group
+        for (const [vendorId, vendorItems] of Object.entries(groupedByVendor)) {
+          const newInventoryIn = {
+            date: new Date().toISOString(),
+            due_date: new Date().toISOString(),
+            vendor_id: parseInt(vendorId, 10),
+            total: vendorItems.reduce((sum, item) => sum + parseFloat(item.totalAmount), 0),
+            stock_moves: vendorItems.map((item) => ({
+              product_id: item.id,
+              quantity: parseInt(item.quantity, 10),
+              price: parseFloat(item.price),
+              discount: parseFloat(item.discount),
+              tax: parseFloat(item.tax),
+              subtotal: parseFloat(item.totalAmount),
+            })),
+          };
+
+          // Post to API
+          await API.post("/inventory-ins", newInventoryIn, {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          });
+        }
       }
 
       const response = await API.post("/inventory-outs", newInventoryOut, {
@@ -606,7 +655,7 @@ function POSPage() {
               <>
                 <MDBox display="flex" alignItems="center" gap={2} mb={2}>
                   <h1 style={{ margin: 0 }}>Consignment</h1>
-                  <Autocomplete
+                  {/* <Autocomplete
                     disablePortal
                     value={selectedVendors}
                     onChange={(e, newValue) => setSelectedVendor(newValue)}
@@ -618,7 +667,7 @@ function POSPage() {
                       "& .MuiInputLabel-root": { lineHeight: "1.5" },
                     }}
                     renderInput={(params) => <MDInput {...params} label="Select Vendor" required />}
-                  />
+                  /> */}
                 </MDBox>
                 <div className="table-responsive bg-dark mb-5">
                   <table className="table table-responsive table-dark table-hover">
@@ -637,7 +686,48 @@ function POSPage() {
                       {consignment
                         ? consignment.map((consignmentProduct, key) => (
                             <tr key={key}>
-                              <td>{consignmentProduct.name}</td>
+                              <td style={{ verticalAlign: "top" }}>
+                                <div style={{ display: "flex", flexDirection: "column" }}>
+                                  <Autocomplete
+                                    disablePortal
+                                    value={consignmentProduct.selectedVendor}
+                                    // onChange={(e, newValue) => setSelectedVendor(newValue)}
+                                    onChange={(event, newValue) =>
+                                      updateProduct(
+                                        consignment,
+                                        setConsignment,
+                                        key,
+                                        "selectedVendor",
+                                        newValue
+                                      )
+                                    }
+                                    options={vendors}
+                                    disableClearable
+                                    getOptionLabel={(option) => option?.company || ""}
+                                    sx={{
+                                      width: 210, // Adjust width as needed
+                                      "& .MuiInputLabel-root": {
+                                        color: "#fff", // Set label (Select Vendor) to white or any contrasting color
+                                        lineHeight: "1.5",
+                                      },
+                                      "& .MuiInputBase-input": {
+                                        color: "#fff", // Set input text color to white
+                                      },
+                                      "& .MuiInputBase-root": {
+                                        backgroundColor: "#333", // Optional: match the dark table background
+                                      },
+                                      "& .MuiPaper-root": {
+                                        backgroundColor: "#fff", // Keep dropdown list background white
+                                        color: "#000", // Dropdown text color
+                                      },
+                                    }}
+                                    renderInput={(params) => (
+                                      <MDInput {...params} label="Select Vendor" required />
+                                    )}
+                                  />
+                                  <div style={{ marginTop: "8px" }}>{consignmentProduct.name}</div>
+                                </div>
+                              </td>
                               <td>
                                 <input
                                   type="number"
