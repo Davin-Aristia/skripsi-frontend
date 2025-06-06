@@ -413,6 +413,18 @@ export default function CreateInventoryOutForm() {
                         borderTop: `${borderWidth[2]} solid ${light.main}`,
                       })}
                     >
+                      Tax
+                    </MDBox>
+                    <MDBox
+                      component="th"
+                      width="auto"
+                      py={1.5}
+                      px={3}
+                      sx={({ palette: { light }, borders: { borderWidth } }) => ({
+                        borderBottom: `${borderWidth[1]} solid ${light.main}`,
+                        borderTop: `${borderWidth[2]} solid ${light.main}`,
+                      })}
+                    >
                       Subtotal (Rp)
                     </MDBox>
                     <MDBox

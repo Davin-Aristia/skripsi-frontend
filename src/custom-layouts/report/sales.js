@@ -141,6 +141,11 @@ export default function CreateSalesForm() {
     return jakartaTime.toISOString().split("T")[0];
   };
 
+  const formatDate = (dateStr) => {
+    const options = { day: "2-digit", month: "long", year: "numeric" };
+    return new Date(dateStr).toLocaleDateString("en-GB", options);
+  };
+
   const exportSimpleExcel = async (fromDate, toDate, customerId) => {
     const data = await fetchSalesData(fromDate, toDate, customerId);
     if (data.length === 0) {
@@ -151,15 +156,32 @@ export default function CreateSalesForm() {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Sales Report");
 
-    worksheet.columns = [
-      { header: "No", key: "no", width: 10 },
-      { header: "Sales Order", key: "name", width: 30 },
-      { header: "Date", key: "date", width: 15 },
-      { header: "Customer", key: "customer", width: 20 },
-      { header: "Total", key: "total", width: 15 },
-    ];
+    worksheet.mergeCells("A1:E1");
+    const titleCell = worksheet.getCell("A1");
+    titleCell.value = "Sales Report";
+    titleCell.font = { size: 14, bold: true };
+    titleCell.alignment = { horizontal: "center", vertical: "middle" };
 
-    worksheet.getRow(1).eachCell((cell) => {
+    // Row 2: Period
+    worksheet.mergeCells("A2:E2");
+    const periodCell = worksheet.getCell("A2");
+    periodCell.value = `Period: ${formatDate(fromDate)} - ${formatDate(toDate)}`;
+    periodCell.font = { italic: true };
+    periodCell.alignment = { horizontal: "center", vertical: "middle" };
+
+    worksheet.addRow([]);
+
+    // worksheet.columns = [
+    //   { header: "No", key: "no", width: 10 },
+    //   { header: "Sales Order", key: "name", width: 30 },
+    //   { header: "Date", key: "date", width: 15 },
+    //   { header: "Customer", key: "customer", width: 20 },
+    //   { header: "Total", key: "total", width: 15 },
+    // ];
+
+    const headerRow = worksheet.addRow(["No", "Sales", "Date", "Customer", "Total"]);
+
+    headerRow.eachCell((cell) => {
       cell.alignment = { horizontal: "center", vertical: "middle" }; // Center align
       cell.font = { bold: true }; // Make header bold
       cell.border = {
@@ -169,6 +191,14 @@ export default function CreateSalesForm() {
         right: { style: "thin" },
       };
     });
+
+    worksheet.columns = [
+      { key: "no", width: 10 },
+      { key: "name", width: 30 },
+      { key: "date", width: 15 },
+      { key: "customer", width: 20 },
+      { key: "total", width: 15 },
+    ];
 
     // data.forEach((item) => {
     //   worksheet.addRow(item);
@@ -180,7 +210,7 @@ export default function CreateSalesForm() {
       const row = worksheet.addRow({
         no: index + 1, // Incremental number starting from 1
         name: item.name,
-        date: convertToLocalDate(item.date),
+        date: formatDate(item.date),
         customer: item.customer,
         total: `Rp ${new Intl.NumberFormat("id-ID", {
           style: "decimal",
@@ -201,6 +231,9 @@ export default function CreateSalesForm() {
           // 1 = No, 3 = Date
           cell.alignment = { horizontal: "center" };
         }
+        if (colNumber === 5) {
+          cell.alignment = { horizontal: "right" };
+        }
       });
     });
 
@@ -219,6 +252,7 @@ export default function CreateSalesForm() {
     // Merge first 4 cells for "Total" label
     worksheet.mergeCells(`A${totalRow.number}:D${totalRow.number}`);
     totalRow.getCell(1).alignment = { horizontal: "right" }; // Right align "Total"
+    totalRow.getCell(5).alignment = { horizontal: "right" }; // Right align "Total"
     totalRow.getCell(1).font = { bold: true }; // Bold font for "Total"
     totalRow.getCell(5).font = { bold: true }; // Bold font for total value
     totalRow.eachCell((cell) => {
@@ -234,7 +268,7 @@ export default function CreateSalesForm() {
     const blob = new Blob([buffer], {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
-    saveAs(blob, "sales.xlsx");
+    saveAs(blob, "Sales.xlsx");
     toast.success("Export successful");
   };
 

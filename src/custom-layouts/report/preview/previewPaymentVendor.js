@@ -26,7 +26,7 @@ const PreviewReport = () => {
   return (
     <BasicLayout>
       <div style={{ padding: "20px", textAlign: "center", fontFamily: "Arial, sans-serif" }}>
-        <h2 style={{ marginBottom: "5px", fontWeight: "bold" }}>PaymentVendor Report</h2>
+        <h2 style={{ marginBottom: "5px", fontWeight: "bold" }}>Payment Vendor Report</h2>
         <p style={{ fontSize: "14px", fontWeight: "bold", color: "#333" }}>
           Report Period:{" "}
           <span style={{ fontWeight: "normal" }}>

@@ -152,7 +152,7 @@ export default function CreateStockMoveForm() {
     }
 
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("StockMove Report");
+    const worksheet = workbook.addWorksheet("Stock Move Report");
 
     worksheet.mergeCells("A1:F1");
     const titleCell = worksheet.getCell("A1");
@@ -235,7 +235,7 @@ export default function CreateStockMoveForm() {
     const blob = new Blob([buffer], {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
-    saveAs(blob, "stockMove.xlsx");
+    saveAs(blob, "Stock Move.xlsx");
     toast.success("Export successful");
   };
 
@@ -291,7 +291,7 @@ export default function CreateStockMoveForm() {
           width="30%"
         >
           <MDTypography variant="h5" fontWeight="medium" color="white" mt={1}>
-            StockMove Report
+            Stock Move Report
           </MDTypography>
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>

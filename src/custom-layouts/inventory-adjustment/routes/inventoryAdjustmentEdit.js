@@ -28,7 +28,7 @@ export default function EditInventoryAdjustmentForm() {
 
   const initialInventoryAdjustmentState = {
     selectedProduct: null,
-    date: "",
+    // date: "",
     quantity: 0,
     reason: "",
   };
@@ -71,7 +71,7 @@ export default function EditInventoryAdjustmentForm() {
         console.log("inventoryAdjustment", inventoryAdjustment);
         setInventoryAdjustment({
           selectedProduct: inventoryAdjustment.product,
-          date: convertToLocalDate(inventoryAdjustment.date),
+          // date: convertToLocalDate(inventoryAdjustment.date),
           reason: inventoryAdjustment.reason,
           quantity: inventoryAdjustment.quantity,
           createdAt: convertToLocalDate(inventoryAdjustment.created_at),
@@ -103,7 +103,7 @@ export default function EditInventoryAdjustmentForm() {
         `/inventory-adjustments/${id}`,
         {
           product_id: inventoryAdjustment.selectedProduct.id,
-          date: ensureDateTimeFormat(inventoryAdjustment.date),
+          // date: ensureDateTimeFormat(inventoryAdjustment.date),
           quantity: parseInt(inventoryAdjustment.quantity, 10),
           reason: inventoryAdjustment.reason,
         },
@@ -245,7 +245,7 @@ export default function EditInventoryAdjustmentForm() {
             <MDBox mb={2}>
               <MDInput
                 type="number"
-                label="Quantity"
+                label="Adjusted Quantity"
                 disabled
                 InputProps={{
                   readOnly: true,
