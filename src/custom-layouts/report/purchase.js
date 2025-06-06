@@ -323,7 +323,7 @@ export default function CreatePurchaseForm() {
                         lineHeight: "1.5", // Adjust the line height for proper vertical alignment
                       },
                     }}
-                    renderInput={(params) => <MDInput {...params} label="Select Vendor" required />}
+                    renderInput={(params) => <MDInput {...params} label="Select Vendor" />}
                   />
                 </MDBox>
               </Grid>

@@ -192,13 +192,14 @@ export default function CreateInventoryAdjustmentForm() {
                     // onChange={(e) =>
                     //   setInventoryAdjustment({ ...inventoryAdjustment, quantity: e.target.value })
                     // }
+                    required
                     onChange={(e) => {
-                      const newQuantity = parseInt(e.target.value) || 0;
+                      const newQuantity = e.target.value;
                       const stock = inventoryAdjustment.selectedProduct?.stock ?? 0;
                       setInventoryAdjustment((prev) => ({
                         ...prev,
                         quantity: newQuantity,
-                        difference: newQuantity - stock, // auto-update difference
+                        difference: parseInt(newQuantity) - stock, // auto-update difference
                       }));
                     }}
                   />
@@ -214,13 +215,14 @@ export default function CreateInventoryAdjustmentForm() {
                     // onChange={(e) =>
                     //   setInventoryAdjustment({ ...inventoryAdjustment, difference: e.target.value })
                     // }
+                    required
                     onChange={(e) => {
-                      const newDifference = parseInt(e.target.value) || 0;
+                      const newDifference = e.target.value;
                       const stock = inventoryAdjustment.selectedProduct?.stock ?? 0;
                       setInventoryAdjustment((prev) => ({
                         ...prev,
                         difference: newDifference,
-                        quantity: stock + newDifference, // auto-update quantity
+                        quantity: stock + parseInt(newDifference), // auto-update quantity
                       }));
                     }}
                   />

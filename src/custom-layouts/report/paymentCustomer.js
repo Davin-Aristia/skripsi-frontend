@@ -324,9 +324,7 @@ export default function CreatePaymentCustomerForm() {
                         lineHeight: "1.5", // Adjust the line height for proper vertical alignment
                       },
                     }}
-                    renderInput={(params) => (
-                      <MDInput {...params} label="Select Customer" required />
-                    )}
+                    renderInput={(params) => <MDInput {...params} label="Select Customer" />}
                   />
                 </MDBox>
               </Grid>

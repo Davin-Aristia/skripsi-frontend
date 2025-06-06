@@ -339,9 +339,7 @@ export default function CreateStockMoveForm() {
                         lineHeight: "1.5", // Adjust the line height for proper vertical alignment
                       },
                     }}
-                    renderInput={(params) => (
-                      <MDInput {...params} label="Select Product" required />
-                    )}
+                    renderInput={(params) => <MDInput {...params} label="Select Product" />}
                   />
                 </MDBox>
               </Grid>
@@ -359,9 +357,7 @@ export default function CreateStockMoveForm() {
                         lineHeight: "1.5", // Adjust the line height for proper vertical alignment
                       },
                     }}
-                    renderInput={(params) => (
-                      <MDInput {...params} label="Select Category" required />
-                    )}
+                    renderInput={(params) => <MDInput {...params} label="Select Category" />}
                   />
                 </MDBox>
               </Grid>
