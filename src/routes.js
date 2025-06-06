@@ -54,6 +54,7 @@ import InventoryReport from "custom-layouts/report/inventory";
 import InventoryInReport from "custom-layouts/report/inventoryIn";
 import PaymentCustomerReport from "custom-layouts/report/paymentCustomer";
 import PaymentVendorReport from "custom-layouts/report/paymentVendor";
+import StockMoveReport from "custom-layouts/report/stockMove";
 // import PreviewReport from "custom-layouts/report/previewReport";
 import Billing from "layouts/billing";
 // import RTL from "layouts/rtl";
@@ -333,6 +334,19 @@ const routes = [
         ),
         route: "/inventory-report",
         component: <InventoryReport />,
+        roles: ["owner"],
+      },
+      {
+        type: "collapse",
+        name: "Stock Move",
+        key: "stock-move-report",
+        icon: (
+          <Icon fontSize="small" style={{ marginLeft: "30px" }}>
+            history
+          </Icon>
+        ),
+        route: "/stock-move-report",
+        component: <StockMoveReport />,
         roles: ["owner"],
       },
     ],

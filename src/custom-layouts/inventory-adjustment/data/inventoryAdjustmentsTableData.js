@@ -139,8 +139,11 @@ export default function data({ query }) {
           to={`/inventory-adjustment/${inventoryAdjustment.id}/edit`}
           style={{ textDecoration: "none" }}
         >
-          <MDButton variant="text" color="info" iconOnly>
+          {/* <MDButton variant="text" color="info" iconOnly>
             <Icon>visibility</Icon>
+          </MDButton> */}
+          <MDButton variant="text" color="dark" iconOnly>
+            <Icon>edit</Icon>
           </MDButton>
         </NavLink>
         {/* <MDButton

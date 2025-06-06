@@ -186,7 +186,7 @@ export default function CreateInventoryAdjustmentForm() {
                 <MDBox mb={2}>
                   <MDInput
                     type="number"
-                    label="Quantity"
+                    label="Counted Quantity"
                     fullWidth
                     value={inventoryAdjustment.quantity}
                     // onChange={(e) =>
