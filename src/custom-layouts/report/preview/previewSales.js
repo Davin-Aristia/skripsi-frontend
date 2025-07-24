@@ -11,8 +11,22 @@ const PreviewReport = () => {
   };
 
   const formatDate = (dateStr) => {
+    if (!dateStr) return null;
+
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return null;
     const options = { day: "2-digit", month: "long", year: "numeric" };
     return new Date(dateStr).toLocaleDateString("en-GB", options);
+  };
+
+  const formatDateRange = (from, to) => {
+    const fromFormatted = formatDate(from);
+    const toFormatted = formatDate(to);
+
+    if (!fromFormatted && !toFormatted) return "All Dates";
+    if (fromFormatted && !toFormatted) return `From ${fromFormatted}`;
+    if (!fromFormatted && toFormatted) return `Until ${toFormatted}`;
+    return `${fromFormatted} - ${toFormatted}`;
   };
 
   const [expandedIndexes, setExpandedIndexes] = useState([]);
@@ -29,9 +43,7 @@ const PreviewReport = () => {
         <h2 style={{ marginBottom: "5px", fontWeight: "bold" }}>Sales Report</h2>
         <p style={{ fontSize: "14px", fontWeight: "bold", color: "#333" }}>
           Report Period:{" "}
-          <span style={{ fontWeight: "normal" }}>
-            {formatDate(fromDate)} - {formatDate(toDate)}
-          </span>
+          <span style={{ fontWeight: "normal" }}>{formatDateRange(fromDate, toDate)}</span>
         </p>
 
         <table

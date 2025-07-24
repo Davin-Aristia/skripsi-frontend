@@ -66,6 +66,7 @@ function Basic() {
         password,
       });
       localStorage.setItem("authToken", response.data.response.token);
+      localStorage.setItem("username", response.data.response.username);
       const role = response.data.response.role;
       localStorage.setItem("role", role);
 

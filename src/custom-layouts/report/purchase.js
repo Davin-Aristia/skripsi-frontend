@@ -141,8 +141,22 @@ export default function CreatePurchaseForm() {
   };
 
   const formatDate = (dateStr) => {
+    if (!dateStr) return null;
+
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return null;
     const options = { day: "2-digit", month: "long", year: "numeric" };
     return new Date(dateStr).toLocaleDateString("en-GB", options);
+  };
+
+  const formatDateRange = (from, to) => {
+    const fromFormatted = formatDate(from);
+    const toFormatted = formatDate(to);
+
+    if (!fromFormatted && !toFormatted) return "All Dates";
+    if (fromFormatted && !toFormatted) return `From ${fromFormatted}`;
+    if (!fromFormatted && toFormatted) return `Until ${toFormatted}`;
+    return `${fromFormatted} - ${toFormatted}`;
   };
 
   const exportSimpleExcel = async (fromDate, toDate, vendorId) => {
@@ -164,7 +178,7 @@ export default function CreatePurchaseForm() {
     // Row 2: Period
     worksheet.mergeCells("A2:E2");
     const periodCell = worksheet.getCell("A2");
-    periodCell.value = `Period: ${formatDate(fromDate)} - ${formatDate(toDate)}`;
+    periodCell.value = `Period: ${formatDateRange(fromDate, toDate)}`;
     periodCell.font = { italic: true };
     periodCell.alignment = { horizontal: "center", vertical: "middle" };
 

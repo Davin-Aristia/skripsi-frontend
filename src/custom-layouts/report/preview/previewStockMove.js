@@ -11,6 +11,10 @@ const PreviewReport = () => {
   };
 
   const formatDate = (dateStr) => {
+    if (!dateStr) return null;
+
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return null;
     const options = { day: "2-digit", month: "long", year: "numeric" };
     return new Date(dateStr).toLocaleDateString("en-GB", options);
   };
@@ -23,15 +27,23 @@ const PreviewReport = () => {
     );
   };
 
+  const formatDateRange = (from, to) => {
+    const fromFormatted = formatDate(from);
+    const toFormatted = formatDate(to);
+
+    if (!fromFormatted && !toFormatted) return "All Dates";
+    if (fromFormatted && !toFormatted) return `From ${fromFormatted}`;
+    if (!fromFormatted && toFormatted) return `Until ${toFormatted}`;
+    return `${fromFormatted} - ${toFormatted}`;
+  };
+
   return (
     <BasicLayout>
       <div style={{ padding: "20px", textAlign: "center", fontFamily: "Arial, sans-serif" }}>
         <h2 style={{ marginBottom: "5px", fontWeight: "bold" }}>StockMove Report</h2>
         <p style={{ fontSize: "14px", fontWeight: "bold", color: "#333" }}>
           Report Period:{" "}
-          <span style={{ fontWeight: "normal" }}>
-            {formatDate(fromDate)} - {formatDate(toDate)}
-          </span>
+          <span style={{ fontWeight: "normal" }}>{formatDateRange(fromDate, toDate)}</span>
         </p>
 
         <table
@@ -89,6 +101,22 @@ const PreviewReport = () => {
                           paddingBottom: "10px", // space below the border inside td
                         }}
                       ></td>
+                    </tr>
+                    <tr>
+                      <td colSpan={2}>
+                        <table style={{ width: "100%" }}>
+                          <tbody>
+                            <tr>
+                              <th width="35%">Date</th>
+                              <th width="65%">Description</th>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </td>
+                      <th width="10%">Initial</th>
+                      <th width="10%">In</th>
+                      <th width="10%">Out</th>
+                      <th width="10%">Last</th>
                     </tr>
 
                     {/* Render all detail rows without dividers */}
