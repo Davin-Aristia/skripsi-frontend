@@ -58,6 +58,8 @@ export default function data({ query }) {
   const [openConfirm, setOpenConfirm] = useState(false);
   const [inventoryOutToDelete, setInventoryOutToDelete] = useState(null);
 
+  const [role, setRole] = useState(localStorage.getItem("role") || "invalid");
+
   const handlePrintClick = async (id) => {
     try {
       const response = await API.get(`/inventory-outs/${id}`, {
@@ -238,14 +240,16 @@ export default function data({ query }) {
             <Icon>edit</Icon>
           </MDButton>
         </NavLink>
-        <MDButton
-          variant="text"
-          color="error"
-          iconOnly
-          onClick={() => handleDeleteClick(inventoryOut.id)}
-        >
-          <Icon>delete</Icon>
-        </MDButton>
+        {role === "owner" && (
+          <MDButton
+            variant="text"
+            color="error"
+            iconOnly
+            onClick={() => handleDeleteClick(inventoryOut.id)}
+          >
+            <Icon>delete</Icon>
+          </MDButton>
+        )}
         <MDButton
           variant="text"
           color="info"
