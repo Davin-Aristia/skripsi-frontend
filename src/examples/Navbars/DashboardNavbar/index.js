@@ -59,7 +59,8 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator, darkMode } = controller;
   const [openMenu, setOpenMenu] = useState(false);
   const route = useLocation().pathname.split("/").slice(1);
-  const [username, setUsername] = useState(localStorage.getItem("username") || "invalid");
+  const [email, setEmail] = useState(localStorage.getItem("email") || "invalid");
+  const [role, setRole] = useState(localStorage.getItem("role") || "invalid");
 
   const { pathname } = useLocation();
 
@@ -167,12 +168,23 @@ function DashboardNavbar({ absolute, light, isMini }) {
               <MDInput label="Search here" />
             </MDBox> */}
             <MDBox color={light ? "white" : "inherit"}>
-              <Link to="/authentication/sign-in/basic">
-                <IconButton sx={navbarIconButton} size="small" disableRipple>
-                  {username}
+              {/* <Link to="/authentication/sign-in/basic"> */}
+              {/* <IconButton sx={navbarIconButton} size="small" disableRipple>
+                  {email}
                   <Icon sx={iconsStyle}>account_circle</Icon>
-                </IconButton>
-              </Link>
+                </IconButton> */}
+              <MDBox size="small" disableRipple>
+                <MDBox display="flex" alignItems="center" gap={1}>
+                  <MDBox textAlign="right">
+                    <div style={{ fontSize: "1rem", fontWeight: 500 }}>{email}</div>
+                    <div style={{ fontSize: "0.75rem", color: "#777" }}>{role}</div>
+                  </MDBox>
+                  <Icon sx={iconsStyle} fontSize="large">
+                    account_circle
+                  </Icon>
+                </MDBox>
+              </MDBox>
+              {/* </Link> */}
               {/* <IconButton
                 size="small"
                 disableRipple

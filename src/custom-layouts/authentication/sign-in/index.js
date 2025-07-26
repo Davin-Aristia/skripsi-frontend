@@ -21,8 +21,8 @@ import { Link, useNavigate } from "react-router-dom";
 
 // @mui material components
 import Card from "@mui/material/Card";
-import Switch from "@mui/material/Switch";
-import Grid from "@mui/material/Grid";
+import Icon from "@mui/material/Icon";
+import IconButton from "@mui/material/IconButton";
 import MuiLink from "@mui/material/Link";
 import Snackbar from "@mui/material/Snackbar";
 import { toast } from "react-toastify";
@@ -49,12 +49,71 @@ function Basic() {
   const navigate = useNavigate();
 
   const [rememberMe, setRememberMe] = useState(false);
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const [error, setError] = useState(null);
+  const [step, setStep] = useState(1); // 1: email, 2: OTP, 3: new password
+  const [otp, setOtp] = useState("");
+  const [token, setToken] = useState(""); // returned from backend after verifying OTP
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleSetRememberMe = () => setRememberMe(!rememberMe);
+  const [showPassword, setShowPassword] = useState(false);
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
+
+  const handleSendOtp = async () => {
+    // send email to backend
+    try {
+      await API.put("/users/send-otp", { email });
+      setStep(2);
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.response) {
+        toast.error(error.response.data.response);
+      } else {
+        toast.error("Something went wrong with the server");
+      }
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    try {
+      const res = await API.put("/users/validate-otp", { email, otp });
+      setToken(res.data.response.token); // save token from backend
+      setStep(3);
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.response) {
+        toast.error(error.response.data.response);
+      } else {
+        toast.error("Something went wrong with the server");
+      }
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (newPassword !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+    try {
+      await API.put(
+        "/users/change-password",
+        { token, password: newPassword },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setStep(4);
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.response) {
+        toast.error(error.response.data.response);
+      } else {
+        toast.error("Something went wrong with the server");
+      }
+    }
+    // redirect or show success
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -62,16 +121,16 @@ function Basic() {
     try {
       // Send POST request to the API
       const response = await API.post("/users/signin", {
-        username,
+        email,
         password,
       });
       localStorage.setItem("authToken", response.data.response.token);
-      localStorage.setItem("username", response.data.response.username);
+      localStorage.setItem("email", response.data.response.email);
       const role = response.data.response.role;
       localStorage.setItem("role", role);
 
       // Clear the form fields after submission
-      setUsername("");
+      setEmail("");
       setPassword("");
 
       let path = "/sign-in"; // Default to sign-in if role is invalid
@@ -93,7 +152,6 @@ function Basic() {
       } else {
         toast.error("Something went wrong with the server");
       }
-      console.log("error:", error);
     }
   };
 
@@ -146,22 +204,40 @@ function Basic() {
           <MDBox component="form" role="form" onSubmit={handleLogin}>
             <MDBox mb={2}>
               <MDInput
-                type="username"
-                label="Username"
+                type="email"
+                label="Email"
                 fullWidth
-                value={username}
+                disabled={step !== 1 && step !== 4}
+                value={email}
                 required
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </MDBox>
             <MDBox mb={2}>
-              <MDInput
+              {/* <MDInput
                 type="password"
                 label="Password"
                 fullWidth
                 value={password}
+                disabled={step !== 1 && step !== 4}
                 required
                 onChange={(e) => setPassword(e.target.value)}
+              /> */}
+              <MDInput
+                type={showPassword ? "text" : "password"}
+                label="Password"
+                fullWidth
+                value={password}
+                disabled={step !== 1 && step !== 4}
+                required
+                onChange={(e) => setPassword(e.target.value)}
+                InputProps={{
+                  endAdornment: (
+                    <IconButton onClick={togglePasswordVisibility} edge="end">
+                      <Icon>{showPassword ? "visibility_off" : "visibility"}</Icon>
+                    </IconButton>
+                  ),
+                }}
               />
             </MDBox>
             {/* <MDBox display="flex" alignItems="center" ml={-1}>
@@ -177,13 +253,18 @@ function Basic() {
               </MDTypography>
             </MDBox> */}
             <MDBox mt={4} mb={1}>
-              <MDButton variant="gradient" color="info" fullWidth type="submit">
+              <MDButton
+                variant="gradient"
+                color="info"
+                fullWidth
+                type="submit"
+                disabled={step !== 1 && step !== 4}
+              >
                 sign in
               </MDButton>
             </MDBox>
-            {/* <MDBox mt={3} mb={1} textAlign="center">
-              <MDTypography variant="button" color="text">
-                Don&apos;t have an account?{" "}
+            <MDBox mt={2} mb={0} textAlign="center">
+              {/* <MDTypography variant="button" color="text">
                 <MDTypography
                   component={Link}
                   to="/authentication/sign-up"
@@ -192,10 +273,76 @@ function Basic() {
                   fontWeight="medium"
                   textGradient
                 >
-                  Sign up
+                  Forgot Password
                 </MDTypography>
-              </MDTypography>
-            </MDBox> */}
+              </MDTypography> */}
+              <MDBox>
+                {step === 1 && (
+                  <>
+                    <MDTypography variant="button" color="text">
+                      <MDTypography
+                        sx={{ cursor: "pointer" }}
+                        onClick={handleSendOtp}
+                        variant="button"
+                        color="info"
+                        fontWeight="medium"
+                        textGradient
+                      >
+                        Forgot Password
+                      </MDTypography>
+                    </MDTypography>
+                  </>
+                )}
+
+                {step === 2 && (
+                  <>
+                    <MDInput
+                      label="Enter OTP"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      fullWidth
+                      sx={{ mt: 2 }}
+                    />
+                    <MDButton onClick={handleVerifyOtp} fullWidth color="info" sx={{ mt: 2 }}>
+                      Verify OTP
+                    </MDButton>
+                    <MDButton variant="text" color="info" onClick={handleSendOtp} sx={{ mt: 1 }}>
+                      Resend OTP
+                    </MDButton>
+                  </>
+                )}
+
+                {step === 3 && (
+                  <>
+                    <MDInput
+                      label="New Password"
+                      type="password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      fullWidth
+                      sx={{ mt: 2 }}
+                    />
+                    <MDInput
+                      label="New Password"
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      fullWidth
+                      sx={{ mt: 2 }}
+                    />
+                    <MDButton onClick={handleResetPassword} fullWidth color="info" sx={{ mt: 2 }}>
+                      Reset Password
+                    </MDButton>
+                  </>
+                )}
+
+                {step === 4 && (
+                  <MDTypography variant="h6" color="success" textAlign="center" mt={2}>
+                    Password successfully changed!
+                  </MDTypography>
+                )}
+              </MDBox>
+            </MDBox>
           </MDBox>
         </MDBox>
       </Card>
