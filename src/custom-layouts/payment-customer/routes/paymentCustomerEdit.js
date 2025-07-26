@@ -49,6 +49,7 @@ export default function CreatePaymentCustomerForm() {
     { label: "Cash", value: "cash" },
     { label: "Credit", value: "credit" },
     { label: "Debit", value: "debit" },
+    { label: "Transfer Bank", value: "transfer" },
   ];
 
   const initialPaymentCustomerState = {

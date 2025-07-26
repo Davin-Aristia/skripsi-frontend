@@ -492,6 +492,7 @@ function POSPage() {
                     <MenuItem value="cash">Cash</MenuItem>
                     <MenuItem value="credit">Credit Card</MenuItem>
                     <MenuItem value="debit">Debit</MenuItem>
+                    <MenuItem value="transfer">Transfer Bank</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
