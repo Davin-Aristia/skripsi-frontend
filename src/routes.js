@@ -76,6 +76,7 @@ import inventoryOutRoutes from "custom-layouts/inventory-out/routes";
 import paymentCustomerRoutes from "custom-layouts/payment-customer/routes";
 import inventoryAdjustmentRoutes from "custom-layouts/inventory-adjustment/routes";
 import SignInCustom from "custom-layouts/authentication/sign-in";
+import ForgotPassword from "custom-layouts/authentication/forgotPassword";
 import PreviewReport from "custom-layouts/report";
 
 // @mui icons
@@ -358,6 +359,13 @@ const routes = [
     icon: <Icon fontSize="small">login</Icon>,
     route: "/sign-in",
     component: <SignInCustom />,
+    // roles: ["owner", "staff", "no-role"],
+  },
+  {
+    type: "sub-route",
+    key: "forgot-password",
+    route: "/forgot-password",
+    component: <ForgotPassword />,
     // roles: ["owner", "staff", "no-role"],
   },
   // {

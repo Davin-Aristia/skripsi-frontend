@@ -13,7 +13,8 @@ Coded by www.creative-tim.com
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
-import { useState } from "react";
+// import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 // react-router-dom components
@@ -47,10 +48,7 @@ import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 
 function Basic() {
   const navigate = useNavigate();
-
-  const [rememberMe, setRememberMe] = useState(false);
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
   const [step, setStep] = useState(1); // 1: email, 2: OTP, 3: new password
   const [otp, setOtp] = useState("");
@@ -58,15 +56,29 @@ function Basic() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const [resendTimer, setResendTimer] = useState(30); // 30-second countdown
+  const [canResend, setCanResend] = useState(false);
+
   const [showPassword, setShowPassword] = useState(false);
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword);
 
-  const handleSendOtp = async () => {
+  const handleSendOtp = async (e) => {
+    console.log("loh");
+    e.preventDefault();
+    console.log("loh 1");
     // send email to backend
     try {
-      await API.put("/users/send-otp", { email });
+      console.log("loh 2");
+      const response = await API.put("/users/send-otp", { email });
+      console.log("jalannnnnnn");
+      setCanResend(false);
+      setResendTimer(30);
+      toast.success(response.data.response);
       setStep(2);
     } catch (error) {
+      console.log("brp x jalan???");
       if (error.response && error.response.data && error.response.data.response) {
         toast.error(error.response.data.response);
       } else {
@@ -75,10 +87,30 @@ function Basic() {
     }
   };
 
+  useEffect(() => {
+    let interval;
+
+    if (!canResend && resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    }
+
+    if (resendTimer === 0) {
+      setCanResend(true);
+      clearInterval(interval);
+    }
+
+    return () => clearInterval(interval);
+  }, [resendTimer, canResend]);
+
   const handleVerifyOtp = async () => {
     try {
+      console.log("jalan kan verif nya? email, otp");
       const res = await API.put("/users/validate-otp", { email, otp });
+      console.log("res", res);
       setToken(res.data.response.token); // save token from backend
+      toast.success(res.data.message);
       setStep(3);
     } catch (error) {
       if (error.response && error.response.data && error.response.data.response) {
@@ -95,7 +127,7 @@ function Basic() {
       return;
     }
     try {
-      await API.put(
+      const response = await API.put(
         "/users/change-password",
         { token, password: newPassword },
         {
@@ -104,6 +136,7 @@ function Basic() {
           },
         }
       );
+      toast.success(response.data.response);
       setStep(4);
     } catch (error) {
       if (error.response && error.response.data && error.response.data.response) {
@@ -131,7 +164,6 @@ function Basic() {
 
       // Clear the form fields after submission
       setEmail("");
-      setPassword("");
 
       let path = "/sign-in"; // Default to sign-in if role is invalid
 
@@ -179,8 +211,11 @@ function Basic() {
           mb={1}
           textAlign="center"
         >
-          <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
+          <MDTypography variant="h4" fontWeight="medium" color="white" mt={0}>
             FlowTera
+          </MDTypography>
+          <MDTypography variant="h5" fontWeight="medium" color="white" mt={1}>
+            Forgot Password
           </MDTypography>
           {/* <Grid container spacing={3} justifyContent="center" sx={{ mt: 1, mb: 2 }}>
             <Grid item xs={2}>
@@ -200,8 +235,8 @@ function Basic() {
             </Grid>
           </Grid> */}
         </MDBox>
-        <MDBox pt={4} pb={3} px={3}>
-          <MDBox component="form" role="form" onSubmit={handleLogin}>
+        <MDBox pt={2} pb={3} px={3}>
+          <MDBox component="form" role="form" onSubmit={handleSendOtp}>
             <MDBox mb={2}>
               <MDInput
                 type="email"
@@ -213,76 +248,14 @@ function Basic() {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </MDBox>
-            <MDBox mb={2}>
-              {/* <MDInput
-                type="password"
-                label="Password"
-                fullWidth
-                value={password}
-                disabled={step !== 1 && step !== 4}
-                required
-                onChange={(e) => setPassword(e.target.value)}
-              /> */}
-              <MDInput
-                type={showPassword ? "text" : "password"}
-                label="Password"
-                fullWidth
-                value={password}
-                disabled={step !== 1 && step !== 4}
-                required
-                onChange={(e) => setPassword(e.target.value)}
-                InputProps={{
-                  endAdornment: (
-                    <IconButton onClick={togglePasswordVisibility} edge="end">
-                      <Icon>{showPassword ? "visibility_off" : "visibility"}</Icon>
-                    </IconButton>
-                  ),
-                }}
-              />
-            </MDBox>
-            {/* <MDBox display="flex" alignItems="center" ml={-1}>
-              <Switch checked={rememberMe} onChange={handleSetRememberMe} />
-              <MDTypography
-                variant="button"
-                fontWeight="regular"
-                color="text"
-                onClick={handleSetRememberMe}
-                sx={{ cursor: "pointer", userSelect: "none", ml: -1 }}
-              >
-                &nbsp;&nbsp;Remember me
-              </MDTypography>
-            </MDBox> */}
-            <MDBox mt={4} mb={1}>
-              <MDButton
-                variant="gradient"
-                color="info"
-                fullWidth
-                type="submit"
-                disabled={step !== 1 && step !== 4}
-              >
-                sign in
-              </MDButton>
-            </MDBox>
             <MDBox mt={2} mb={0} textAlign="center">
-              {/* <MDTypography variant="button" color="text">
-                <MDTypography
-                  component={Link}
-                  to="/authentication/sign-up"
-                  variant="button"
-                  color="info"
-                  fontWeight="medium"
-                  textGradient
-                >
-                  Forgot Password
-                </MDTypography>
-              </MDTypography> */}
               <MDBox>
                 {step === 1 && (
                   <>
                     <MDTypography variant="button" color="text">
-                      <MDTypography
-                        // sx={{ cursor: "pointer" }}
-                        // onClick={handleSendOtp}
+                      {/* <MDTypography
+                        sx={{ cursor: "pointer" }}
+                        onClick={handleSendOtp}
                         component={Link}
                         to="/forgot-password"
                         variant="button"
@@ -291,7 +264,17 @@ function Basic() {
                         textGradient
                       >
                         Forgot Password
-                      </MDTypography>
+                      </MDTypography> */}
+                      <MDButton
+                        variant="gradient"
+                        // onClick={handleSendOtp}
+                        color="info"
+                        fullWidth
+                        type="submit"
+                        disabled={step !== 1 && step !== 4}
+                      >
+                        Send OTP
+                      </MDButton>
                     </MDTypography>
                   </>
                 )}
@@ -303,13 +286,22 @@ function Basic() {
                       value={otp}
                       onChange={(e) => setOtp(e.target.value)}
                       fullWidth
-                      sx={{ mt: 2 }}
+                      sx={{ mt: 1 }}
                     />
                     <MDButton onClick={handleVerifyOtp} fullWidth color="info" sx={{ mt: 2 }}>
                       Verify OTP
                     </MDButton>
-                    <MDButton variant="text" color="info" onClick={handleSendOtp} sx={{ mt: 1 }}>
+                    {/* <MDButton variant="text" color="info" onClick={handleSendOtp} sx={{ mt: 1 }}>
                       Resend OTP
+                    </MDButton> */}
+                    <MDButton
+                      variant="text"
+                      color="info"
+                      onClick={handleSendOtp}
+                      disabled={!canResend}
+                      sx={{ mt: 1 }}
+                    >
+                      {canResend ? "Resend OTP" : `Resend in ${resendTimer}s`}
                     </MDButton>
                   </>
                 )}
@@ -318,19 +310,33 @@ function Basic() {
                   <>
                     <MDInput
                       label="New Password"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       fullWidth
-                      sx={{ mt: 2 }}
+                      sx={{ mt: 1 }}
+                      InputProps={{
+                        endAdornment: (
+                          <IconButton onClick={togglePasswordVisibility} edge="end">
+                            <Icon>{showPassword ? "visibility_off" : "visibility"}</Icon>
+                          </IconButton>
+                        ),
+                      }}
                     />
                     <MDInput
-                      label="New Password"
-                      type="password"
+                      label="Confirm Password"
+                      type={showConfirmPassword ? "text" : "password"}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       fullWidth
                       sx={{ mt: 2 }}
+                      InputProps={{
+                        endAdornment: (
+                          <IconButton onClick={toggleConfirmPasswordVisibility} edge="end">
+                            <Icon>{showConfirmPassword ? "visibility_off" : "visibility"}</Icon>
+                          </IconButton>
+                        ),
+                      }}
                     />
                     <MDButton onClick={handleResetPassword} fullWidth color="info" sx={{ mt: 2 }}>
                       Reset Password
@@ -343,6 +349,26 @@ function Basic() {
                     Password successfully changed!
                   </MDTypography>
                 )}
+
+                <MDTypography
+                  component={Link}
+                  to="/sign-in"
+                  sx={{
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    mt: 2,
+                  }}
+                  // onClick={handleBackToSignIn}
+                  variant="button"
+                  color="info"
+                  fontWeight="medium"
+                  textGradient
+                >
+                  <Icon sx={{ fontSize: "1rem", mr: 0.5 }}>arrow_back</Icon>
+                  Back to Sign In
+                </MDTypography>
               </MDBox>
             </MDBox>
           </MDBox>
